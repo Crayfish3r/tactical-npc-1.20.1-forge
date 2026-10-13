@@ -1,0 +1,28 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+[[mods]]
+modId="tacticalnpcai"
+version="0.2.0"
+displayName="Tactical NPC AI - PvP Edition"
+authors="Zuma"
+displayTest="MATCH_VERSION"
+description='''Server-authoritative tactical NPCs using TaCZ. NPCs compatibility is a separate optional artifact.'''
+[[dependencies.tacticalnpcai]]
+modId="forge"
+mandatory=true
+versionRange="[47.4.20,48)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.tacticalnpcai]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1]"
+ordering="NONE"
+side="BOTH"
+[[dependencies.tacticalnpcai]]
+modId="tacz"
+mandatory=true
+versionRange="[1.1.8-hotfix2]"
+ordering="AFTER"
+side="BOTH"

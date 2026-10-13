@@ -1,0 +1,39 @@
+{
+  "schema": "proposal-only; implement in own mod config; NOT a TACZ NPCs config file",
+  "difficulty": {
+    "profile": "hardcore_fair",
+    "minReactionTicks": 4,
+    "maxReactionTicks": 8,
+    "turnRateDegPerTick": 14.0,
+    "aimNoiseDegNear": 0.7,
+    "aimNoiseDegFar": 2.0,
+    "lastSeenMemoryTicks": 100,
+    "sharingDelayTicks": 8
+  },
+  "sensors": {
+    "combatVisionIntervalTicks": 3,
+    "idleVisionIntervalTicks": 12,
+    "maxVisionRangeBlocks": 64,
+    "fovDegrees": 155,
+    "hearingRadiusBlocks": 48
+  },
+  "planning": {
+    "intentIntervalTicks": 5,
+    "coverScanIntervalTicks": 16,
+    "maxCoverCandidatesPerScan": 12,
+    "pathReplanMinIntervalTicks": 20,
+    "squadRoleRefreshTicks": 15,
+    "stuckTimeoutTicks": 35
+  },
+  "safety": {
+    "requireLineOfSightToShoot": true,
+    "noFriendlyFire": true,
+    "disableOmniscientTargetTracking": true,
+    "maxBotControllersPerEntity": 1
+  },
+  "performance": {
+    "activeCombatRadiusBlocks": 80,
+    "farNpcThinkMultiplier": 4,
+    "maxCoverRaycastsPerTickPerLevel": 75
+  }
+}

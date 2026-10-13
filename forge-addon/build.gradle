@@ -1,0 +1,106 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '6.0.54'
+}
+
+group = 'dev.zuma.tacticalnpc'
+version = '0.2.0'
+base { archivesName = 'tacticalnpcai' }
+java { toolchain.languageVersion = JavaLanguageVersion.of(17) }
+sourceSets {
+    compat {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+    compatTest {
+        compileClasspath += sourceSets.main.output + sourceSets.compat.output + sourceSets.compat.compileClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+}
+
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    copyIdeResources = true
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'info'
+            // TaCZ ships an SRG refmap; userdev uses Mojang names.
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                tacticalnpcai {
+                    source sourceSets.main
+                    if(project.hasProperty('legacyCompatibility') && project.hasProperty('combatTests')) source sourceSets.compatTest
+                }
+                if(project.hasProperty('legacyCompatibility')) tacticalnpcai_npcs { source sourceSets.compat }
+            }
+        }
+        server {
+            args '--nogui'; workingDirectory project.file(project.hasProperty('profile')?'run/profile':'run/standalone')
+            if(project.hasProperty('profile')) {
+                property 'tactical.profile.legacy',project.hasProperty('profileLegacy').toString()
+                property 'tactical.profile.quick',project.hasProperty('profileQuick').toString()
+                jvmArgs '-Xms1G','-Xmx4G','-XX:StartFlightRecording=filename=profile.jfr,settings=profile,dumponexit=true,maxsize=64m'
+            }
+        }
+        client {
+            workingDirectory project.file('run/client-standalone')
+            if(project.hasProperty('clientSmoke')) args '--username','TacticalSmoke','--quickPlayMultiplayer','127.0.0.1:25585'
+        }
+        gameTestServer {
+            workingDirectory project.file(project.hasProperty('legacyCompatibility') ? 'run/gametest-compat' : 'run/gametest-standalone')
+            property 'forge.enabledGameTestNamespaces', 'tacticalnpcai'
+            property 'tactical.tests.noNpcs', (!project.hasProperty('legacyCompatibility')).toString()
+        }
+    }
+}
+repositories { flatDir { dirs 'libs' } }
+def taczLua = tasks.register('extractTaczLua', Copy) {
+    from(zipTree(file('libs/tacz-1.20.1-1.1.8-hotfix2.jar'))) {
+        include 'META-INF/jarjar/*luaj*.jar'
+        eachFile { path = name }
+        includeEmptyDirs = false
+    }
+    into layout.buildDirectory.dir('tacz-compile-libs')
+}
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.4.20'
+    compatCompileOnly fg.deobf('local:tacznpcs:2.1.0-1.20.1')
+    if(project.hasProperty('legacyCompatibility')) runtimeOnly fg.deobf('local:tacznpcs:2.1.0-1.20.1')
+    implementation fg.deobf('local:tacz:1.20.1-1.1.8-hotfix2')
+    compileOnly files(fileTree(layout.buildDirectory.dir('tacz-compile-libs')) { include '*.jar' }).builtBy(taczLua)
+}
+sourceSets.main.java.srcDir '../ai-core/src/main/java'
+if (project.hasProperty('combatTests')) {
+    sourceSets.main.java.srcDir 'src/gametest/java'
+    sourceSets.main.resources.srcDir 'src/gametest/resources'
+}
+if(project.hasProperty('clientSmoke')) sourceSets.main.java.srcDir 'src/clientSmoke/java'
+if(project.hasProperty('profile')) sourceSets.main.java.srcDir 'src/profile/java'
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+tasks.named('jar', Jar).configure {
+    manifest { attributes 'Implementation-Version': project.version }
+    // Also reject stale processResources outputs after switching away from test runs.
+    exclude 'data/tacticalnpcai/structures/arena.nbt', 'data/tacticalnpcai/structures/wide_arena.nbt'
+    finalizedBy 'reobfJar'
+}
+tasks.register('compatJar', Jar) {
+    archiveClassifier = 'npcs-compat'
+    from sourceSets.compat.output
+    finalizedBy 'reobfCompatJar'
+}
+reobf { compatJar {} }
+tasks.named('build').configure { dependsOn 'compatJar' }
+tasks.withType(JavaExec).configureEach {
+    if (name == 'runServer') standardInput = System.in
+}
+if(project.hasProperty('profile') && project.hasProperty('profileLegacy')) {
+    tasks.register('prepareOriginalProfile',Copy) {
+        from 'src/profile/fixtures'
+        into 'run/profile/config'
+    }
+    tasks.configureEach { if(name=='runServer') dependsOn 'prepareOriginalProfile' }
+}

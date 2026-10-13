@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.sh text eol=lf
+/forge-addon/gradlew text eol=lf
+*.bat text eol=crlf
+*.nbt binary
+*.jar binary

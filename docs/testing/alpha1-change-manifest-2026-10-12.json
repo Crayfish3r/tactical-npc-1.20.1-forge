@@ -1,0 +1,162 @@
+[
+  {
+    "path": "ai-core/run-tests.sh",
+    "before": "bdfae33a4c00faf7f05518991ee3711e738cd895aeec3cd35e1a586fb92312e5",
+    "after": "034ca555d19765e43af0f804e5e3f350747463d12f4213bf72dcaa924caed27e"
+  },
+  {
+    "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/CombatBrain.java",
+    "before": "279995d8f8e9d0df3210348a49a736ea6b7fbd9b783fd69e582d43daa0a5c696",
+    "after": "ab7f2993ef24c7c93826a857e618d9b27fdc275b53df1b59d82f409ff2e91925"
+  },
+  {
+    "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/CombatDecision.java",
+    "before": "a02eca989f48525e9a191f9174086c4548bca93ee0a9a8fe818685fbd725a5d1",
+    "after": "396a0b07d8886c4b8b079db134df2fadc375b21218be93af352d0184c65bacc0"
+  },
+  {
+    "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/ContactReadiness.java",
+    "before": null,
+    "after": "f90a19fe413dbefdaaf8377c7602ae8280713fcb6d07892224c166c4a74b12de"
+  },
+  {
+    "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/MovementCommand.java",
+    "before": "91c918b6de79dfa3d8bd74a2e12ad6ea26f8f5448f8cbd205c6c23f0e06e9a1f",
+    "after": "72995c78bf17e287aa0fe60898d55fcaeddc9c4e86d7924648545134954bc8e6"
+  },
+  {
+    "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/MovementPlanner.java",
+    "before": "cfbd9e2ab1fc864352a6e865ad885817ea434cf7c81b7c882c6bb4a2e9213444",
+    "after": "a384124bc569a6807c7c911a34807f661edbc69d863975ec02fb0b3a94334710"
+  },
+  {
+    "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/OrderPlanner.java",
+    "before": "c3097edc3cfbdec6453bbb0d260dc29c505a50568fa5ae3025e81ec7aff7e95c",
+    "after": "1a1578030984c307283a54fcf9c57543f1931c1af054dc0b4a05dc735ca72e99"
+  },
+  {
+    "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/RouteRecovery.java",
+    "before": null,
+    "after": "cb270f42ff21ad195258a2460e169b05df6f095220470db7e8257969797898cc"
+  },
+  {
+    "path": "ai-core/src/test/java/dev/zuma/tacticalnpc/core/AlphaRegressionTest.java",
+    "before": null,
+    "after": "5bb443b6ec9dfb7ffcb5e53b2b5c23d0306738b6a637545b3309309c3318af40"
+  },
+  {
+    "path": "ai-core/src/test/java/dev/zuma/tacticalnpc/core/CoreSmokeTest.java",
+    "before": "f468b6ad62937b15ec94cde2c22eae7766e1c976a5e8ec51ea711cb4fabb3f28",
+    "after": "5d3a9f3305ed4225f4a39d9cd3cd5693d57700a5da2a2cd3ee48a21587b4a64a"
+  },
+  {
+    "path": "forge-addon/src/compatTest/java/dev/zuma/tacticalnpc/CombatGameTests.java",
+    "before": "dfe66fda55437e867cfef94a6940be71eead2c44a7a300a1a46686a04ac92f1d",
+    "after": "d544227e20ad3d05ad0e076a55d3f93422d9a1eee774f46c04ac9c665d7278e6"
+  },
+  {
+    "path": "forge-addon/src/gametest/java/dev/zuma/tacticalnpc/AlphaLocomotionTests.java",
+    "before": null,
+    "after": "8691d196fb7c6510785d31e7be05df8c24354c18b6c085cc34de4e9a19d2dafd"
+  },
+  {
+    "path": "forge-addon/src/gametest/java/dev/zuma/tacticalnpc/AlphaResponsivenessTests.java",
+    "before": null,
+    "after": "b45065e8e895759eca5fa724e5c4e6fb4aa97dfbe714df1433d5ac28ebf61861"
+  },
+  {
+    "path": "forge-addon/src/gametest/java/dev/zuma/tacticalnpc/CoverTests.java",
+    "before": "117c0fd6bc1c9be397ba75fac3c5a6bbb08507d049757e220c727d418c5ff4fe",
+    "after": "838fe155cf225496a0a866ea0075639db292d10289c516045ebfc889c5903a86"
+  },
+  {
+    "path": "forge-addon/src/gametest/java/dev/zuma/tacticalnpc/IndependentNpcTests.java",
+    "before": "73b3032c8962883623148f9147e6f7d21a57916ed1d512b099f0686092a2c4ac",
+    "after": "f24312efb994a892419b8f56df39c2285956b0648d9c0ee8f0131ac3c322b4f6"
+  },
+  {
+    "path": "forge-addon/src/gametest/java/dev/zuma/tacticalnpc/ScenarioIsolation.java",
+    "before": "07852e7def6abb68665e20acc8682923356c0b4bb37175f6fb9d8c5f395b2467",
+    "after": "846b7ea1747a1ecac922677b2595348255cccb251ad435ce9e1b84ed591729e3"
+  },
+  {
+    "path": "forge-addon/src/main/java/dev/zuma/tacticalnpc/combat/AiTelemetry.java",
+    "before": "a93c3178d2b5c7234fd0b294f978734bfe2e65e4356f9014b6229bf8823b7910",
+    "after": "c04d6b11bfebc67817d454be9c16f1307195b17462f8aee2a272bc8880479a88"
+  },
+  {
+    "path": "forge-addon/src/main/java/dev/zuma/tacticalnpc/combat/AiWorkBudget.java",
+    "before": "4cfc43b9656991b3ba42b21c653915390d428384940d3d2ec2299760fe4c0a6f",
+    "after": "de745f3edda67fe15e8ba3a7738473fe8406c29b0ee14b71844c3137e24ef31d"
+  },
+  {
+    "path": "forge-addon/src/main/java/dev/zuma/tacticalnpc/combat/CoverSensor.java",
+    "before": "925acb215bfdcead9804b3913219cc1db8fa54fd2f34679b3f7c10607ea480f5",
+    "after": "a6c9fd70b559961c358a899d1af6524d7fffa57f78666d5c024cfc8aaf09c21f"
+  },
+  {
+    "path": "forge-addon/src/main/java/dev/zuma/tacticalnpc/combat/MovementExecutor.java",
+    "before": "c086e513c7fea3f1f52e98b1bd033b72adb34f3e568fafb0b5fe7cc6cdc25b68",
+    "after": "54e6a3b771ed1be9563da78ca9315de24dfe77bde2b7d6e7c675a190f8b40b29"
+  },
+  {
+    "path": "forge-addon/src/main/java/dev/zuma/tacticalnpc/combat/TacticalCombatGoal.java",
+    "before": "79433bf60fdb8133dc61af4acfc2926bd238c52763c927be4df1bb12c03a9274",
+    "after": "9a694f1651ae5be87ea39983a50cf7f3bb48be42ca54b1c9187cc480a995e72b"
+  },
+  {
+    "path": "forge-addon/src/main/java/dev/zuma/tacticalnpc/combat/VisibilitySensor.java",
+    "before": "c0ce4bbcf8c13b710c706f1838c10296e54f05d186b9faa4591c10e03f4bccf4",
+    "after": "e4e326c7e7428ebfcc28c045da98758082e88f9acd515ad8d1957f2cff58ce40"
+  },
+  {
+    "path": "forge-addon/src/main/java/dev/zuma/tacticalnpc/compat/ShotSafetyEvents.java",
+    "before": "4c0895e6d0d77ad0bef88d8217873c79bc76969dbc26952975350de4e0d98bba",
+    "after": "eb6178287a41930b2a7abead837b820253dd6cc785db6c21a76add7f281cb2a3"
+  },
+  {
+    "path": "forge-addon/src/main/java/dev/zuma/tacticalnpc/compat/TaczGunController.java",
+    "before": "5e74badb851ee41a8383c1018f0655c34bc0a331280411447c3eaa22641a7276",
+    "after": "dda9727c0d86306673b95887d822e42290238c5c62a5d3f016a152b37e14a3c8"
+  },
+  {
+    "path": "forge-addon/src/main/java/dev/zuma/tacticalnpc/config/ServerConfig.java",
+    "before": "b6ec083d465713a1fd77586fa774edd1b0083d46b4919d52d61feb692d19e9d2",
+    "after": "f25c5f331e4bd3dc89424e2b689e58cc3120391181b0d3af35132a1ccf91cdab"
+  },
+  {
+    "path": "forge-addon/src/main/java/dev/zuma/tacticalnpc/debug/DebugCommands.java",
+    "before": "fefe5a32f844e3b1823786810c4a814fa899825a9e78891225f1d6f3c67bffd5",
+    "after": "17b228d91e23aee60886cdc14006dd326417727b10cd64e794a18ad257970cdd"
+  },
+  {
+    "path": "docs/ALPHA-1-RELEASE-NOTES-2026-10-11.md",
+    "before": null,
+    "after": "6d3d3d3b4bc51ffbfb5ac333e32c1ddfc00bf2b172459ab2f6728951809b0125"
+  },
+  {
+    "path": "docs/IMPLEMENTATION-STATUS.md",
+    "before": "0ffc1c44d793bd2c79fe39835021525fa4dc18d35f87058bba168996be9bd21a",
+    "after": "8115fda76c4903b9ae0a9e7a2c25fc268e2f8f15bfa36a85d9912c857dacc62d"
+  },
+  {
+    "path": "docs/INTEGRATION-AUDIT.md",
+    "before": "9e5c862a4f79a01596f6b130e8d379240cd77742d17d2cf5b74b92869c4287de",
+    "after": "ee63a30f4e29df2df3d08d38fd38c9310688cb80899f5e5dc2403b32acd76b63"
+  },
+  {
+    "path": "tools/review/AlphaReviewProbe.java",
+    "before": "22f21a76d37b04cc590d1d8e105ffda641fff454be6e71db2384b08d51f65812",
+    "after": "61a0471b6a478b2c3d6cdac6c7edc6817a44af13f3878fe37283eac196c13f4b"
+  },
+  {
+    "path": "tools/review/run-alpha-probe.sh",
+    "before": null,
+    "after": "0b62fa643132c171ac05d75bcc33fc96f4f5897cb2858434b4c0f3283a575de3"
+  },
+  {
+    "path": "tools/review/speed-probe.init.gradle",
+    "before": null,
+    "after": "d1cb4b1b817153e4d4945ea5c45e451e6a0180b4a0bfad457634a7bfcd3243e5"
+  }
+]

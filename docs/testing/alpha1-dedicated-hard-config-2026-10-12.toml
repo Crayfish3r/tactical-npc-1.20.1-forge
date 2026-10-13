@@ -1,0 +1,42 @@
+#Only NPCs with entity tag tactical_ai are affected.
+enabled = true
+#Log target, state, successful shots and reload requests.
+debug = false
+#Range: 4.0 ~ 64.0
+detectionRange = 40.0
+#Maximum aim rotation in degrees per tick.
+#Range: 1.0 ~ 18.0
+turnRate = 17.0
+#Correlated aim error amplitude in degrees, plus native TaCZ spread.
+#Range: 0.1 ~ 5.0
+aimError = 1.0
+#First-contact reaction; same visual UUID within 60 ticks uses reacquireTicks. Geometry is always fresh.
+#Range: 2 ~ 20
+reactionTicks = 3
+#Range: 0.0 ~ 1.0
+strafeSpeed = 0.55
+#Aggregate in-memory AI samples; log every 200 ticks, not every NPC tick.
+telemetry = false
+#Limited fire at a fresh known open point. No deliberate wall penetration.
+suppression = true
+#Dormant AI updates every ten ticks outside this radius; never smaller than sight/hearing. Does not grant a target observation.
+#Range: 16.0 ~ 128.0
+activationRange = 64.0
+#Range: 30.0 ~ 180.0
+horizontalFov = 140.0
+#Hard starting profile: perception 1-2, reaction 2-3, reacquire 1-2, acquisition 2-4, turn 16-18. Existing world overrides remain authoritative; latency requires measurement.
+#Range: 1 ~ 40
+perceptionTicks = 1
+#Search memory; longer than the separate 40-tick suppression permit.
+#Range: 20 ~ 600
+memoryTicks = 160
+#Range: 8.0 ~ 128.0
+memoryRange = 64.0
+#Range: 4.0 ~ 64.0
+hearingRange = 40.0
+#Range: 1 ~ 20
+reacquireTicks = 1
+#Active scan interval with UUID phase staggering.
+#Range: 2 ~ 10
+activeAcquisitionTicks = 3
+

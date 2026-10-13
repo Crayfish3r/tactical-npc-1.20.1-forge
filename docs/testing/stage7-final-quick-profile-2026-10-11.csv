@@ -1,0 +1,3 @@
+mode,phase,npc,samples,wall_s,tps,tick_p50_ms,tick_p95_ms,ai_p50_ms,ai_p95_ms,rays_mean,candidates_mean,paths_mean,active_mean,heap_p50_mb,heap_p95_mb,cpu_core_percent,native_projectiles
+independent,combat,30,240,11.979,20.03,9.3753,23.8438,1.9705,4.7520,44.35,9.03,0.217,30.00,1071.5,1346.5,103.8,707
+independent,combat,50,240,12.001,20.00,9.6615,18.2387,2.0471,4.0663,74.70,15.05,0.325,50.00,1201.6,1395.6,51.8,1228

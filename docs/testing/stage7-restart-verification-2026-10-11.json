@@ -1,0 +1,15 @@
+{
+  "result": "PASS",
+  "entity": "df933dd7-b617-4bad-a443-eff828dec148",
+  "serviceId": "758448b2-6b80-4be6-9ffc-3fade56d1965",
+  "schema": 2,
+  "order": "DEFEND_AREA",
+  "radius": 16,
+  "faction": "blue",
+  "squad": "00000000-0000-0000-0000-000000000041",
+  "ammoPolicy": "FINITE",
+  "reserve": 17,
+  "magazine": 29,
+  "chamber": true,
+  "method": "real save-all flush, clean stop, process restart, native console data reads; both serialized compounds match"
+}

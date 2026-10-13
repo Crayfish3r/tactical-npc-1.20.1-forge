@@ -1,0 +1,21 @@
+{
+  "result": "PASS",
+  "artifacts": [
+    {
+      "file": "forge-addon\\build\\libs\\tacticalnpcai-0.2.0.jar",
+      "bytes": 149042,
+      "sha256": "2AE86B9665E51C8FD004CCBEB6ABB9C3CC1B90DB464ADDDB87DB7BA671A9ACF8",
+      "classes": 77,
+      "java_major": 61,
+      "npc_compat": false
+    },
+    {
+      "file": "forge-addon\\build\\libs\\tacticalnpcai-0.2.0-npcs-compat.jar",
+      "bytes": 7680,
+      "sha256": "F6408E3FD0A36D008B0029313865FD9D1CD8A5A94BDDEECEDCD0EE8B3635ED1E",
+      "classes": 4,
+      "java_major": 61,
+      "npc_compat": true
+    }
+  ]
+}

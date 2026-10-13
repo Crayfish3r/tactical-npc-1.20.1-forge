@@ -1,0 +1,11 @@
+// Diagnostic only: full required suites must also run without this init script.
+gradle.projectsEvaluated {
+    allprojects {
+        if (plugins.hasPlugin('java')) {
+            sourceSets.main.java.exclude { element ->
+                !element.isDirectory() && element.file.path.replace('\\','/').contains('/src/gametest/') &&
+                    element.file.name.endsWith('Tests.java') && element.file.name != 'AlphaLocomotionTests.java'
+            }
+        }
+    }
+}

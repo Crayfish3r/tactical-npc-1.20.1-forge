@@ -1,0 +1,7 @@
+{
+  "default": {
+    "primary": "%tacz:ak47",
+    "skin": {"id": "tacznpcs:entity/default.png"},
+    "opposed": ["players"]
+  }
+}

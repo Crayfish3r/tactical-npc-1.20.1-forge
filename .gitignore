@@ -1,0 +1,27 @@
+.gradle/
+**/build/
+forge-addon/run/
+forge-addon/libs/*.jar
+tools/*.jar
+tools/audit/
+tools/review/backups/
+
+# Local runtime and diagnostic output (keep in the working directory only).
+*.class
+*.jfr
+*.log
+*.log.*
+hs_err_pid*
+replay_pid*
+__pycache__/
+*.py[cod]
+
+# Editor, OS and local environment files.
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
