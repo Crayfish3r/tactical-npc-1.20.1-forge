@@ -14,6 +14,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 public final class TacticalCombatGoal extends Goal {
@@ -47,7 +48,7 @@ public final class TacticalCombatGoal extends Goal {
     private int previousRounds=-1;
     private boolean previousBusy;
     private long nextActivation;
-    private boolean nearPlayer;
+    private boolean nearActor;
 
     public TacticalCombatGoal(NpcRuntimeAdapter runtime,Object lifetime) {
         this.runtime=runtime; npc=runtime.entity(); ownershipLifetime=lifetime;
@@ -74,15 +75,19 @@ public final class TacticalCombatGoal extends Goal {
             AiTelemetry.contactShot((ServerLevel)npc.level(),contact.reacquiring(),tick-contact.episodeStart());latencyRecorded=true;
         }
     }
-    public void forget(UUID subject) { memory.forget(subject);SquadRuntime.of((ServerLevel)npc.level()).releaseClaims(npc.getUUID()); if(subject.equals(targetId)) { targetId=null;candidateId=null;contact.clear();freshVisible=false;generation=GENERATIONS.incrementAndGet();nextPlan=0; } }
+    public void forget(UUID subject) {
+        var known=memory.sample(npc.level().getGameTime(),false,vector(npc.position()),ServerConfig.MEMORY_RANGE.get());
+        boolean matched=subject.equals(targetId) || subject.equals(candidateId) || subject.equals(contact.subject()) || known!=null && subject.equals(known.subject());
+        memory.forget(subject);
+        if(matched){SquadRuntime.of((ServerLevel)npc.level()).releaseClaims(npc.getUUID());targetId=null;candidateId=null;contact.clear();freshVisible=false;decision=null;generation=GENERATIONS.incrementAndGet();nextPlan=0;movement.contactRestored();}
+    }
     public Observation observation() {
         var known=memory.sample(npc.level().getGameTime(),freshVisible,vector(npc.position()),ServerConfig.MEMORY_RANGE.get());
         return known!=null && subjectAlive(known.subject())?known:null;
     }
     private boolean subjectAlive(UUID subject) {
         // Validity only. No position/velocity from this reference reaches the planner.
-        Player player=((ServerLevel)npc.level()).getPlayerByUUID(subject);
-        return player!=null && player.isAlive() && !player.isRemoved() && !player.isCreative() && !player.isSpectator();
+        return CombatTargets.eligible(npc,CombatTargets.resolve((ServerLevel)npc.level(),subject));
     }
     public void hear(Player source) {
         runtime.requireServer(); long tick=npc.level().getGameTime();
@@ -115,7 +120,7 @@ public final class TacticalCombatGoal extends Goal {
             if(sensor.los(npc,point,true)!=VisibilitySensor.Los.CLEAR || sensor.los(npc,end,true)!=VisibilitySensor.Los.CLEAR || sensor.occupied(npc,null,point) || sensor.occupied(npc,null,end)) return false;
             suppressionRounds++;return true;
         }
-        Player target=targetId==null?null:((ServerLevel)npc.level()).getPlayerByUUID(targetId);
+        LivingEntity target=CombatTargets.resolve((ServerLevel)npc.level(),targetId);
         WeaponState current=guns.snapshot();
         if(!npc.isAlive() || failed || !current.supported() || current.busy() || !sensor.valid(npc,target,ServerConfig.RANGE.get()) || !sensor.inFov(npc,target) ||
                 !freshVisible || !contact.ready(tick) || decision==null || !decision.firePermitted() || decision.frame().generation()!=generation || tick>decision.expires() || decision.aim().mode()!=AimCommand.Mode.DIRECT) return false;
@@ -134,7 +139,7 @@ public final class TacticalCombatGoal extends Goal {
         finally{AiTelemetry.end((ServerLevel)npc.level(),start);}
     }
     private void combatTick() {
-        runtime.requireServer(); runtime.beforeTick();
+        runtime.requireServer(); runtime.beforeTick();movement.guardTerritory();
         long tick=npc.level().getGameTime(); double range=ServerConfig.RANGE.get();
         var squad=SquadRuntime.of((ServerLevel)npc.level());
         if(runtime.squadId()!=null) squad.heartbeat(runtime.squadId(),npc.getUUID(),vector(npc.position()),tick);
@@ -142,19 +147,17 @@ public final class TacticalCombatGoal extends Goal {
         if(targetId==null && stored==null) {
             if(tick>=nextActivation) {
                 nextActivation=tick+20;
-                var nearby=new java.util.ArrayList<Player>(1);
                 double activation=Math.max(ServerConfig.ACTIVATION_RANGE.get(),Math.max(range,ServerConfig.HEARING_RANGE.get()));
-                if(AiWorkBudget.of((ServerLevel)npc.level()).candidate(npc.getUUID()))
-                    npc.level().getEntities(net.minecraft.world.level.entity.EntityTypeTest.forClass(Player.class),npc.getBoundingBox().inflate(activation),p->p.isAlive() && !p.isCreative() && !p.isSpectator(),nearby,1);
-                // Activation is a proximity boolean only. No hidden coordinates enter an Observation.
-                nearPlayer=!nearby.isEmpty();
+                var nearby=sensor.activation(npc,activation);
+                // A partial page/budget deferral cannot prove that all potential contacts vanished.
+                if(nearby!=VisibilitySensor.Nearby.DEFERRED)nearActor=nearby==VisibilitySensor.Nearby.PRESENT;
             }
-            if(!nearPlayer && Math.floorMod(tick+npc.getUUID().hashCode(),10)!=0)return;
+            if(!nearActor && Math.floorMod(tick+npc.getUUID().hashCode(),10)!=0)return;
         }
         if(stored!=null && !subjectAlive(stored.subject())) {memory.clear();contact.clear();targetId=null;squad.releaseClaims(npc.getUUID());generation=GENERATIONS.incrementAndGet();nextPlan=0;}
         if(targetId!=null && stored==null) {contact.clear();targetId=null;generation=GENERATIONS.incrementAndGet();nextPlan=0;}
         UUID checkId=candidateId!=null?candidateId:targetId;
-        Player target=checkId==null?null:((ServerLevel)npc.level()).getPlayerByUUID(checkId);
+        LivingEntity target=CombatTargets.resolve((ServerLevel)npc.level(),checkId);
         boolean wasVisible=freshVisible;long oldEpisode=contact.episodeStart();UUID oldContact=targetId;
         activeLos=sensor.valid(npc,target,range) && sensor.inFov(npc,target)?sensor.los(npc,sensor.aimPoint(target),true):VisibilitySensor.Los.BLOCKED;
         if(activeLos==VisibilitySensor.Los.CLEAR) {
@@ -168,12 +171,19 @@ public final class TacticalCombatGoal extends Goal {
         if(target==null && tick>=nextScan && activeLos!=VisibilitySensor.Los.DEFERRED) {
             int interval=ServerConfig.ACQUISITION.get();
             nextScan=tick+1+Math.floorMod(npc.getUUID().hashCode()-tick-1,interval);
-            Player detected=sensor.acquire(npc,range);
-            if(detected==null) {candidateId=null;}
-            else {
-                candidateId=detected.getUUID();
-                if(contact.visual(candidateId,tick,ServerConfig.PERCEPTION.get(),ServerConfig.REACTION.get(),ServerConfig.REACQUIRE.get(),60)) {
-                    target=detected;targetId=target.getUUID();activeLos=VisibilitySensor.Los.CLEAR;
+            // A freshly visible candidate may still be awaiting perception. Keep that identity
+            // without scanning another page, but retain the same UUID-staggered scan cadence.
+            if(activeLos!=VisibilitySensor.Los.CLEAR) {
+                LivingEntity detected=sensor.acquire(npc,range);
+                if(detected==null) {
+                    if(sensor.acquisitionDeferred()) {activeLos=VisibilitySensor.Los.DEFERRED;contact.deferred();}
+                    else candidateId=null;
+                }
+                else {
+                    candidateId=detected.getUUID();
+                    if(contact.visual(candidateId,tick,ServerConfig.PERCEPTION.get(),ServerConfig.REACTION.get(),ServerConfig.REACQUIRE.get(),60)) {
+                        target=detected;targetId=target.getUUID();activeLos=VisibilitySensor.Los.CLEAR;
+                    }
                 }
             }
         }
@@ -220,7 +230,9 @@ public final class TacticalCombatGoal extends Goal {
         if(decision==null || tick>=nextPlan || gun.rounds()!=previousRounds || gun.busy()!=previousBusy || npc.hurtTime>0 && previous!=TacticalIntent.TAKE_COVER && previous!=TacticalIntent.RETREAT || npc.getHealth()/npc.getMaxHealth()<=.25 && previous!=TacticalIntent.RETREAT) {
             decision=movementPlanner.plan(snapshot,new CombatBrain(ServerConfig.MEMORY.get(),gun.effectiveRange()).decide(snapshot)); nextPlan=tick+4;
             if(runtime.squadId()!=null)decision=squadPlanner.plan(snapshot,decision,squad.role(runtime.squadId(),npc.getUUID()));
-            decision=orderPlanner.plan(snapshot,decision,runtime.orderState());
+            long patrolRevision=orderPlanner.patrolRevision();
+            decision=orderPlanner.plan(snapshot,decision,runtime.orderState(),npc.getBbWidth(),movement.recoveryStatus());
+            if(orderPlanner.patrolRevision()!=patrolRevision)movement.patrolLegChanged();
             decision=suppressionPlanner.plan(snapshot,decision,suppression);
             if(decision.reason().equals("unusable peek timeout") && !coverOptions.isEmpty()) covers.reject(coverOptions.get(0).position(),tick);
             previousRounds=gun.rounds(); previousBusy=gun.busy();
@@ -229,7 +241,7 @@ public final class TacticalCombatGoal extends Goal {
         if(decision.intent()!=previous) { debug("state "+decision.intent()+" weapon "+decision.weaponAction()); previous=decision.intent();stateSince=tick; }
         boolean aligned=false;
         if(decision.aim().point()!=null) aligned=turn(decision.aim().point(),tick);
-        else if(candidateId==null && tick%4==0) {
+        else if(candidateId==null && (tick%4==0 || orderPlanner.patrolling() && decision.movement().mode()==MovementCommand.Mode.HOLD)) {
             // Bounded idle sweep lets a patrol eventually inspect the rear hemisphere.
             float yaw=npc.getYHeadRot()+ServerConfig.TURN.get().floatValue()/2;
             npc.setYRot(yaw);npc.getLookControl().setLookAt(npc.getEyePosition().add(Vec3.directionFromRotation(0,yaw).scale(10)));
@@ -268,7 +280,9 @@ public final class TacticalCombatGoal extends Goal {
         return Math.abs(Mth.wrapDegrees(yaw-npc.getYHeadRot()))<=error+2 && Math.abs(pitch-npc.getXRot())<=error+2;
     }
     @Override public void stop() {
+        orderPlanner.resetPatrol();
         generation=GENERATIONS.incrementAndGet(); targetId=null; candidateId=null; contact.clear();freshVisible=false;memory.clear();covers.reset(); decision=null;
+        sensor.resetAcquisition();
         previous=null;stateSince=npc.level().getGameTime();nextPlan=0;previousRounds=-1;suppressionTrack=-1;suppressionRounds=0;
         nextActivation=0;
         SquadRuntime.of((ServerLevel)npc.level()).release(npc.getUUID());

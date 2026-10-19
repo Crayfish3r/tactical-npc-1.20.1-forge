@@ -23,6 +23,28 @@ Audited 2026-10-10 from official binaries, not legacy tacz_npc sources.
 - Squad reports содержат только первоначальное зрительное Observation и UUID, доставляются через 10 тиков в пределах 48 блоков, не обновляют скрытую координату. Pure board отделён по ServerLevel с weak key, не держит world/entity references. Claims/roles ограничены TTL и очищаются при lifecycle; optional NPCs adapter по умолчанию не подключается к squads.
 - Ordinary dedicated profile выполнен отдельно от GameTest pacing. JFR показал затраты сектора; запросы до готовности оружия/поворота убраны, per-native-round safety сохранён. Dormant activation — только proximity boolean, не наблюдение скрытого Player; native gun tick не пропускается. Точные результаты и ограничения: [IMPLEMENTATION-STATUS](IMPLEMENTATION-STATUS.md).
 
+## Supported target boundary, stage 02, 2026-10-19
+
+The shared `CombatTargets` filter accepts Player or an entity whose registered
+`NpcRuntimeAdapter.entity()` is that exact entity. The independent TacticalNpcEntity
+provider and the existing optional provider (`getClass()==AutoGunOperator.class`)
+are the only providers; arbitrary LivingEntity/gun holders/subclass-name guesses are excluded.
+Pinned binary signatures were rechecked with `javap -p` against NPCs 2.1.0 (SHA below):
+AutoGunOperator extends PathfinderMob, implements IGunOperator, and exposes
+`isAlliedTo(LivingEntity)`, `isOpposedTo(LivingEntity)`, `getTemplate()`.
+No new NPCs imports or hooks were added to main; existing adapter ownership is retained.
+
+RuntimeRegistry keeps only UUIDs of loaded supported NPCs, per weak ServerLevel key,
+from join/leave/unload events. Vision pages at most 16 combined Player/NPC identities and
+four LOS candidates, with retained DEFERRED cursor; activation pages at most 16 NPCs per
+20-tick check, grants only a proximity boolean and retains its previous state on deferral.
+For a finite stable combined list of N entries with four available rays, the existing
+`4*ceil(N/16)` fresh-cycle bound remains; no full-world entity scan/sort is introduced.
+UUID resolution/lifecycle/alliance validation reads no hidden position or velocity.
+Dead/removed/other-dimension contacts invalidate generation, memory and native fire gates;
+hearing remains Player-only. Our tagged native projectile pre-damage guard also rejects
+unsupported victims, while native faction/team alliances remain authoritative.
+
 ## Server head rotation ownership, 2026-10-11
 
 Confirmed in the pinned Forge/Mojang binary: `Mob.createBodyControl(): BodyRotationControl`, `Mob.tickHeadTurn(float,float): float`, `BodyRotationControl.clientTick(): void`, and final field `Mob.bodyRotationControl` / SRG `f_21361_`. `LookControl.tick()` applies a navigation clamp after `rotateTowards`; later `Mob.tickHeadTurn()` invokes a second head clamp through BodyRotationControl. A new GameTest reproduced a 105-degree head jump despite a 10-degree turn limit ([failed run](testing/stage7-first-look-regression-2026-10-11.log)).

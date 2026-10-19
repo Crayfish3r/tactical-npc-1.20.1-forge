@@ -60,7 +60,7 @@ public final class CoverSensor {
             if(point==null || !withinOrder(point) || !available(vector(point),tick) || blacklist.containsKey(BlockPos.containing(point)) || !budget.canRays(npc.getUUID(),6) || !protectedAt(point,threat)) continue;
             if(tick<nextPath || !budget.path(npc.getUUID())) break;
             nextPath=tick+20;var path=npc.getNavigation().createPath(BlockPos.containing(point),0);
-            if(path==null || !path.canReach()) {blacklist.put(BlockPos.containing(point),tick+160);continue;}
+            if(path==null || !path.canReach() || !withinOrderPath(path)) {blacklist.put(BlockPos.containing(point),tick+160);continue;}
             Vec3 peek=findPeek(point,threat);
             if(!reserve(vector(point),tick))continue;
             selected=new CoverOption(vector(point),peek==null?null:vector(peek),tick+100);
@@ -116,8 +116,33 @@ public final class CoverSensor {
     }
     public boolean withinOrder(Vec3 point) {
         var order=runtime.orderState();
+        if(order.kind()==OrderState.Kind.DEFEND_AREA) return territory().contains(vector(point));
         double radius=order.kind()==OrderState.Kind.HOLD_POSITION?Math.min(6,order.radius()):order.radius();
         return order.kind()==OrderState.Kind.ASSAULT || vector(point).minus(order.anchor()).lengthSquared()<=radius*radius;
+    }
+    public DefendTerritory territory() {
+        var order=runtime.orderState();
+        return order.kind()==OrderState.Kind.DEFEND_AREA?new DefendTerritory(order.anchor(),order.radius(),DefendTerritory.clearance(runtime.entity().getBbWidth())):null;
+    }
+    /** Validate actual vanilla node coordinates, including detours with interior endpoints. */
+    public boolean withinOrderPath(net.minecraft.world.level.pathfinder.Path path) {
+        var boundary=territory();if(boundary==null)return true;
+        if(path.getNodeCount()>128)return false;
+        var npc=runtime.entity();Vector3 previous=vector(npc.position());
+        for(int i=path.getNextNodeIndex();i<path.getNodeCount();i++) {
+            Vec3 point=path.getEntityPosAtNode(npc,i);
+            // The initial cell represents the displaced starting position, not a requested step.
+            if(i==0 && BlockPos.containing(npc.position()).equals(BlockPos.containing(point)))continue;
+            // PathNavigation advances an already-arrived waypoint before issuing its next move.
+            // Its arrival reference is node + (width + 1)/2, not getEntityPosAtNode's center.
+            var node=path.getNode(i);float width=npc.getBbWidth(),tolerance=width>.75f?width/2:.75f-width/2;
+            double offset=(width+1)/2.0;
+            if(i==path.getNextNodeIndex() && Math.abs(npc.getX()-node.x-offset)<=tolerance &&
+                    Math.abs(npc.getZ()-node.z-offset)<=tolerance && Math.abs(npc.getY()-node.y)<1)continue;
+            if(!boundary.permitsStep(previous,vector(point)))return false;
+            previous=vector(point);
+        }
+        return true;
     }
     private boolean available(Vector3 point,long tick){return runtime.squadId()==null || SquadRuntime.of((ServerLevel)runtime.entity().level()).available(runtime.squadId(),runtime.entity().getUUID(),point,tick);}
     private boolean reserve(Vector3 point,long tick){return runtime.squadId()==null || SquadRuntime.of((ServerLevel)runtime.entity().level()).claim(runtime.squadId(),runtime.entity().getUUID(),point,tick);}

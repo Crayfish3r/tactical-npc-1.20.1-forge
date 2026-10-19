@@ -63,9 +63,10 @@ public final class TacticalNpcEntity extends PathfinderMob {
     public void setSquad(UUID id) {runtime.requireServer();if(controller!=null)controller.stop();squadId=id;}
     public void setOrder(OrderState.Kind kind,double radius) {
         runtime.requireServer();
-        if(!Double.isFinite(radius) || radius<4 || radius>64) throw new IllegalArgumentException("Order radius must be 4..64 blocks");
+        if(!OrderState.validRadius(kind,radius)) throw new IllegalArgumentException("Order radius must be 4.."+OrderState.maximumRadius(kind)+" blocks");
         order=kind.name();leash=radius;anchor=new Vector3(getX(),getY(),getZ());
         if(controller!=null) controller.stop();
+        getNavigation().stop();
     }
     public void setFaction(String value) {
         runtime.requireServer();
@@ -129,7 +130,7 @@ public final class TacticalNpcEntity extends PathfinderMob {
         if(tag.contains("faction")) faction=tag.getString("faction");
         try {order=OrderState.Kind.valueOf(tag.getString("order")).name();}catch(IllegalArgumentException ex){order="HOLD_POSITION";}
         try { ammoPolicy=AmmoPolicy.valueOf(tag.getString("ammoPolicy")); } catch(IllegalArgumentException ex) { ammoPolicy=AmmoPolicy.FINITE; }
-        initialReserve=Math.max(0,tag.getInt("initialReserve")); leash=Math.max(4,Math.min(64,tag.getDouble("leash")));
+        initialReserve=Math.max(0,tag.getInt("initialReserve")); leash=Math.max(4,Math.min(OrderState.maximumRadius(OrderState.Kind.valueOf(order)),tag.getDouble("leash")));
         if(!Double.isFinite(leash)) leash=24;
         anchor=null;
         if(tag.getInt("schema")==2) {

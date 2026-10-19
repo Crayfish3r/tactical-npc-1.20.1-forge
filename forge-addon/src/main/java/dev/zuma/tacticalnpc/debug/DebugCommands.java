@@ -17,6 +17,15 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public final class DebugCommands {
     @SubscribeEvent
     public void register(RegisterCommandsEvent event) {
+        event.getDispatcher().register(Commands.literal("npc").requires(s->s.hasPermission(2))
+            .then(Commands.literal("mode").requires(s->s.hasPermission(2))
+                .then(mode("attack",dev.zuma.tacticalnpc.core.OrderState.Kind.ASSAULT))
+                .then(Commands.literal("defend")
+                    .then(Commands.argument("radius",com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg(4,128))
+                        .executes(c->modeOrder(c,dev.zuma.tacticalnpc.core.OrderState.Kind.DEFEND_AREA,false,com.mojang.brigadier.arguments.DoubleArgumentType.getDouble(c,"radius")))
+                        .then(Commands.argument("targets",EntityArgument.entities())
+                            .executes(c->modeOrder(c,dev.zuma.tacticalnpc.core.OrderState.Kind.DEFEND_AREA,true,com.mojang.brigadier.arguments.DoubleArgumentType.getDouble(c,"radius"))))))
+                .then(mode("stand",dev.zuma.tacticalnpc.core.OrderState.Kind.HOLD_POSITION))));
         event.getDispatcher().register(Commands.literal("tacticalnpc").requires(s -> s.hasPermission(2))
             .then(Commands.literal("diagnostics").executes(c->{c.getSource().sendSuccess(()->Component.literal(dev.zuma.tacticalnpc.combat.AiTelemetry.diagnostics(c.getSource().getLevel())),false);return 1;}))
             .then(Commands.literal("hard").executes(c->{var s=c.getSource();dev.zuma.tacticalnpc.config.ServerConfig.PERCEPTION.set(1);dev.zuma.tacticalnpc.config.ServerConfig.REACTION.set(3);dev.zuma.tacticalnpc.config.ServerConfig.REACQUIRE.set(1);dev.zuma.tacticalnpc.config.ServerConfig.ACQUISITION.set(3);dev.zuma.tacticalnpc.config.ServerConfig.TURN.set(17.0);s.sendSuccess(()->Component.literal("Hard starting profile: perception=1 reaction=3 reacquire=1 acquisition=3 turn=17. Latency/speed need measurement. Verify persistent values in the server config."),true);return 1;}))
@@ -28,7 +37,7 @@ public final class DebugCommands {
             .then(Commands.literal("order").then(Commands.argument("npc",EntityArgument.entity())
                 .then(Commands.argument("kind",com.mojang.brigadier.arguments.StringArgumentType.word())
                     .suggests((c,b)->{for(var kind:dev.zuma.tacticalnpc.core.OrderState.Kind.values())b.suggest(kind.name());return b.buildFuture();})
-                    .then(Commands.argument("radius",com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg(4,64))
+                    .then(Commands.argument("radius",com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg(4,128))
                         .executes(c->order(c.getSource(),EntityArgument.getEntity(c,"npc"),com.mojang.brigadier.arguments.StringArgumentType.getString(c,"kind"),com.mojang.brigadier.arguments.DoubleArgumentType.getDouble(c,"radius")))))))
             .then(Commands.literal("faction").then(Commands.argument("npc",EntityArgument.entity())
                 .then(Commands.argument("name",com.mojang.brigadier.arguments.StringArgumentType.word()).executes(c->{
@@ -74,13 +83,62 @@ public final class DebugCommands {
         npc.setAmmoPolicy(finite?dev.zuma.tacticalnpc.entity.TacticalNpcEntity.AmmoPolicy.FINITE:dev.zuma.tacticalnpc.entity.TacticalNpcEntity.AmmoPolicy.INFINITE,reserve);
         source.sendSuccess(()->Component.literal("Ammo policy "+npc.ammoPolicy()+" reserve="+reserve),true);return 1;
     }
-    private static int order(net.minecraft.commands.CommandSourceStack source,net.minecraft.world.entity.Entity entity,String kind,double radius) {
-        if(!(entity instanceof dev.zuma.tacticalnpc.entity.TacticalNpcEntity npc)) {
-            source.sendFailure(Component.literal("Orders require the independent NPC runtime."));return 0;
+    private static int order(net.minecraft.commands.CommandSourceStack source,net.minecraft.world.entity.Entity entity,String kind,double radius) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        dev.zuma.tacticalnpc.core.OrderState.Kind order;
+        try {order=dev.zuma.tacticalnpc.core.OrderState.Kind.valueOf(kind.toUpperCase(java.util.Locale.ROOT));}
+        catch(IllegalArgumentException ex){source.sendFailure(Component.literal("Use DEFEND_AREA (radius 4..128), HOLD_POSITION, ASSAULT or PATROL (4..64)."));return 0;}
+        return applyOrder(source,java.util.List.of(entity),order,radius);
+    }
+    private static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> mode(String name,dev.zuma.tacticalnpc.core.OrderState.Kind kind) {
+        return Commands.literal(name).executes(c->modeOrder(c,kind,false,null))
+            .then(Commands.argument("targets",EntityArgument.entities()).executes(c->modeOrder(c,kind,true,null)));
+    }
+    private static int modeOrder(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> context,dev.zuma.tacticalnpc.core.OrderState.Kind kind,boolean explicit,Double radius) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        var source=context.getSource();
+        var targets=explicit?EntityArgument.getEntities(context,"targets"):java.util.List.of(aimedNpc(source));
+        return applyOrder(source,targets,kind,radius);
+    }
+    /** Both syntaxes mutate only the entity's existing order state, after validating all recipients. */
+    private static int applyOrder(net.minecraft.commands.CommandSourceStack source,java.util.Collection<? extends net.minecraft.world.entity.Entity> targets,dev.zuma.tacticalnpc.core.OrderState.Kind kind,Double radius) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        if(radius!=null && !dev.zuma.tacticalnpc.core.OrderState.validRadius(kind,radius))throw commandError("Order radius must be 4.."+dev.zuma.tacticalnpc.core.OrderState.maximumRadius(kind)+" blocks.");
+        if(targets.isEmpty())throw commandError("No NPC targets selected.");
+        for(var entity:targets) {
+            if(!(entity instanceof dev.zuma.tacticalnpc.entity.TacticalNpcEntity npc) || !npc.isAlive() || npc.isRemoved())
+                throw commandError("Every target must be a live independent tacticalnpcai:npc; no targets changed.");
+            npc.runtime().requireServer();
         }
-        try {npc.setOrder(dev.zuma.tacticalnpc.core.OrderState.Kind.valueOf(kind.toUpperCase(java.util.Locale.ROOT)),radius);}
-        catch(IllegalArgumentException ex){source.sendFailure(Component.literal("Use DEFEND_AREA, HOLD_POSITION, ASSAULT or PATROL; radius 4..64."));return 0;}
-        source.sendSuccess(()->Component.literal("Order "+npc.order()+" anchored at current NPC position; radius="+radius),true);return 1;
+        for(var entity:targets) {
+            var npc=(dev.zuma.tacticalnpc.entity.TacticalNpcEntity)entity;
+            npc.setOrder(kind,radius==null?Math.min(dev.zuma.tacticalnpc.core.OrderState.maximumRadius(kind),npc.runtime().orderState().radius()):radius);
+        }
+        source.sendSuccess(()->Component.literal("Order "+kind+" assigned to "+targets.size()+" NPC(s), anchored at each current position; "+(radius==null?"existing radii retained up to this order's maximum.":"radius="+radius)),true);
+        return targets.size();
+    }
+    private static net.minecraft.world.entity.Entity aimedNpc(net.minecraft.commands.CommandSourceStack source) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        if(!(source.getEntity() instanceof net.minecraft.server.level.ServerPlayer player))
+            throw commandError("Console/non-player sources require explicit targets at the end of /npc mode.");
+        var level=player.serverLevel();Vec3 start=player.getEyePosition(),end=start.add(player.getViewVector(1).scale(32));
+        var block=level.clip(new net.minecraft.world.level.ClipContext(start,end,net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,player));
+        boolean wall=block.getType()!=net.minecraft.world.phys.HitResult.Type.MISS;
+        if(wall)end=block.getLocation();
+        var candidates=new java.util.ArrayList<net.minecraft.world.entity.Entity>();
+        level.getEntities(net.minecraft.world.level.entity.EntityTypeTest.forClass(net.minecraft.world.entity.Entity.class),
+            new net.minecraft.world.phys.AABB(start,end).inflate(1),e->e!=player && !e.isSpectator() && e.isPickable() && !e.isRemoved(),candidates,64);
+        if(candidates.size()==64)throw commandError("Aim selection is crowded; use explicit targets.");
+        net.minecraft.world.entity.Entity hit=null;double nearest=start.distanceToSqr(end);
+        for(var entity:candidates) {
+            var box=entity.getBoundingBox().inflate(entity.getPickRadius());
+            var point=box.contains(start)?java.util.Optional.of(start):box.clip(start,end);
+            if(point.isPresent()) {
+                double distance=start.distanceToSqr(point.get());
+                if(distance<nearest || !wall && distance==nearest) {nearest=distance;hit=entity;}
+            }
+        }
+        if(hit==null)throw commandError("Aim at an independent NPC within 32 blocks with no wall, or supply targets.");
+        return hit;
+    }
+    private static com.mojang.brigadier.exceptions.CommandSyntaxException commandError(String message) {
+        return new com.mojang.brigadier.exceptions.SimpleCommandExceptionType(Component.literal(message)).create();
     }
     private static int squad(net.minecraft.commands.CommandSourceStack source,java.util.Collection<? extends net.minecraft.world.entity.Entity> entities,java.util.UUID id) {
         int count=0;for(var entity:entities)if(entity instanceof dev.zuma.tacticalnpc.entity.TacticalNpcEntity npc){npc.setSquad(id);count++;}

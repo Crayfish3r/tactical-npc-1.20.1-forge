@@ -8,10 +8,40 @@ import java.util.WeakHashMap;
 import java.util.function.Function;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
+@net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid=dev.zuma.tacticalnpc.TacticalNpcAiMod.ID)
 public final class RuntimeRegistry {
     public static final String TAG = "tactical_ai";
     private static final List<Function<LivingEntity,NpcRuntimeAdapter>> PROVIDERS = new java.util.concurrent.CopyOnWriteArrayList<>();
     private static final Map<LivingEntity,WeakReference<TacticalCombatGoal>> ACTIVE = new WeakHashMap<>();
+    // Loaded supported NPC identities only. No entity references or full-world scans.
+    private static final Map<ServerLevel,Loaded> LOADED=new WeakHashMap<>();
+    private static final class Loaded {
+        final ArrayList<java.util.UUID> ids=new ArrayList<>();
+        final Map<java.util.UUID,Integer> positions=new java.util.HashMap<>();
+        void add(java.util.UUID id){if(!positions.containsKey(id)){positions.put(id,ids.size());ids.add(id);}}
+        void remove(java.util.UUID id){Integer index=positions.remove(id);if(index==null)return;var last=ids.remove(ids.size()-1);if(index<ids.size()){ids.set(index,last);positions.put(last,index);}}
+    }
+    public static int loadedNpcCount(ServerLevel level){var loaded=LOADED.get(level);return loaded==null?0:loaded.ids.size();}
+    public static LivingEntity loadedNpcAt(ServerLevel level,int index){
+        var loaded=LOADED.get(level);if(loaded==null || index<0 || index>=loaded.ids.size())return null;
+        var id=loaded.ids.get(index);var entity=level.getEntity(id);
+        if(entity instanceof LivingEntity living && !entity.isRemoved())return living;
+        loaded.remove(id);return null;
+    }
+    @net.minecraftforge.eventbus.api.SubscribeEvent(priority=net.minecraftforge.eventbus.api.EventPriority.LOWEST)
+    public static void joined(net.minecraftforge.event.entity.EntityJoinLevelEvent event){
+        if(event.getLevel() instanceof ServerLevel level && event.getEntity() instanceof LivingEntity living && adapt(living)!=null)
+            LOADED.computeIfAbsent(level,k->new Loaded()).add(living.getUUID());
+    }
+    @net.minecraftforge.eventbus.api.SubscribeEvent
+    public static void left(net.minecraftforge.event.entity.EntityLeaveLevelEvent event){
+        if(event.getLevel() instanceof ServerLevel level && event.getEntity() instanceof LivingEntity living){
+            var loaded=LOADED.get(level);if(loaded!=null)loaded.remove(living.getUUID());
+            for(var goal:activeIn(level))goal.forget(living.getUUID());
+        }
+    }
+    @net.minecraftforge.eventbus.api.SubscribeEvent
+    public static void unloaded(net.minecraftforge.event.level.LevelEvent.Unload event){if(event.getLevel() instanceof ServerLevel level)LOADED.remove(level);}
     private static volatile Function<ServerLevel,NpcRuntimeAdapter> spawner;
     private static volatile Function<ServerLevel,NpcRuntimeAdapter> legacySpawner;
     public static void register(Function<LivingEntity,NpcRuntimeAdapter> provider, Function<ServerLevel,NpcRuntimeAdapter> create) { PROVIDERS.add(provider); legacySpawner=create; }

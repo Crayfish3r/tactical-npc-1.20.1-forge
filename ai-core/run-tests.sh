@@ -6,3 +6,6 @@ trap 'rm -rf "$out"' EXIT
 find src/main/java src/test/java -name '*.java' -print0 | xargs -0 javac --release 17 -encoding UTF-8 -d "$out"
 java -cp "$out" dev.zuma.tacticalnpc.core.CoreSmokeTest
 java -cp "$out" dev.zuma.tacticalnpc.core.AlphaRegressionTest
+java -cp "$out" dev.zuma.tacticalnpc.core.DefendTerritoryTest
+java -cp "$out" dev.zuma.tacticalnpc.core.DefendPatrolTest
+java -cp "$out" dev.zuma.tacticalnpc.core.AttackRouteTest

@@ -11,8 +11,8 @@ import net.minecraftforge.fml.LogicalSide;
 
 public final class ShotSafetyEvents {
     @SubscribeEvent public void death(net.minecraftforge.event.entity.living.LivingDeathEvent event) {
-        if(event.getEntity() instanceof net.minecraft.server.level.ServerPlayer player)
-            for(var goal:RuntimeRegistry.activeIn(player.serverLevel())) goal.forget(player.getUUID());
+        if(event.getEntity().level() instanceof net.minecraft.server.level.ServerLevel level)
+            for(var goal:RuntimeRegistry.activeIn(level)) goal.forget(event.getEntity().getUUID());
     }
     @SubscribeEvent public void starting(net.minecraftforge.event.server.ServerStartingEvent event) { GunSupport.verifyResources(event.getServer().getResourceManager()); }
     @SubscribeEvent public void reload(net.minecraftforge.event.OnDatapackSyncEvent event) {
@@ -38,8 +38,8 @@ public final class ShotSafetyEvents {
         // Without a faction authority, reject damage from our orphan rather than lose ally protection.
         var runtime=event.getAttacker()==null?null:RuntimeRegistry.adapt(event.getAttacker());
         if(runtime==null) {event.setCanceled(true);return;}
-        if (event.getHurtEntity() instanceof LivingEntity victim &&
-                runtime.allied(victim)) event.setCanceled(true);
+        if (!(event.getHurtEntity() instanceof LivingEntity victim) ||
+                !dev.zuma.tacticalnpc.combat.CombatTargets.eligible(runtime.entity(),victim)) event.setCanceled(true);
     }
     @SubscribeEvent
     public void projectile(net.minecraftforge.event.entity.EntityJoinLevelEvent event) {
