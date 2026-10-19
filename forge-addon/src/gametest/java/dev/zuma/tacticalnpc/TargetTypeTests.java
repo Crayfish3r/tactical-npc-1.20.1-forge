@@ -20,7 +20,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.gametest.*;
 
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 @Mod.EventBusSubscriber(modid=TacticalNpcAiMod.ID)
 public final class TargetTypeTests {
     private static UUID capture;
@@ -28,7 +28,7 @@ public final class TargetTypeTests {
     @SubscribeEvent public static void projectile(net.minecraftforge.event.entity.EntityJoinLevelEvent event) {
         if(event.getEntity() instanceof com.tacz.guns.entity.EntityKineticBullet bullet && bullet.getOwner()!=null && bullet.getOwner().getUUID().equals(capture))nativeBullet=bullet;
     }
-    @GameTest(template="arena",batch="targets-01-duel",timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="targets-01-duel",timeoutTicks=180)
     public static void opposingNpcsFireNativeRoundsWithoutPlayers(GameTestHelper h) {
         begin(h);var a=npc(h,2.5,7.5,"red",true);var b=npc(h,13.5,7.5,"blue",true);b.setYRot(90);b.setYHeadRot(90);capture=a.getUUID();
         int beforeA=ProjectileProbe.count(a.getUUID()),beforeB=ProjectileProbe.count(b.getUUID());
@@ -43,7 +43,7 @@ public final class TargetTypeTests {
             h.assertTrue(a.faction().equals("red"),"no automatic faction conversion");finish(h);
         });
     }
-    @GameTest(template="arena",batch="targets-02-allies",timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="targets-02-allies",timeoutTicks=180)
     public static void defaultFactionAndScoreboardAlliesNeverAcquire(GameTestHelper h) {
         begin(h);var a=npc(h,2.5,7.5,"hostile",true);var b=npc(h,13.5,7.5,"hostile",true);
         var scoreboard=h.getLevel().getScoreboard();var team=scoreboard.addPlayerTeam("t"+a.getUUID().toString().substring(0,8));
@@ -53,7 +53,7 @@ public final class TargetTypeTests {
         });
         h.runAtTickTime(140,()->{h.assertTrue(!new VisibilitySensor().valid(a,b,40) && a.controller().observation()==null && a.controller().shots()==0 && b.controller().shots()==0,"scoreboard alliance wins over different factions");scoreboard.removePlayerTeam(team);finish(h);});
     }
-    @GameTest(template="arena",batch="targets-03-types",timeoutTicks=140)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="targets-03-types",timeoutTicks=140)
     public static void ordinaryMobsAnimalsArmorStandsAndSelfAreExcluded(GameTestHelper h) {
         begin(h);var a=npc(h,2.5,7.5,"red",true);var zombie=h.spawn(EntityType.ZOMBIE,new BlockPos(10,2,5));zombie.setNoAi(true);zombie.setInvulnerable(true);
         var cow=h.spawn(EntityType.COW,new BlockPos(11,2,7));cow.setNoAi(true);var stand=h.spawn(EntityType.ARMOR_STAND,new BlockPos(10,2,9));
@@ -65,7 +65,7 @@ public final class TargetTypeTests {
             noPlayers(h);h.assertTrue(a.controller().observation()==null && a.controller().shots()==0,"excluded nearby living entities never become AI contacts");finish(h);
         });
     }
-    @GameTest(template="arena",batch="targets-04-page",timeoutTicks=55)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="targets-04-page",timeoutTicks=55)
     public static void npcPageBeyondSixteenAndDeferredKeepProgress(GameTestHelper h) {
         begin(h);var a=npc(h,3.5,7.5,"red",false);for(int i=0;i<20;i++)npc(h,9.5+i*.01,2.5,"blue",false);var open=npc(h,13.5,7.5,"blue",false);
         for(int x=0;x<=14;x++)for(int y=2;y<=6;y++)h.setBlock(new BlockPos(x,y,4),Blocks.STONE);
@@ -83,18 +83,18 @@ public final class TargetTypeTests {
         });
         h.runAtTickTime(25,()->{h.assertTrue(found[0],"NPC beyond cap is reached after deferred cursor continuation");finish(h);});
     }
-    @GameTest(template="arena",batch="targets-05-memory",timeoutTicks=130)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="targets-05-memory",timeoutTicks=130)
     public static void occludedNpcResolutionNeverRefreshesHiddenCoordinates(GameTestHelper h) {
         begin(h);var a=npc(h,2.5,7.5,"red",true);var b=npc(h,13.5,7.5,"blue",false);Observation[] frozen={null};
         h.runAtTickTime(40,()->{h.assertTrue(a.controller().observation()!=null && a.controller().observation().visible(),"NPC genuinely observed before wall");frozen[0]=a.controller().observation();wall(h);var at=h.absoluteVec(new Vec3(13.5,2,3.5));b.moveTo(at.x,at.y,at.z);});
         h.onEachTick(()->{if(h.getTick()<=42 || frozen[0]==null || a.controller()==null)return;var memory=a.controller().observation();h.assertTrue(memory!=null && !memory.visible() && memory.position().equals(frozen[0].position()) && memory.tick()==frozen[0].tick() && memory.velocity().lengthSquared()==0,"UUID validity cannot reveal hidden NPC position or velocity");h.assertFalse(a.controller().allowNativeFire(),"wall still gates every native round");});
         h.runAtTickTime(100,()->finish(h));
     }
-    @GameTest(template="arena",batch="targets-06-death",timeoutTicks=150)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="targets-06-death",timeoutTicks=150)
     public static void npcDeathClearsContactAndQueuedNativeFire(GameTestHelper h){lifecycle(h,0);}
-    @GameTest(template="arena",batch="targets-07-unload",timeoutTicks=150)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="targets-07-unload",timeoutTicks=150)
     public static void npcUnloadClearsContactAndLoadedIndex(GameTestHelper h){lifecycle(h,1);}
-    @GameTest(template="arena",batch="targets-08-dimension",timeoutTicks=150)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="targets-08-dimension",timeoutTicks=150)
     public static void npcDimensionTransferCannotResolveAcrossLevels(GameTestHelper h){lifecycle(h,2);}
     private static void lifecycle(GameTestHelper h,int change) {
         begin(h);var a=npc(h,2.5,7.5,"red",true);var b=npc(h,13.5,7.5,"blue",false);long[] shots={0},generation={0};Entity[] moved={null};
@@ -110,7 +110,7 @@ public final class TargetTypeTests {
         });
         h.runAtTickTime(110,()->{h.assertTrue(a.controller().shots()==shots[0] && a.controller().observation()==null,"no stale post-lifecycle fire");if(moved[0]!=null)moved[0].discard();finish(h);});
     }
-    @GameTest(template="arena",batch="targets-09-activation",timeoutTicks=100)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="targets-09-activation",timeoutTicks=100)
     public static void hiddenNpcWakesLodWithoutGrantingObservation(GameTestHelper h) {
         begin(h);var a=npc(h,2.5,7.5,"red",true);var b=npc(h,13.5,7.5,"blue",false);wall(h);var frames=new HashSet<Long>();
         h.onEachTick(()->{if(h.getTick()>20 && h.getTick()<45 && a.controller()!=null && a.controller().decision()!=null)frames.add(a.controller().decision().frame().tick());});

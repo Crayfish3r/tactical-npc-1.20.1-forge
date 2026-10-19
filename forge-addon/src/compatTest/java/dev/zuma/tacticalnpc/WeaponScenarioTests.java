@@ -18,14 +18,12 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 /** Separate batches prevent nearby fixtures/FakePlayers from becoming each other's targets. */
-@GameTestHolder(TacticalNpcAiMod.ID)
 @PrefixGameTestTemplate(false)
 public final class WeaponScenarioTests {
-    @GameTest(template="arena", batch="01-no-target", timeoutTicks=200)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena", batch="01-no-target", timeoutTicks=200)
     public static void noTargetMaintenance(GameTestHelper h) {
         var n = spawn(h, "ak47", 0, false);
         h.runAtTickTime(100, () -> {
@@ -34,7 +32,7 @@ public final class WeaponScenarioTests {
             finish(h,n);
         });
     }
-    @GameTest(template="arena", batch="02-reload-cover", timeoutTicks=220)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena", batch="02-reload-cover", timeoutTicks=220)
     public static void reloadBehindWall(GameTestHelper h) {
         var n = spawn(h,"ak47",0,false); var p = player(h);
         wall(h,true);
@@ -45,7 +43,7 @@ public final class WeaponScenarioTests {
             p.discard(); finish(h,n);
         });
     }
-    @GameTest(template="arena", batch="03-reaction", timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena", batch="03-reaction", timeoutTicks=180)
     public static void reactionThenLoss(GameTestHelper h) {
         var n=spawn(h,"ak47",30,true); var p=player(h);
         h.runAtTickTime(4, () -> h.assertTrue(goal(n).shots()==0,"no instant shot"));
@@ -58,7 +56,7 @@ public final class WeaponScenarioTests {
             });
         });
     }
-    @GameTest(template="arena", batch="04-bolt", timeoutTicks=160)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena", batch="04-bolt", timeoutTicks=160)
     public static void boltWithoutTarget(GameTestHelper h) {
         var n=spawn(h,"ai_awp",3,false);
         h.runAtTickTime(90, () -> {
@@ -66,7 +64,7 @@ public final class WeaponScenarioTests {
             h.assertTrue(goal(n).shots()==0,"bolt does not fire"); finish(h,n);
         });
     }
-    @GameTest(template="arena", batch="05-corridor", timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena", batch="05-corridor", timeoutTicks=180)
     public static void allyCrossingAndBehindTarget(GameTestHelper h) {
         ServerConfig.DEBUG.set(true);
         var n=spawn(h,"aa12",8,true); var p=player(h);
@@ -81,7 +79,7 @@ public final class WeaponScenarioTests {
         });
         h.runAtTickTime(90, () -> { h.assertTrue(goal(n).shots()>0,"shotgun fires after corridor clears: target="+goal(n).targetId()+" head="+n.getYHeadRot()+" position="+n.position()+" decision="+goal(n).decision()+" gun="+goal(n).weaponState()); p.discard(); finish(h,n); });
     }
-    @GameTest(template="arena", batch="06-ownership", timeoutTicks=100)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena", batch="06-ownership", timeoutTicks=100)
     public static void tagDeathUnload(GameTestHelper h) {
         var n=spawn(h,"ak47",30,true);
         var originalLook=n.getLookControl();var originalBody=n.bodyRotationControl;
@@ -94,7 +92,7 @@ public final class WeaponScenarioTests {
         h.runAtTickTime(20, () -> { h.assertTrue(goal(n)!=null,"reclaimed"); n.setHealth(0); });
         h.runAtTickTime(25, () -> { h.assertTrue(goal(n)==null,"death releases"); n.discard(); finish(h,n); });
     }
-    @GameTest(template="arena",batch="08-legacy-navigation-clamp",timeoutTicks=80)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="08-legacy-navigation-clamp",timeoutTicks=80)
     public static void legacyNavigationCannotSnapAim(GameTestHelper h) {
         var n=spawn(h,"ak47",30,true);var at=n.position();
         h.runAtTickTime(5,()->{
@@ -107,7 +105,7 @@ public final class WeaponScenarioTests {
             finish(h,n);
         });
     }
-    @GameTest(template="arena", batch="07-modes", timeoutTicks=160)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena", batch="07-modes", timeoutTicks=160)
     public static void nativeModesAndBurst(GameTestHelper h) {
         h.assertTrue(IGun.getIGunOrNull(GunSupport.create(new ResourceLocation("tacz:ak47"))).getFireMode(GunSupport.create(new ResourceLocation("tacz:ak47")))==FireMode.AUTO,"AK chooses allowed AUTO");
         var glock=GunSupport.create(new ResourceLocation("tacz:glock_17"));

@@ -14,9 +14,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.*;
 
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 public final class PerceptionTests {
-    @GameTest(template="arena",batch="perception-r2-four",timeoutTicks=40)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="perception-r2-four",timeoutTicks=40)
     public static void acquisitionContinuesPastFourBlocked(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=acquisitionNpc(h,false);
         var players=acquisitionPlayers(h,4,true);var open=players.get(4);
@@ -32,7 +32,7 @@ public final class PerceptionTests {
             acquisitionFinish(h,n,players);
         });
     }
-    @GameTest(template="arena",batch="perception-r2-fov",timeoutTicks=40)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="perception-r2-fov",timeoutTicks=40)
     public static void acquisitionFiltersFovBeforeLos(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=acquisitionNpc(h,false);
         var players=acquisitionPlayers(h,4,false);var open=players.get(4);
@@ -45,7 +45,7 @@ public final class PerceptionTests {
             acquisitionFinish(h,n,players);
         });
     }
-    @GameTest(template="arena",batch="perception-r2-cap",timeoutTicks=50)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="perception-r2-cap",timeoutTicks=50)
     public static void acquisitionContinuesBeyondSixteen(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=acquisitionNpc(h,false);
         var players=acquisitionPlayers(h,33,true);var open=players.get(33);
@@ -66,7 +66,7 @@ public final class PerceptionTests {
         });
         h.runAtTickTime(23,()->{h.assertTrue(found[0],"R2: stable 34-player scene reaches the visible player beyond the 16-player cap");acquisitionFinish(h,n,players);});
     }
-    @GameTest(template="arena",batch="perception-r2-budget",timeoutTicks=40)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="perception-r2-budget",timeoutTicks=40)
     public static void acquisitionDeferredKeepsCursor(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=acquisitionNpc(h,false);
         var players=acquisitionPlayers(h,4,true);var open=players.get(4);
@@ -80,7 +80,7 @@ public final class PerceptionTests {
         });
         h.runAtTickTime(11,()->{h.assertTrue(sensor.acquire(n,40)==open,"DEFERRED must retry the untested fifth candidate, without restarting or skipping it");acquisitionFinish(h,n,players);});
     }
-    @GameTest(template="arena",batch="perception-r2-runtime",timeoutTicks=60)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="perception-r2-runtime",timeoutTicks=60)
     public static void controllerAcquiresFifthWithCadence(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=acquisitionNpc(h,true);
         var players=acquisitionPlayers(h,4,true);var open=players.get(4);
@@ -101,7 +101,7 @@ public final class PerceptionTests {
         });
         h.runAtTickTime(31,()->acquisitionFinish(h,n,players));
     }
-    @GameTest(template="arena",batch="perception-r2-pending",timeoutTicks=70)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="perception-r2-pending",timeoutTicks=70)
     public static void acquisitionRetainsVisiblePendingPerception(GameTestHelper h) {
         ScenarioIsolation.begin(h);
         dev.zuma.tacticalnpc.config.ServerConfig.PERCEPTION.set(8);
@@ -135,7 +135,7 @@ public final class PerceptionTests {
     private static void acquisitionFinish(GameTestHelper h,TacticalNpcEntity n,java.util.List<net.minecraftforge.common.util.FakePlayer> players) {
         players.forEach(net.minecraft.world.entity.Entity::discard);n.discard();h.succeed();
     }
-    @GameTest(template="arena",batch="perception-01",timeoutTicks=260)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="perception-01",timeoutTicks=260)
     public static void hiddenPositionFrozenAndExpires(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=NpcEntities.NPC.get().create(h.getLevel());
         Vec3 origin=h.absoluteVec(new Vec3(3.5,2,7.5));n.moveTo(origin.x,origin.y,origin.z,-90,0);n.setYHeadRot(-90);
@@ -157,7 +157,7 @@ public final class PerceptionTests {
         });
         h.runAtTickTime(235,()->{h.assertTrue(n.controller().observation()==null,"visual memory expires");p.discard();n.discard();h.succeed();});
     }
-    @GameTest(template="arena",batch="perception-02",timeoutTicks=100)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="perception-02",timeoutTicks=100)
     public static void hearingIsRegionAndFovIsSeparate(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=NpcEntities.NPC.get().create(h.getLevel());Vec3 at=h.absoluteVec(new Vec3(3.5,2,7.5));n.moveTo(at.x,at.y,at.z,90,0);n.setYHeadRot(90);
         n.setItemSlot(EquipmentSlot.MAINHAND,GunSupport.create(new ResourceLocation("tacz:ak47")));n.addTag(RuntimeRegistry.TAG);h.getLevel().addFreshEntity(n);

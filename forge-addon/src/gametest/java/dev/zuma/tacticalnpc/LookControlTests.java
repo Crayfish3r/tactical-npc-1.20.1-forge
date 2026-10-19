@@ -4,9 +4,9 @@ import dev.zuma.tacticalnpc.config.ServerConfig;
 import net.minecraft.gametest.framework.*;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.*;
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 public final class LookControlTests {
-    @GameTest(template="arena",batch="look-01-navigation-clamp",timeoutTicks=80)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="look-01-navigation-clamp",timeoutTicks=80)
     public static void navigationCannotSnapAim(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=NpcEntities.NPC.get().create(h.getLevel());var at=h.absoluteVec(new Vec3(8.5,2,8.5));n.moveTo(at.x,at.y,at.z,180,0);n.setYHeadRot(0);h.getLevel().addFreshEntity(n);
         h.runAtTickTime(5,()->{

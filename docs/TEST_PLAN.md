@@ -2,6 +2,10 @@
 
 Фактические прогоны, ошибки и логи: [IMPLEMENTATION-STATUS](IMPLEMENTATION-STATUS.md). NPCs 2.1.0 — отдельный compatibility runtime; версии зависимостей закреплены.
 
+Текущий выбор FAST/STAGE/FULL, команды для локальной регрессии и правила production rebuild:
+[TESTING-PROFILES](TESTING-PROFILES.md). Полная матрица ниже относится к FULL; её не нужно
+повторять после каждой локальной правки. Исторические результаты не заменяют актуальные receipts.
+
 ```bash
 bash ai-core/run-tests.sh
 ```
@@ -9,9 +13,10 @@ bash ai-core/run-tests.sh
 Из `forge-addon`:
 
 ```powershell
-.\gradlew.bat --offline build
-.\gradlew.bat --offline -PcombatTests runGameTestServer
-.\gradlew.bat --offline -PcombatTests -PlegacyCompatibility runGameTestServer
+python ../tools/testing/run-gametests.py FULL --offline
+python ../tools/testing/run-gametests.py FULL --legacy --offline
+.\gradlew.bat --offline build --console=plain
+python -B ../tools/verify-production-artifacts.py
 .\gradlew.bat --offline runServer
 ```
 

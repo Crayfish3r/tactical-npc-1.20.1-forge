@@ -1,0 +1,41 @@
+// Test-only registration selection. All test sources stay in the compiler inputs.
+def testProfile = providers.gradleProperty('testProfile').getOrElse('FULL')
+def selection = providers.gradleProperty('testSelection').getOrElse('')
+if (!(testProfile in ['FAST', 'STAGE', 'FULL'])) throw new GradleException('Unknown testProfile')
+if (testProfile == 'FULL' && !selection.isBlank()) throw new GradleException('FULL cannot filter tests')
+if (testProfile != 'FULL' && selection.isBlank()) throw new GradleException('FAST/STAGE require testSelection')
+if (project.hasProperty('profile') || project.hasProperty('clientSmoke')) {
+    throw new GradleException('Do not combine combatTests with profile/clientSmoke')
+}
+def roots = ['src/gametest/java']
+if (project.hasProperty('legacyCompatibility')) roots += 'src/compatTest/java'
+def knownSelectors = [] as Set
+def catalog = roots.collectMany { root ->
+    fileTree(root).matching { include '**/*.java' }.files.findAll {
+        it.getText('UTF-8') =~ /@GameTest\s*\(/
+    }.collect { source ->
+        def text = source.getText('UTF-8')
+        if (text =~ /@GameTestHolder\b|@GameTestGenerator\b/) {
+            throw new GradleException("Use SelectedGameTests registration only: ${source}")
+        }
+        def pkg = text =~ /package\s+([\w.]+)\s*;/
+        if (!pkg.find()) throw new GradleException("Missing test package: ${source}")
+        def simpleName = source.name[0..-6]
+        knownSelectors.add(simpleName)
+        def methods = text =~ /@GameTest\s*\([^)]*\)\s*public static void (\w+)\(/
+        methods.each { match -> knownSelectors.add("${simpleName}#${match[1]}".toString()) }
+        "${pkg.group(1)}.${simpleName}"
+    }
+}.sort()
+if (catalog.isEmpty()) throw new GradleException('Empty GameTest catalog')
+if (!selection.isBlank()) {
+    def tokens = selection.split(',', -1).toList()
+    if (tokens.size() != tokens.toSet().size() || tokens.any { !knownSelectors.contains(it) }) {
+        throw new GradleException("Unknown or duplicate testSelection: ${selection}")
+    }
+}
+minecraft.runs.gameTestServer {
+    property 'tactical.tests.catalog', catalog.join(',')
+    property 'tactical.tests.selection', selection
+    property 'tactical.tests.profile', testProfile
+}

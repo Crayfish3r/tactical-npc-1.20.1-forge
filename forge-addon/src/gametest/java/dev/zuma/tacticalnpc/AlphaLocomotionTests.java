@@ -12,9 +12,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.*;
 
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 public final class AlphaLocomotionTests {
-    @GameTest(template="wide_arena",batch="alpha-speed",timeoutTicks=570)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="alpha-speed",timeoutTicks=570)
     public static void straightLaneNpcGaits(GameTestHelper h) {
         ScenarioIsolation.begin(h);Vec3 origin=h.absoluteVec(new Vec3(3.5,2,20.5));
         // Seal a dry lane before clearing it: old test-world fluids must not flow into a speed sample.

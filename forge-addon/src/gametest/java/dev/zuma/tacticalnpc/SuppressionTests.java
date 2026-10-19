@@ -12,9 +12,9 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.*;
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 public final class SuppressionTests {
-    @GameTest(template="arena",batch="suppress-01",timeoutTicks=220)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="suppress-01",timeoutTicks=220)
     public static void knownOpenPointWithoutHiddenTracking(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=NpcEntities.NPC.get().create(h.getLevel());Vec3 at=h.absoluteVec(new Vec3(3.5,2,7.5));n.moveTo(at.x,at.y,at.z,-90,0);n.setYHeadRot(-90);n.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
         var stack=GunSupport.create(new ResourceLocation("tacz:ak47"));var gun=IGun.getIGunOrNull(stack);gun.setCurrentAmmoCount(stack,30);gun.setBulletInBarrel(stack,true);n.setItemSlot(EquipmentSlot.MAINHAND,stack);n.addTag(RuntimeRegistry.TAG);h.getLevel().addFreshEntity(n);

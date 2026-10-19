@@ -19,7 +19,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.gametest.*;
 
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 @Mod.EventBusSubscriber(modid=TacticalNpcAiMod.ID)
 public final class AttackTests {
     private static UUID watched;
@@ -35,7 +35,7 @@ public final class AttackTests {
         int count=AiWorkBudget.of(level).paths();maximum=Math.max(maximum,count);
         if(count>0){long tick=level.getGameTime();if(last>=0)minGap=Math.min(minGap,tick-last);last=tick;requests+=count;}
     }
-    @GameTest(template="wide_arena",batch="attack-01-idle",timeoutTicks=550)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="attack-01-idle",timeoutTicks=550)
     public static void idleAttackReallyExploresBeyondOldAnchor(GameTestHelper h) {
         begin(h);var n=npc(h,31.5,31.5,false);var origin=n.position();var points=new HashSet<Vector3>();double[] distance={0};boolean[] pause={false};
         h.onEachTick(()->{
@@ -46,7 +46,7 @@ public final class AttackTests {
         });
         h.runAtTickTime(500,()->{h.assertTrue(points.size()>=3 && distance[0]>8 && pause[0],"actual free movement and held legs/pauses beyond ASSAULT radius 4: points="+points.size()+" distance="+distance[0]+" pause="+pause[0]);budget(h,500);finish(n);h.succeed();});
     }
-    @GameTest(template="wide_arena",batch="attack-02-blocked",timeoutTicks=550)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="attack-02-blocked",timeoutTicks=550)
     public static void unreachableExplorationBacksOffWithoutPathSpam(GameTestHelper h) {
         begin(h);var n=npc(h,31.5,31.5,false);Vector3[] closed={null};boolean[] pause={false},replaced={false};var origin=n.position();
         h.onEachTick(()->{
@@ -58,7 +58,7 @@ public final class AttackTests {
         });
         h.runAtTickTime(500,()->{h.assertTrue(closed[0]!=null && pause[0] && replaced[0] && n.position().distanceTo(origin)>2,"unreachable exploration replaced after finite recovery/backoff");budget(h,500);finish(n);h.succeed();});
     }
-    @GameTest(template="wide_arena",batch="attack-03-native",timeoutTicks=650)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="attack-03-native",timeoutTicks=650)
     public static void approachRunsThenAdsAndNativeProjectile(GameTestHelper h) {
         begin(h);var n=npc(h,9.5,31.5,true);var origin=n.position();var p=player(h,47.5,31.5);boolean[] run={false},adsAfterRun={false},advance={false};double[] nearest={100},farthest={0};
         int bulletsBefore=ProjectileProbe.count(n.getUUID());
@@ -76,7 +76,7 @@ public final class AttackTests {
             budget(h,600);p.discard();finish(n);h.succeed();
         });
     }
-    @GameTest(template="wide_arena",batch="attack-04-memory",timeoutTicks=550)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="attack-04-memory",timeoutTicks=550)
     public static void hiddenRouteFrozenUntilExpiryThenFreeSearch(GameTestHelper h) {
         begin(h);var n=npc(h,11.5,31.5,true);var p=player(h,27.5,31.5);Observation[] frozen={null};boolean[] hidden={false},resumed={false};Vec3[] resumedAt={null};double[] motion={0};
         n.setAmmoPolicy(TacticalNpcEntity.AmmoPolicy.INFINITE,0);
@@ -99,7 +99,7 @@ public final class AttackTests {
         });
         h.runAtTickTime(500,()->{h.assertTrue(hidden[0] && resumed[0] && motion[0]>.5,"memory TTL ends and actual free exploration resumes: motion="+motion[0]);budget(h,500);p.discard();finish(n);h.succeed();});
     }
-    @GameTest(template="wide_arena",batch="attack-05-obstacle",timeoutTicks=350)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="attack-05-obstacle",timeoutTicks=350)
     public static void legitimateMemoryPathDetoursSimpleBarrier(GameTestHelper h) {
         begin(h);var n=npc(h,11.5,31.5,true);var p=player(h,23.5,31.5);Vector3[] frozen={null};double[] side={0};boolean[] beyond={false};
         h.runAtTickTime(30,()->{

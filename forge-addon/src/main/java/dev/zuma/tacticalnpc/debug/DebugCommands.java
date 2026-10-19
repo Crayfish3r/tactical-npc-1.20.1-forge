@@ -17,6 +17,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public final class DebugCommands {
     @SubscribeEvent
     public void register(RegisterCommandsEvent event) {
+        // Merge only this literal child; do not require permission on another mod's /spawn root.
+        event.getDispatcher().register(Commands.literal("spawn")
+            .then(Commands.literal("npc").requires(s->s.hasPermission(2)).executes(c->spawn(c.getSource(),false))));
         event.getDispatcher().register(Commands.literal("npc").requires(s->s.hasPermission(2))
             .then(Commands.literal("mode").requires(s->s.hasPermission(2))
                 .then(mode("attack",dev.zuma.tacticalnpc.core.OrderState.Kind.ASSAULT))
@@ -149,9 +152,19 @@ public final class DebugCommands {
         try {
             var level=source.getLevel();var runtime=legacy?RuntimeRegistry.createLegacy(level):RuntimeRegistry.create(level);
             runtime.requireServer();var npc=runtime.entity();Vec3 pos=source.getPosition().add(3,0,0);
+            if(!legacy) {
+                var standing=new dev.zuma.tacticalnpc.combat.CoverSensor(runtime);
+                pos=null;
+                for(Vec3 offset:new Vec3[]{new Vec3(3,0,0),new Vec3(-3,0,0),new Vec3(0,0,3),new Vec3(0,0,-3)}) {
+                    Vec3 candidate=standing.safeStanding(source.getPosition().add(offset));
+                    if(candidate!=null) {pos=candidate;break;}
+                }
+                if(pos==null) {source.sendFailure(Component.literal("Cannot spawn: no safe loaded space within 3 blocks."));return 0;}
+            }
             npc.moveTo(pos.x,pos.y,pos.z,0,0);npc.setPersistenceRequired();
+            if(!legacy) ((dev.zuma.tacticalnpc.entity.TacticalNpcEntity)npc).enterNeutral();
             npc.setItemSlot(EquipmentSlot.MAINHAND,gun(new ResourceLocation("tacz:ak47")));runtime.onEquip(npc.getMainHandItem());npc.addTag(RuntimeRegistry.TAG);
-            if(!level.noCollision(npc) || !level.addFreshEntity(npc)) {
+            if((!legacy && !level.getWorldBorder().isWithinBounds(npc.getBoundingBox())) || !level.noCollision(npc) || !level.addFreshEntity(npc)) {
                 source.sendFailure(Component.literal("Cannot spawn: clear a space 3 blocks east of your position."));return 0;
             }
             source.sendSuccess(()->Component.literal("Tactical NPC "+npc.getUUID()+" spawned with AK-47; runtime="+(legacy?"NPCs 2.1.0":"independent")),true);return 1;

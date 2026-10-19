@@ -19,13 +19,11 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
-@GameTestHolder(TacticalNpcAiMod.ID)
 @PrefixGameTestTemplate(false)
 public final class IndependentNpcTests {
-    @GameTest(template="arena",batch="own-01-maintenance",timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="own-01-maintenance",timeoutTicks=180)
     public static void nativeLifecycleWithoutNpcs(GameTestHelper h) {
         if(Boolean.getBoolean("tactical.tests.noNpcs")) h.assertFalse(net.minecraftforge.fml.ModList.get().isLoaded("tacznpcs"),"NPCs is absent from standalone process");
         var npc=spawn(h,"ak47",0,false);
@@ -37,7 +35,7 @@ public final class IndependentNpcTests {
             h.assertTrue(npc.controller().shots()==0,"maintenance never shoots"); finish(h,npc);
         });
     }
-    @GameTest(template="arena",batch="own-02-combat",timeoutTicks=320)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="own-02-combat",timeoutTicks=320)
     public static void combatSmoke(GameTestHelper h) {
         dev.zuma.tacticalnpc.config.ServerConfig.DEBUG.set(true);
         var npc=spawn(h,"ak47",0,false); var p=player(h); wall(h,true);
@@ -61,7 +59,7 @@ public final class IndependentNpcTests {
             h.runAtTickTime(230,()->{h.assertTrue(npc.controller()==null,"death cleanup");p.discard();finish(h,npc);});
         });
     }
-    @GameTest(template="arena",batch="own-03-finite",timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="own-03-finite",timeoutTicks=180)
     public static void finiteReserveAndBolt(GameTestHelper h) {
         var npc=spawn(h,"ai_awp",3,false);
         npc.setAmmoPolicy(TacticalNpcEntity.AmmoPolicy.FINITE,0);
@@ -73,7 +71,7 @@ public final class IndependentNpcTests {
         });
         h.runAtTickTime(110,()->{h.assertTrue(npc.controller().reloads()==0,"empty reserve refuses reload");finish(h,npc);});
     }
-    @GameTest(template="arena",batch="own-04-persistence",timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="own-04-persistence",timeoutTicks=180)
     public static void nbtUnloadReload(GameTestHelper h) {
         var npc=spawn(h,"glock_17",10,true);npc.setAmmoPolicy(TacticalNpcEntity.AmmoPolicy.FINITE,7);
         CompoundTag saved=new CompoundTag();var service=npc.serviceId();long[] oldGeneration={0};
@@ -91,7 +89,7 @@ public final class IndependentNpcTests {
             });
         });
     }
-    @GameTest(template="arena",batch="own-07-finite-consumption",timeoutTicks=220)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="own-07-finite-consumption",timeoutTicks=220)
     public static void finiteReloadConsumesReserve(GameTestHelper h) {
         var npc=spawn(h,"glock_17",0,false);npc.setAmmoPolicy(TacticalNpcEntity.AmmoPolicy.FINITE,7);
         h.runAtTickTime(120,()->{
@@ -102,7 +100,7 @@ public final class IndependentNpcTests {
         });
         h.runAtTickTime(165,()->{h.assertTrue(npc.controller().reloads()==1,"exhausted reserve cannot reload again");finish(h,npc);});
     }
-    @GameTest(template="arena",batch="own-05-dimension",timeoutTicks=120)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="own-05-dimension",timeoutTicks=120)
     public static void dimensionTransfer(GameTestHelper h) {
         var npc=spawn(h,"ak47",15,true);
         h.runAtTickTime(15,()->{
@@ -116,7 +114,7 @@ public final class IndependentNpcTests {
             h.runAtTickTime(25,()->{moved.discard();finish(h,npc);});
         });
     }
-    @GameTest(template="arena",batch="own-06-friendly",timeoutTicks=100)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="own-06-friendly",timeoutTicks=100)
     public static void alliedDamageEventGuard(GameTestHelper h) {
         var npc=spawn(h,"ak47",30,true);
         var ally=NpcEntities.NPC.get().create(h.getLevel());var pos=h.absoluteVec(new Vec3(14,2,7));ally.moveTo(pos.x,pos.y,pos.z);h.getLevel().addFreshEntity(ally);

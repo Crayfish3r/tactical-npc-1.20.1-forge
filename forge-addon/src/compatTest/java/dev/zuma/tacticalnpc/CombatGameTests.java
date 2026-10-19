@@ -18,13 +18,11 @@ import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
-@GameTestHolder(TacticalNpcAiMod.ID)
 @PrefixGameTestTemplate(false)
 public final class CombatGameTests {
-    @GameTest(template = "arena", timeoutTicks = 600)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template = "arena", timeoutTicks = 600)
     public static void combatLifecycle(GameTestHelper h) {
         ScenarioIsolation.begin(h);
         ServerConfig.DEBUG.set(true);

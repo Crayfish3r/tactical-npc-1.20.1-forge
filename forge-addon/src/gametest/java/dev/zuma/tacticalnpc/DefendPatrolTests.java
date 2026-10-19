@@ -21,7 +21,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.gametest.*;
 
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 @Mod.EventBusSubscriber(modid=TacticalNpcAiMod.ID)
 public final class DefendPatrolTests {
     private static final Map<UUID,Probe> PROBES=new HashMap<>();
@@ -34,11 +34,11 @@ public final class DefendPatrolTests {
             if(count>0){long tick=level.getGameTime();if(p.last>=0)p.minGap=Math.min(p.minGap,tick-p.last);p.last=tick;p.requests+=count;}
         }
     }
-    @GameTest(template="wide_arena",batch="defend-patrol-01-small",timeoutTicks=550)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-patrol-01-small",timeoutTicks=550)
     public static void idleRadius4ReallyMovesAndPauses(GameTestHelper h){idle(h,4,500);}
-    @GameTest(template="wide_arena",batch="defend-patrol-02-medium",timeoutTicks=650)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-patrol-02-medium",timeoutTicks=650)
     public static void idleRadius32ReallyMovesAndPauses(GameTestHelper h){idle(h,32,600);}
-    @GameTest(template="wide_arena",batch="defend-patrol-03-large",timeoutTicks=650)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-patrol-03-large",timeoutTicks=650)
     public static void idleRadius128ExploresBeyondLegacyCap(GameTestHelper h){idle(h,128,600);}
     private static void idle(GameTestHelper h,int radius,int duration) {
         begin(h);var n=npc(h,radius);var anchor=n.position();var points=new HashSet<Vector3>();
@@ -59,7 +59,7 @@ public final class DefendPatrolTests {
         });
     }
 
-    @GameTest(template="wide_arena",batch="defend-patrol-04-blocked",timeoutTicks=550)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-patrol-04-blocked",timeoutTicks=550)
     public static void blockedWaypointBacksOffAndSelectsAnother(GameTestHelper h) {
         begin(h);var n=npc(h,32);final Vector3[] blocked={null};boolean[] replaced={false},pause={false};var origin=n.position();
         h.onEachTick(()->{
@@ -78,7 +78,7 @@ public final class DefendPatrolTests {
         });
     }
 
-    @GameTest(template="wide_arena",batch="defend-patrol-05-combat",timeoutTicks=550)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-patrol-05-combat",timeoutTicks=550)
     public static void combatAndLiveMemoryInterruptThenPatrolResumes(GameTestHelper h) {
         begin(h);var n=npc(h,4);var anchor=n.position();
         var stack=GunSupport.create(new ResourceLocation("tacz:ak47"));var gun=com.tacz.guns.api.item.IGun.getIGunOrNull(stack);
@@ -112,9 +112,9 @@ public final class DefendPatrolTests {
         });
     }
 
-    @GameTest(template="wide_arena",batch="defend-patrol-06-save",timeoutTicks=550)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-patrol-06-save",timeoutTicks=550)
     public static void persistedDefendRebuildsPatrolAfterEntityLoad(GameTestHelper h) {
-        begin(h);var original=npc(h,32);final CompoundTag saved=new CompoundTag();final TacticalNpcEntity[] loaded={null};
+        begin(h);var original=npc(h,32,UUID.fromString("2ca0999a-f025-4308-88ba-5e2ec2f39aa8"));final CompoundTag saved=new CompoundTag();final TacticalNpcEntity[] loaded={null};
         final Vec3[] position={null};final OrderState[] order={null};var points=new HashSet<Vector3>();double[] distance={0};
         h.runAtTickTime(180,()->{
             h.assertTrue(original.position().distanceTo(h.absoluteVec(new Vec3(31.5,2,31.5)))>1,"original actually patrolled before save");
@@ -123,17 +123,21 @@ public final class DefendPatrolTests {
         });
         h.runAtTickTime(182,()->{
             loaded[0]=(TacticalNpcEntity)EntityType.loadEntityRecursive(saved,h.getLevel(),e->e);
-            h.assertTrue(loaded[0]!=null && order[0].equals(loaded[0].runtime().orderState()) && saved.getCompound("tacticalnpc").getInt("schema")==2,"persisted order/anchor/radius, unchanged schema");
+            h.assertTrue(loaded[0]!=null && order[0].equals(loaded[0].runtime().orderState()) && saved.getCompound("tacticalnpc").getInt("schema")==3,"schema 3 retains persisted order/anchor/radius");
             loaded[0].setOnGround(true);h.assertTrue(h.getLevel().addFreshEntity(loaded[0]),"saved entity re-added with original UUID");
         });
         h.onEachTick(()->{
             var n=loaded[0];if(n==null)return;inside(h,n);distance[0]=Math.max(distance[0],n.position().distanceTo(position[0]));
             if(n.controller()!=null && n.controller().decision()!=null && n.controller().decision().movement().destination()!=null)points.add(n.controller().decision().movement().destination());
         });
-        h.runAtTickTime(500,()->{h.assertTrue(points.size()>=2 && distance[0]>2,"new controller rebuilds actual patrol after load");budget(h,loaded[0],500);finish(loaded[0]);h.succeed();});
+        h.runAtTickTime(500,()->{
+            String evidence="points="+points+" distance="+distance[0]+" position="+loaded[0].position()+" neutral="+loaded[0].neutral()+" entityTicks="+loaded[0].tickCount+" chunkTicking="+h.getLevel().isPositionEntityTicking(loaded[0].blockPosition())+" noAI="+loaded[0].isNoAi()+" controller="+(loaded[0].controller()==null?"null":loaded[0].controller().decision())+" navigationDone="+loaded[0].getNavigation().isDone();
+            TacticalNpcAiMod.LOGGER.info("STAGE07 persisted patrol diagnostic {}",evidence);
+            h.assertTrue(points.size()>=2 && distance[0]>2,"new controller rebuilds actual patrol after load: "+evidence);budget(h,loaded[0],500);finish(loaded[0]);h.succeed();
+        });
     }
 
-    @GameTest(template="wide_arena",batch="defend-patrol-07-legacy",timeoutTicks=550)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-patrol-07-legacy",timeoutTicks=550)
     public static void independentPatrolOrderKeepsOldCardinalRoute(GameTestHelper h) {
         begin(h);var n=npc(h,32);n.setOrder(OrderState.Kind.PATROL,32);var origin=n.position();var points=new HashSet<Vector3>();double[] distance={0};
         h.onEachTick(()->{
@@ -146,7 +150,11 @@ public final class DefendPatrolTests {
     }
     private static void begin(GameTestHelper h){ScenarioIsolation.begin(h);PROBES.clear();}
     private static TacticalNpcEntity npc(GameTestHelper h,int radius) {
+        return npc(h,radius,null);
+    }
+    private static TacticalNpcEntity npc(GameTestHelper h,int radius,UUID id) {
         var n=NpcEntities.NPC.get().create(h.getLevel());var at=h.absoluteVec(new Vec3(31.5,2,31.5));n.moveTo(at.x,at.y,at.z);n.setOnGround(true);
+        if(id!=null)n.setUUID(id);
         n.setOrder(OrderState.Kind.DEFEND_AREA,radius);n.addTag(RuntimeRegistry.TAG);h.getLevel().addFreshEntity(n);PROBES.put(n.getUUID(),new Probe());return n;
     }
     private static void inside(GameTestHelper h,TacticalNpcEntity n) {

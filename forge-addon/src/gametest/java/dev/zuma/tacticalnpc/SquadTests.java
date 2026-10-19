@@ -16,9 +16,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.*;
 import java.util.*;
 
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 public final class SquadTests {
-    @GameTest(template="arena",batch="squad-01-report-lifecycle",timeoutTicks=160)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="squad-01-report-lifecycle",timeoutTicks=160)
     public static void delayedFrozenReportsAndLeaderDeath(GameTestHelper h) {
         ScenarioIsolation.begin(h);UUID squad=UUID.randomUUID();
         var leader=npc(h,new Vec3(3.5,2,4.5),squad);var receiver=npc(h,new Vec3(3.5,2,12.5),squad);
@@ -43,7 +43,7 @@ public final class SquadTests {
         });
         h.runAtTickTime(100,()->{h.assertTrue(board.members(squad)==0,"tag ownership release clears squad references");receiver.discard();p.discard();h.succeed();});
     }
-    @GameTest(template="arena",batch="squad-02-coordinated-1v4",timeoutTicks=220)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="squad-02-coordinated-1v4",timeoutTicks=220)
     public static void coordinatedFourNativeFire(GameTestHelper h) {
         ScenarioIsolation.begin(h);UUID group=UUID.randomUUID();var actors=new ArrayList<TacticalNpcEntity>();
         for(int i=0;i<4;i++)actors.add(npc(h,new Vec3(3.5,2,1.5+4*i),group));

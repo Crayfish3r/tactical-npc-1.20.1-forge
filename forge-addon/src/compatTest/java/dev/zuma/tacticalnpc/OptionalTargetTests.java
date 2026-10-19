@@ -11,9 +11,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.*;
 
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 public final class OptionalTargetTests {
-    @GameTest(template="arena",batch="targets-optional-01",timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="targets-optional-01",timeoutTicks=180)
     public static void independentTargetsVerifiedLegacyRuntime(GameTestHelper h) {
         ScenarioIsolation.begin(h);var own=own(h,2.5);var legacy=RuntimeRegistry.createLegacy(h.getLevel());var target=legacy.entity();var at=h.absoluteVec(new Vec3(13.5,2,7.5));target.moveTo(at.x,at.y,at.z);target.setNoAi(true);target.setInvulnerable(true);h.getLevel().addFreshEntity(target);
         int bullets=ProjectileProbe.count(own.getUUID());
@@ -23,7 +23,7 @@ public final class OptionalTargetTests {
             target.discard();h.assertTrue(own.controller().observation()==null && own.controller().contactId()==null && !own.controller().allowNativeFire(),"optional target leave invalidates contact and native gate");own.discard();h.succeed();
         });
     }
-    @GameTest(template="arena",batch="targets-optional-02",timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="targets-optional-02",timeoutTicks=180)
     public static void legacyControllerUsesSameNpcPolicyAndNativeGate(GameTestHelper h) {
         ScenarioIsolation.begin(h);var target=own(h,13.5);target.removeTag(RuntimeRegistry.TAG);var legacy=RuntimeRegistry.createLegacy(h.getLevel());var shooter=legacy.entity();var at=h.absoluteVec(new Vec3(2.5,2,7.5));shooter.moveTo(at.x,at.y,at.z,-90,0);shooter.setYHeadRot(-90);shooter.setInvulnerable(true);shooter.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
         var stack=GunSupport.create(new ResourceLocation("tacz:ak47"));var gun=com.tacz.guns.api.item.IGun.getIGunOrNull(stack);gun.setCurrentAmmoCount(stack,30);gun.setBulletInBarrel(stack,true);shooter.setItemSlot(EquipmentSlot.MAINHAND,stack);shooter.addTag(RuntimeRegistry.TAG);h.getLevel().addFreshEntity(shooter);

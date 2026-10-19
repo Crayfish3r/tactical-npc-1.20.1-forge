@@ -932,7 +932,8 @@ HEAD прежний, commit/PR не создавались. **WAITING_PLAYTEST �
 
 ## 06 — свободный attack / ASSAULT, 2026-10-18–19
 
-Статус: **WAITING_PLAYTEST**. Этап 05 принят владельцем в запросе 06.
+Статус: **ACCEPTED** — владелец явно написал «Этап 06 принят, продолжай!» 2026-10-19 в текущем чате.
+При завершении 06 статус был WAITING_PLAYTEST. Этап 05 принят владельцем в запросе 06.
 HEAD/main: `d3d7de3de41a27c52db51e14df2473206bd3d11c`; работаем поверх принятого
 dirty checkpoint 01/03/04/05, без reset/checkout/pull. Новый commit/PR не создаётся.
 Исходный review SHA сам по себе не подтверждает эти изменения.
@@ -1365,3 +1366,33 @@ HEAD, все восемь source/audit receipts, stage-only patch, оба produc
 
 **WAITING_PLAYTEST — ОСТАНОВКА.** Этап 02 ещё не принят; принятие 06 также не предполагается
 автоматически. Следующий этап не запускался и требует отдельного сообщения владельца.
+
+## 07 — нейтральный spawn / реальный damage, 2026-10-19
+
+Статус: **WAITING_PLAYTEST**. Владелец явно принял 06 сообщением
+«Этап 06 принят, продолжай!»; запись 06 выше дополнена этим подтверждением.
+База `main`, HEAD `eb1f04eefb2141adaefd91c90fb82b56a0d9c030`, плюс сохранённый dirty diff
+аудита тестирования. Принятие аудита/02/07 не предполагается. Commit/reset/push/merge отсутствуют.
+
+Выполнен только 07. Полный stage-only отчёт, actual commands/receipts, production SHA,
+ошибки запусков и ручные шаги: [STAGE-07-NEUTRAL](STAGE-07-NEUTRAL.md).
+Изменены 4 production файла (entity/targets/goal/commands), 2 новых test classes,
+2 прежние NBT schema assertions/диагностика одного patrol fixture, audit и этот журнал.
+Сохранения schema 3; schema 1/2 остаются active и сохраняют прежние order/radius128/identity/ammo.
+
+FAST 3/3; первый STAGE standalone 22/24, reload fixture исправлен; точечный повтор 2/2;
+save/load с UUID упавшего NPC 1/1; combined selected 7/7. Всего 37 executions / 32 уникальных
+сценария, каждый имеет итоговый PASS receipt. Новый core run не нужен: core не менялся.
+Старый необъяснённый ранний save/load patrol FAIL из принятого 06 не объявлен исправленным;
+повторная диагностика: 318 entity ticks, chunkTicking=true, несколько leg points, 14.528 blocks.
+
+Один plain production build PASS (18s), artifact verifier PASS; main 171937 bytes / 83 classes,
+compat 7680 / 4, Java major 61. Точные SHA в отчёте. Финальный ordinary runServer без flags/init:
+новый stage07-neutral-smoke, `/spawn npc`, schema3/neutral1b NBT, save-all и clean stop PASS.
+Неудачные helper-запуски также задокументированы: прежний ignored independent-smoke загружался
+и сохранялся, его runtime state не объявляется неизменным. Properties/TOML восстановлены
+побайтово, EULA не менялась. Ordinary smoke не доказывает бой/native reload: magazine=0,
+projectile n=0; реальные native reload/BURST/projectile проверены GameTests.
+
+Human playtest/save-restart/FULL/perf/JFR/soak NOT RUN. 08–14 не начинались.
+**WAITING_PLAYTEST — ОСТАНОВКА.** Следующий этап только после «Этап 07 принят, продолжай».

@@ -16,9 +16,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.*;
 
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 public final class AlphaResponsivenessTests {
-    @GameTest(template="arena",batch="alpha-01",timeoutTicks=200)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="alpha-01",timeoutTicks=200)
     public static void contactReacquireTrackingAndDeferred(GameTestHelper h) {
         ScenarioIsolation.begin(h);ServerConfig.PERCEPTION.set(2);ServerConfig.REACTION.set(3);ServerConfig.REACQUIRE.set(1);ServerConfig.ACQUISITION.set(4);ServerConfig.TURN.set(17.0);ServerConfig.SUPPRESSION.set(false);
         var n=NpcEntities.NPC.get().create(h.getLevel());Vec3 origin=h.absoluteVec(new Vec3(3.5,2,7.5));n.moveTo(origin.x,origin.y,origin.z,-90,0);n.setYHeadRot(-90);
@@ -59,14 +59,14 @@ public final class AlphaResponsivenessTests {
             ServerConfig.SUPPRESSION.set(true);p.discard();n.discard();h.succeed();
         });
     }
-    @GameTest(template="arena",batch="alpha-02",timeoutTicks=120)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="alpha-02",timeoutTicks=120)
     public static void failedDestinationRecoversLocally(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=NpcEntities.NPC.get().create(h.getLevel());Vec3 origin=h.absoluteVec(new Vec3(3.5,2,7.5));n.moveTo(origin.x,origin.y,origin.z);n.setOrder(OrderState.Kind.ASSAULT,24);h.getLevel().addFreshEntity(n);
         var movement=new MovementExecutor(n.runtime());var bad=new Vector3(origin.x+8,origin.y+20,origin.z);long[] ticks={0};boolean[] failed={false},arrived={false};
         h.onEachTick(()->{movement.apply(MovementCommand.navigate(bad,MovementCommand.Locomotion.RELOCATION),++ticks[0]);failed[0]|=movement.failedDestination(ticks[0])!=null;arrived[0]|=movement.recoveryStatus()==RouteRecovery.Status.ACCEPTED;});
         h.runAtTickTime(100,()->{h.assertTrue(failed[0] && arrived[0] && n.position().distanceTo(origin)>1,"one unsafe destination chooses a real reachable local alternative within 100 ticks: status="+movement.recoveryStatus()+" pos="+n.position());movement.stop(ticks[0]);n.discard();h.succeed();});
     }
-    @GameTest(template="arena",batch="alpha-03",timeoutTicks=40)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="alpha-03",timeoutTicks=40)
     public static void emergencyStopsPeekWhilePathDeferred(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=NpcEntities.NPC.get().create(h.getLevel());Vec3 origin=h.absoluteVec(new Vec3(3.5,2,7.5));
         n.moveTo(origin.x,origin.y,origin.z);n.setOrder(OrderState.Kind.ASSAULT,24);h.getLevel().addFreshEntity(n);

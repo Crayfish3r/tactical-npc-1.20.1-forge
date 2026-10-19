@@ -13,19 +13,19 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.*;
 
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 public final class WeaponProfileTests {
-    @GameTest(template="arena",batch="profile-01-ar",timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="profile-01-ar",timeoutTicks=180)
     public static void rifleNativeFire(GameTestHelper h){weapon(h,"ak47",WeaponProfile.Kind.AR,30,true,1);}
-    @GameTest(template="arena",batch="profile-02-pistol",timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="profile-02-pistol",timeoutTicks=180)
     public static void pistolNativeFire(GameTestHelper h){weapon(h,"glock_17",WeaponProfile.Kind.PISTOL,15,true,1);}
-    @GameTest(template="arena",batch="profile-03-shotgun",timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="profile-03-shotgun",timeoutTicks=180)
     public static void shotgunNativePellets(GameTestHelper h){weapon(h,"aa12",WeaponProfile.Kind.SHOTGUN,8,false,10);}
-    @GameTest(template="arena",batch="profile-04-sniper",timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="profile-04-sniper",timeoutTicks=180)
     public static void sniperNativeBoltFire(GameTestHelper h){weapon(h,"ai_awp",WeaponProfile.Kind.SNIPER,3,false,1);}
-    @GameTest(template="arena",batch="profile-05-smg",timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="profile-05-smg",timeoutTicks=180)
     public static void smgNativeFire(GameTestHelper h){weapon(h,"uzi",WeaponProfile.Kind.SMG,25,false,1);}
-    @GameTest(template="arena",batch="profile-06-lmg",timeoutTicks=180)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="profile-06-lmg",timeoutTicks=180)
     public static void lmgNativeFire(GameTestHelper h){weapon(h,"m249",WeaponProfile.Kind.LMG,30,false,1);}
 
     private static void weapon(GameTestHelper h,String id,WeaponProfile.Kind kind,int ammo,boolean chamber,int pellets) {
@@ -44,7 +44,7 @@ public final class WeaponProfileTests {
         });
     }
 
-    @GameTest(template="wide_arena",batch="profile-09-working-distances",timeoutTicks=500)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="profile-09-working-distances",timeoutTicks=500)
     public static void weaponDistanceReallyMoves(GameTestHelper h) {
         ScenarioIsolation.begin(h);var smg=npc(h,"uzi",25,false,new Vec3(3.5,2,20.5));smg.setOrder(OrderState.Kind.ASSAULT,24);
         var p=player(h,new Vec3(35.5,2,20.5));
@@ -58,7 +58,7 @@ public final class WeaponProfileTests {
         });
     }
 
-    @GameTest(template="arena",batch="profile-07-orders",timeoutTicks=200)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="profile-07-orders",timeoutTicks=200)
     public static void defendReturnAndOrderPersistence(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,"uzi",20,false,new Vec3(3.5,2,7.5));
         n.setOrder(OrderState.Kind.DEFEND_AREA,4);var anchor=n.runtime().orderState().anchor();
@@ -74,7 +74,7 @@ public final class WeaponProfileTests {
     }
 
     /** Independent 1v4 baseline, before any squad coordination exists. FakePlayer, not a human duel. */
-    @GameTest(template="arena",batch="profile-08-independent-1v4",timeoutTicks=220)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="profile-08-independent-1v4",timeoutTicks=220)
     public static void independentFourAgainstOne(GameTestHelper h) {
         ScenarioIsolation.begin(h);var actors=new java.util.ArrayList<TacticalNpcEntity>();
         for(int i=0;i<4;i++) {

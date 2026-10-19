@@ -141,3 +141,26 @@ javap -classpath 'forge-addon/libs/tacz-1.20.1-1.1.8-hotfix2.jar' -p com.tacz.gu
 
 Conclusion: an independent NPC runtime using TaCZ has a binary-supported path worth testing. Keep the current NPCs adapter during contract extraction; prove a standalone vertical slice before porting larger tactical systems. See [architecture review](ARCHITECTURE-REVIEW-2026-10-10.md) and [development instructions](DEVELOPMENT-PLAN.md).
 
+## Stage 07 actual-damage / ownership audit, 2026-10-19
+
+- Pinned mapped Forge 47.4.20 binary confirms `LivingEntity.actuallyHurt(DamageSource,float): void`
+  is protected/overridable. The independent entity calls super and compares health + absorption
+  after Forge hurt/damage cancellation and reductions. A pre-event, `hurt()` boolean or
+  `lastHurtByMob` alone never grants reactive hostility. No new Mixin/event-order dependency.
+- `DamageSource.getEntity()` identifies the causing entity; for a direct `Projectile` the actual
+  `Projectile.getOwner()` must be that same supported living attacker. Unknown/unresolved owner,
+  self, ordinary mobs, cross-level/dead/creative/spectator sources cannot grant a target.
+- Rechecked `javap -c -p EntityKineticBullet` from pinned `libs/tacz-1.20.1-1.1.8-hotfix2.jar`:
+  `createDamageSources(MaybeMultipartEntity)` normally supplies bullet as direct entity and
+  `getOwner()` as causing entity to `ModDamageTypes.Sources.bullet/bulletVoid`. Magic uses the
+  same bullet/owner pair; PRETEND_MELEE_DAMAGE_ON uses owner directly. This is damage-source
+  inspection only, not a new unsupported weapon/script allowance. Raw evidence local:
+  `forge-addon/build/stage07-bullet-api.txt`.
+- Damage grants only a transient UUID. Exact aim points enter memory only after budgeted CLEAR
+  LOS; real-hit rearward response can sample LOS without FOV/acquisition delay, while turn limits,
+  native weapon/ADS/reload/cooldown and final per-round safety remain. No attacker coordinates
+  are serialized; schema 3 persists only neutral policy plus the existing saved state.
+- Personal exception is evaluated by the same `CombatTargets.eligible` used by vision and the
+  existing TaCZ pre-damage guard. It does not change faction/team alliances; any other ally is
+  protected. Existing optional spawn/operator/equipment code is unchanged.
+

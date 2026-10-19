@@ -30,6 +30,10 @@ public final class TacticalNpcEntity extends PathfinderMob {
     private double leash=24;
     private Vector3 anchor;
     private boolean initialized;
+    private boolean neutral;
+    // Transient identity only: never serialize an attacker, live target or hidden coordinates.
+    private UUID reactiveAttacker;
+    private long reactiveUntil;
     private TacticalCombatGoal controller;
     private final NpcRuntimeAdapter runtime=new NpcRuntimeAdapter() {
         @Override public TacticalNpcEntity entity() { return TacticalNpcEntity.this; }
@@ -60,10 +64,35 @@ public final class TacticalNpcEntity extends PathfinderMob {
     public AmmoPolicy ammoPolicy() { return ammoPolicy; }
     public String faction() { return faction; }
     public String order() { return order; }
+    public boolean neutral() { return neutral; }
+    public UUID reactiveAttacker() { return reactiveAttacker; }
+    public boolean reactiveTo(UUID id) { return id!=null && id.equals(reactiveAttacker); }
+    public long reactiveUntil() { return reactiveUntil; }
+    public void enterNeutral() {
+        runtime.requireServer();setOrder(OrderState.Kind.HOLD_POSITION,24);neutral=true;
+    }
+    public void clearRetaliation() { runtime.requireServer();reactiveAttacker=null;reactiveUntil=0; }
+    public void refreshRetaliation() {
+        runtime.requireServer();if(reactiveAttacker!=null)reactiveUntil=level().getGameTime()+ServerConfig.MEMORY.get();
+    }
+    @Override protected void actuallyHurt(net.minecraft.world.damagesource.DamageSource source,float amount) {
+        float before=getHealth()+getAbsorptionAmount();
+        super.actuallyHurt(source,amount);
+        if(level().isClientSide || !neutral || !isAlive() || !(getHealth()+getAbsorptionAmount()<before))return;
+        // Runs after Forge hurt/damage cancellation and reductions, not from a pre-damage event.
+        if(!(source.getEntity() instanceof LivingEntity attacker) ||
+                !dev.zuma.tacticalnpc.combat.CombatTargets.validSubject(this,attacker))return;
+        Entity direct=source.getDirectEntity();
+        if(direct!=attacker && !(direct instanceof net.minecraft.world.entity.projectile.Projectile projectile && projectile.getOwner()==attacker))return;
+        runtime.requireServer();boolean changed=!reactiveTo(attacker.getUUID());
+        reactiveAttacker=attacker.getUUID();refreshRetaliation();
+        if(changed && controller!=null)controller.retaliate(reactiveAttacker);
+    }
     public void setSquad(UUID id) {runtime.requireServer();if(controller!=null)controller.stop();squadId=id;}
     public void setOrder(OrderState.Kind kind,double radius) {
         runtime.requireServer();
         if(!OrderState.validRadius(kind,radius)) throw new IllegalArgumentException("Order radius must be 4.."+OrderState.maximumRadius(kind)+" blocks");
+        neutral=false;clearRetaliation();
         order=kind.name();leash=radius;anchor=new Vector3(getX(),getY(),getZ());
         if(controller!=null) controller.stop();
         getNavigation().stop();
@@ -100,6 +129,7 @@ public final class TacticalNpcEntity extends PathfinderMob {
         super.tick();
     }
     public void release() {
+        clearRetaliation();
         if(controller!=null) { goalSelector.removeGoal(controller); controller.stop(); controller=null; }
         RuntimeRegistry.release(this);
     }
@@ -107,7 +137,8 @@ public final class TacticalNpcEntity extends PathfinderMob {
     @Override protected void removeAfterChangingDimensions() { if(!level().isClientSide) release(); super.removeAfterChangingDimensions(); }
     @Override public void addAdditionalSaveData(CompoundTag root) {
         super.addAdditionalSaveData(root);
-        CompoundTag tag=new CompoundTag(); tag.putInt("schema",2); tag.putUUID("serviceId",serviceId);
+        CompoundTag tag=new CompoundTag(); tag.putInt("schema",3); tag.putUUID("serviceId",serviceId);
+        tag.putBoolean("neutral",neutral);
         tag.putString("loadout",loadout); tag.putString("faction",faction); tag.putString("order",order);
         tag.putString("ammoPolicy",ammoPolicy.name()); tag.putInt("initialReserve",initialReserve); tag.putDouble("leash",leash);
         Vector3 saved=anchor==null?new Vector3(getX(),getY(),getZ()):anchor;
@@ -119,7 +150,8 @@ public final class TacticalNpcEntity extends PathfinderMob {
         super.readAdditionalSaveData(root);
         CompoundTag tag=root.getCompound("tacticalnpc");
         if(tag.isEmpty()) return;
-        if(tag.getInt("schema")<1 || tag.getInt("schema")>2) {
+        reactiveAttacker=null;reactiveUntil=0;neutral=false;
+        if(tag.getInt("schema")<1 || tag.getInt("schema")>3) {
             removeTag(RuntimeRegistry.TAG); ammoPolicy=AmmoPolicy.FINITE; initialReserve=0;
             dev.zuma.tacticalnpc.TacticalNpcAiMod.LOGGER.warn("NPC {} unsupported NBT schema {}; tactical control disabled",getUUID(),tag.getInt("schema"));
             return;
@@ -128,12 +160,13 @@ public final class TacticalNpcEntity extends PathfinderMob {
         squadId=tag.hasUUID("squad")?tag.getUUID("squad"):null;
         if(tag.contains("loadout")) loadout=tag.getString("loadout");
         if(tag.contains("faction")) faction=tag.getString("faction");
+        neutral=tag.getInt("schema")==3 && tag.getBoolean("neutral");
         try {order=OrderState.Kind.valueOf(tag.getString("order")).name();}catch(IllegalArgumentException ex){order="HOLD_POSITION";}
         try { ammoPolicy=AmmoPolicy.valueOf(tag.getString("ammoPolicy")); } catch(IllegalArgumentException ex) { ammoPolicy=AmmoPolicy.FINITE; }
         initialReserve=Math.max(0,tag.getInt("initialReserve")); leash=Math.max(4,Math.min(OrderState.maximumRadius(OrderState.Kind.valueOf(order)),tag.getDouble("leash")));
         if(!Double.isFinite(leash)) leash=24;
         anchor=null;
-        if(tag.getInt("schema")==2) {
+        if(tag.getInt("schema")>=2) {
             double x=tag.getDouble("anchorX"),y=tag.getDouble("anchorY"),z=tag.getDouble("anchorZ");
             if(Double.isFinite(x) && Double.isFinite(y) && Double.isFinite(z)) anchor=new Vector3(x,y,z);
         }

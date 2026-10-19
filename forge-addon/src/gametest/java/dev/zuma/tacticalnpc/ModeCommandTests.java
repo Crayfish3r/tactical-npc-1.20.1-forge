@@ -22,12 +22,11 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 public final class ModeCommandTests {
-    @GameTest(template="arena",batch="mode-01-aliases",timeoutTicks=60)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="mode-01-aliases",timeoutTicks=60)
     public static void aliasesShareStatePersistenceAndInvalidation(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,3.5,7.5);
         var stack=GunSupport.create(new ResourceLocation("tacz:ak47"));var gun=IGun.getIGunOrNull(stack);
@@ -53,14 +52,14 @@ public final class ModeCommandTests {
             run(h,source,"tacticalnpc order "+id+" PATROL 9");h.assertTrue(n.runtime().orderState().kind()==OrderState.Kind.PATROL,"PATROL remains independent");
             run(h,source,"npc mode defend 14 "+id);var expected=n.runtime().orderState();
             var saved=new CompoundTag();n.save(saved);
-            h.assertTrue(saved.getCompound("tacticalnpc").getInt("schema")==2 && !saved.getCompound("tacticalnpc").contains("mode"),"existing NBT schema and order are the single source of truth");
+            h.assertTrue(saved.getCompound("tacticalnpc").getInt("schema")==3 && !saved.getCompound("tacticalnpc").contains("mode"),"schema 3 adds neutral policy without duplicating the order/mode source of truth");
             var restored=(TacticalNpcEntity)EntityType.loadEntityRecursive(saved,h.getLevel(),e->e);
             h.assertTrue(restored!=null && expected.equals(restored.runtime().orderState()) && n.serviceId().equals(restored.serviceId()),"new command mode persists via actual entity save/load");
             n.discard();restored.discard();h.succeed();
         });
     }
 
-    @GameTest(template="arena",batch="mode-02-targets",timeoutTicks=60)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="mode-02-targets",timeoutTicks=60)
     public static void validateWholeBatchBeforeMutationAndRequireConsoleTargets(GameTestHelper h) {
         ScenarioIsolation.begin(h);var a=npc(h,3.5,7.5);var b=npc(h,10.5,10.5);
         var at=h.absoluteVec(new Vec3(8.5,2,7.5));var other=new ArmorStand(h.getLevel(),at.x,at.y,at.z);h.getLevel().addFreshEntity(other);
@@ -87,7 +86,7 @@ public final class ModeCommandTests {
         });
     }
 
-    @GameTest(template="arena",batch="mode-03-permission",timeoutTicks=50)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="mode-03-permission",timeoutTicks=50)
     public static void permissionSuggestionsAndOldCommandSurface(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,3.5,7.5);
         h.runAtTickTime(10,()->{
@@ -107,7 +106,7 @@ public final class ModeCommandTests {
         });
     }
 
-    @GameTest(template="arena",batch="mode-04-aim",timeoutTicks=50)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="mode-04-aim",timeoutTicks=50)
     public static void aimSelectsHitInsteadOfNearestAndRespectsWall(GameTestHelper h) {
         ScenarioIsolation.begin(h);var near=npc(h,5.5,10.5);var hit=npc(h,11.5,7.5);var player=player(h);
         h.runAtTickTime(10,()->{
@@ -123,7 +122,7 @@ public final class ModeCommandTests {
         });
     }
 
-    @GameTest(template="wide_arena",batch="mode-05-range",timeoutTicks=50)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="mode-05-range",timeoutTicks=50)
     public static void aimRangeAndUnsupportedFrontEntity(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,38.5,7.5);var player=player(h);
         h.runAtTickTime(10,()->{

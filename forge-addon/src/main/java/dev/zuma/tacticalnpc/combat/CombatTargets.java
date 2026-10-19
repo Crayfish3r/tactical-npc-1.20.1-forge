@@ -18,9 +18,14 @@ public final class CombatTargets {
         var entity=id==null?null:level.getEntity(id);
         return entity instanceof LivingEntity living && living.level()==level && !living.isRemoved()?living:null;
     }
-    public static boolean eligible(PathfinderMob owner,LivingEntity target) {
+    public static boolean validSubject(PathfinderMob owner,LivingEntity target) {
         if(target==null || target==owner || target.level()!=owner.level() || !target.isAlive() || target.isRemoved() || !supported(target))return false;
-        if(target instanceof Player player && (player.isCreative() || player.isSpectator()))return false;
+        return !(target instanceof Player player && (player.isCreative() || player.isSpectator()));
+    }
+    public static boolean eligible(PathfinderMob owner,LivingEntity target) {
+        if(!validSubject(owner,target))return false;
+        if(owner instanceof dev.zuma.tacticalnpc.entity.TacticalNpcEntity npc && npc.neutral())
+            return npc.reactiveTo(target.getUUID());
         var runtime=RuntimeRegistry.adapt(owner);
         return !(runtime==null?owner.isAlliedTo(target):runtime.allied(target));
     }

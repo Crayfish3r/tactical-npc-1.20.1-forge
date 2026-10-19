@@ -13,9 +13,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.*;
 
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 public final class CoverTests {
-    @GameTest(template="wide_arena",batch="cover-01",timeoutTicks=320)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="cover-01",timeoutTicks=320)
     public static void moveReloadAndPeek(GameTestHelper h) {
         dev.zuma.tacticalnpc.config.ServerConfig.DEBUG.set(true);
         ScenarioIsolation.begin(h);dev.zuma.tacticalnpc.config.ServerConfig.STRAFE.set(0.0);var n=NpcEntities.NPC.get().create(h.getLevel());Vec3 origin=h.absoluteVec(new Vec3(3.5,2,7.5));n.moveTo(origin.x,origin.y,origin.z,-90,0);n.setYHeadRot(-90);
@@ -50,7 +50,7 @@ public final class CoverTests {
             p.discard();n.discard();h.succeed();
         });
     }
-    @GameTest(template="arena",batch="cover-02",timeoutTicks=80)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="cover-02",timeoutTicks=80)
     public static void hazardsAndBudgets(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=NpcEntities.NPC.get().create(h.getLevel());Vec3 pos=h.absoluteVec(new Vec3(3.5,2,7.5));n.moveTo(pos.x,pos.y,pos.z);h.getLevel().addFreshEntity(n);
         h.runAtTickTime(5,()->{

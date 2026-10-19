@@ -10,9 +10,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.*;
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 public final class ActivationTests {
-    @GameTest(template="wide_arena",batch="activation-01",timeoutTicks=240)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="activation-01",timeoutTicks=240)
     public static void dormantMaintenanceAndHonestWake(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=NpcEntities.NPC.get().create(h.getLevel());var at=h.absoluteVec(new Vec3(3.5,2,20.5));n.moveTo(at.x,at.y,at.z,-90,0);n.setYHeadRot(-90);n.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
         n.setItemSlot(EquipmentSlot.MAINHAND,GunSupport.create(new ResourceLocation("tacz","ak47")));n.addTag(RuntimeRegistry.TAG);h.getLevel().addFreshEntity(n);

@@ -12,9 +12,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.*;
 
-@GameTestHolder(TacticalNpcAiMod.ID) @PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(false)
 public final class DefendTerritoryTests {
-    @GameTest(template="wide_arena",batch="defend-01-radius",timeoutTicks=40)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-01-radius",timeoutTicks=40)
     public static void commandSetterAndNbtRadiusContract(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,10.5,10.5);
         h.runAtTickTime(5,()->{
@@ -45,7 +45,7 @@ public final class DefendTerritoryTests {
         });
     }
 
-    @GameTest(template="wide_arena",batch="defend-02-detour",timeoutTicks=50)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-02-detour",timeoutTicks=50)
     public static void interiorEndpointRejectsExteriorDetourAndRecovery(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,10.5,10.5);var movement=new MovementExecutor(n.runtime());
         var goal=h.absoluteVec(new Vec3(12.5,2,10.5));final boolean[] ready={false};
@@ -67,7 +67,7 @@ public final class DefendTerritoryTests {
         h.runAtTickTime(40,()->{n.discard();h.succeed();});
     }
 
-    @GameTest(template="wide_arena",batch="defend-03-edge",timeoutTicks=160)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-03-edge",timeoutTicks=160)
     public static void strafeAndRetreatCannotLeaveEdge(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,10.5,10.5);var movement=new MovementExecutor(n.runtime());
         final double[] maximum={0};final Vec3[] anchor={null};final int[] ticks={0};
@@ -89,7 +89,7 @@ public final class DefendTerritoryTests {
         h.runAtTickTime(140,()->{h.assertTrue(maximum[0]<3,"outward strafe is actually stopped");n.discard();h.succeed();});
     }
 
-    @GameTest(template="wide_arena",batch="defend-04-return",timeoutTicks=220)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-04-return",timeoutTicks=220)
     public static void externalDisplacementReturnsThroughOutsideNodes(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,10.5,10.5);var movement=new MovementExecutor(n.runtime());final Vec3[] anchor={null};
         h.runAtTickTime(5,()->{
@@ -114,7 +114,7 @@ public final class DefendTerritoryTests {
         h.runAtTickTime(200,()->{h.assertTrue(n.position().subtract(anchor[0]).horizontalDistance()<2,"displaced NPC really walked back inside: "+n.position());n.discard();h.succeed();});
     }
 
-    @GameTest(template="wide_arena",batch="defend-05-long-return",timeoutTicks=250)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-05-long-return",timeoutTicks=250)
     public static void radius128UsesLocalReturnSegments(GameTestHelper h) {
         ScenarioIsolation.begin(h);
         // Beyond the structure's ticking area: load AND tick only this test's finite corridor.
@@ -140,7 +140,7 @@ public final class DefendTerritoryTests {
         });
     }
 
-    @GameTest(template="wide_arena",batch="defend-06-slope",timeoutTicks=200)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-06-slope",timeoutTicks=200)
     public static void heightAndSlopeAreIndependentFromHorizontalCircle(GameTestHelper h) {
         ScenarioIsolation.begin(h);
         for(int x=9;x<=12;x++)for(int z=9;z<=11;z++)for(int y=2;y<=x-8;y++)h.setBlock(new BlockPos(x,y,z),Blocks.STONE);
@@ -152,7 +152,7 @@ public final class DefendTerritoryTests {
         h.onEachTick(()->{if(goal[0]!=null){movement.apply(MovementCommand.navigate(vector(goal[0])),h.getLevel().getGameTime());movement.guardTerritory();}});
         h.runAtTickTime(180,()->{h.assertTrue(n.position().distanceTo(goal[0])<1 && n.getY()>h.absolutePos(new BlockPos(0,2,0)).getY(),"native navigation climbs checked slope inside circle: "+n.position());n.discard();h.succeed();});
     }
-    @GameTest(template="wide_arena",batch="defend-07-external-contact",timeoutTicks=230)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-07-external-contact",timeoutTicks=230)
     public static void visibleExternalTargetIsShotWithoutPursuit(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,10.5,10.5);n.setYRot(-90);n.setYHeadRot(-90);
         n.setOrder(OrderState.Kind.DEFEND_AREA,4);var anchor=n.position();

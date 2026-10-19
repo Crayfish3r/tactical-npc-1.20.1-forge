@@ -80,6 +80,7 @@ if (project.hasProperty('combatTests')) {
 }
 if(project.hasProperty('clientSmoke')) sourceSets.main.java.srcDir 'src/clientSmoke/java'
 if(project.hasProperty('profile')) sourceSets.main.java.srcDir 'src/profile/java'
+if(project.hasProperty('combatTests')) apply from: 'gradle/testing.gradle'
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
 tasks.named('jar', Jar).configure {
     manifest { attributes 'Implementation-Version': project.version }
