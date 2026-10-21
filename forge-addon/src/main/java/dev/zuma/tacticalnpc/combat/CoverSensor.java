@@ -14,6 +14,10 @@ public final class CoverSensor {
     private final NpcRuntimeAdapter runtime;
     private CoverOption selected;
     private long nextUpdate,nextPath;
+    private long coverUntil,peekUntil,revision;
+    private boolean deferred;
+    public boolean deferred(){return deferred;}
+    public long revision(){return revision;}
     private int cursor,peekCursor;
     private Vec3 lastThreat;
     private final Map<BlockPos,Long> blacklist=new HashMap<>();
@@ -27,43 +31,60 @@ public final class CoverSensor {
         }
         nextUpdate=tick+20;
     }
-    public void reset(){selected=null;lastThreat=null;blacklist.clear();SquadRuntime.of((ServerLevel)runtime.entity().level()).releaseClaims(runtime.entity().getUUID());}
+    public void reset(){selected=null;lastThreat=null;coverUntil=peekUntil=0;deferred=false;revision++;blacklist.clear();SquadRuntime.of((ServerLevel)runtime.entity().level()).releaseClaims(runtime.entity().getUUID());}
     public List<CoverOption> sample(Observation observation,long tick,boolean reposition) {
         runtime.requireServer();var npc=runtime.entity();var level=(ServerLevel)npc.level();
+        deferred=false;
         blacklist.entrySet().removeIf(e->e.getValue()<tick);
         if(observation==null){if(selected!=null || lastThreat!=null)reset();return List.of();}
         if(selected!=null && !reserve(selected.position(),tick))selected=null;
         Vec3 threat=vec(observation.position());
-        if(lastThreat!=null && lastThreat.distanceToSqr(threat)>16) selected=null;
+        if(lastThreat!=null && lastThreat.distanceToSqr(threat)>1){coverUntil=peekUntil=0;revision++;}
         lastThreat=threat;
         if(reposition && selected!=null) reject(selected.position(),tick);
-        if(selected!=null && selected.expires()<tick) selected=null;
-        if(tick<nextUpdate) return selected==null?List.of():List.of(selected);
-        nextUpdate=tick+20;
         if(selected!=null) {
-            if(!AiWorkBudget.of(level).canRays(npc.getUUID(),6)) return List.of(selected);
-            if(!withinOrder(vec(selected.position())) || safeStanding(vec(selected.position()))==null || !protectedAt(vec(selected.position()),threat)) selected=null;
-            else {
-                Vec3 peek=selected.peek()==null?findPeek(vec(selected.position()),threat):vec(selected.peek());
-                selected=new CoverOption(selected.position(),peek==null?null:vector(peek),tick+100);
+            var budget=AiWorkBudget.of(level);Vec3 cover=vec(selected.position());
+            if(!withinOrder(cover) || !sameStanding(cover)){selected=null;revision++;return List.of();}
+            if(tick>=coverUntil) {
+                if(!budget.canRays(npc.getUUID(),6)){deferred=true;return List.of();}
+                if(!protectedAt(cover,threat)){selected=null;revision++;SquadRuntime.of(level).releaseClaims(npc.getUUID());return List.of();}
+                coverUntil=tick+20;
             }
-            return selected==null?List.of():List.of(selected);
+            Vec3 peek=selected.peek()==null?null:vec(selected.peek());
+            if(peek!=null && (!withinOrder(peek) || !sameStanding(peek))){peek=null;peekUntil=0;revision++;}
+            if(tick>=peekUntil){
+                if(peek!=null){
+                    if(!budget.canRays(npc.getUUID(),3)){deferred=true;return List.of(new CoverOption(selected.position(),null,coverUntil));}
+                    if(!peekOpen(peek,cover,threat)){peek=null;revision++;}
+                }
+                if(peek==null)peek=findPeek(cover,threat);
+                peekUntil=deferred?tick:tick+4;
+            }
+            var checked=new CoverOption(selected.position(),peek==null?null:vector(peek),coverUntil);
+            if(!java.util.Objects.equals(checked.peek(),selected.peek()))revision++;
+            selected=checked;
+            return List.of(new CoverOption(selected.position(),deferred?null:selected.peek(),coverUntil));
         }
+        if(tick<nextUpdate)return List.of();
+        nextUpdate=tick+20;
         var budget=AiWorkBudget.of(level);
         double base=Math.atan2(threat.z-npc.getZ(),threat.x-npc.getX());
         for(int count=0;count<6;count++) {
-            if(!budget.candidate(npc.getUUID())) break;
+            if(!budget.candidate(npc.getUUID())) {nextUpdate=tick+1;break;}
             int index=cursor++%24,sector=index%8;
             if(runtime.squadId()!=null && SquadRuntime.of(level).role(runtime.squadId(),npc.getUUID())==SquadBlackboard.Role.FLANKER)sector=new int[]{2,6,1,7,3,5,0,4}[sector];
             double radius=3+(index/8)*2,angle=base+sector*Math.PI/4;
             Vec3 point=safeStanding(npc.position().add(Math.cos(angle)*radius,0,Math.sin(angle)*radius));
-            if(point==null || !withinOrder(point) || !available(vector(point),tick) || blacklist.containsKey(BlockPos.containing(point)) || !budget.canRays(npc.getUUID(),6) || !protectedAt(point,threat)) continue;
-            if(tick<nextPath || !budget.path(npc.getUUID())) break;
+            if(point==null || !withinOrder(point) || !available(vector(point),tick) || blacklist.containsKey(BlockPos.containing(point)))continue;
+            if(!budget.canRays(npc.getUUID(),6)){cursor--;nextUpdate=tick+1;break;}
+            if(!protectedAt(point,threat))continue;
+            if(tick<nextPath || !budget.path(npc.getUUID())) {cursor--;nextUpdate=Math.max(tick+1,nextPath);break;}
             nextPath=tick+20;var path=npc.getNavigation().createPath(BlockPos.containing(point),0);
             if(path==null || !path.canReach() || !withinOrderPath(path)) {blacklist.put(BlockPos.containing(point),tick+160);continue;}
             Vec3 peek=findPeek(point,threat);
             if(!reserve(vector(point),tick))continue;
-            selected=new CoverOption(vector(point),peek==null?null:vector(peek),tick+100);
+            coverUntil=tick+20;peekUntil=deferred?tick:tick+4;revision++;
+            selected=new CoverOption(vector(point),peek==null?null:vector(peek),coverUntil);
             if(dev.zuma.tacticalnpc.config.ServerConfig.DEBUG.get()) dev.zuma.tacticalnpc.TacticalNpcAiMod.LOGGER.info("NPC {} checked cover {} peek {}",npc.getUUID(),point,peek);
             break;
         }
@@ -99,16 +120,22 @@ public final class CoverSensor {
         Vec3 side=new Vec3(-(threat.z-point.z),0,threat.x-point.x).normalize();
         // Continue across budgeted updates instead of starving the farther usable exits forever.
         for(int count=0;count<6;count++) {
-            if(!budget.candidate(npc.getUUID()) || !budget.canRays(npc.getUUID(),3)) return null;
+            if(!budget.candidate(npc.getUUID()) || !budget.canRays(npc.getUUID(),3)){deferred=true;return null;}
             int index=Math.floorMod(peekCursor++,6);double distance=new double[]{1.7,3.2,4.5}[index/2];int sign=index%2==0?-1:1;
             Vec3 test=safeStanding(point.add(side.scale(sign*distance)));
             if(test==null || !withinOrder(test) || blacklist.containsKey(BlockPos.containing(test))) continue;
-            boolean open=true;
-            for(double offset:new double[]{0,-1.2,1.2})
-                if(!Boolean.TRUE.equals(clear(test.add(side.scale(offset)).add(0,npc.getEyeHeight(),0),threat))) {open=false;break;}
-            if(open) return test;
+            if(peekOpen(test,point,threat))return test;
         }
         return null;
+    }
+    private boolean sameStanding(Vec3 point){var checked=safeStanding(point);return checked!=null && checked.distanceToSqr(point)<.01;}
+    private boolean peekOpen(Vec3 test,Vec3 cover,Vec3 threat){
+        var npc=runtime.entity();Vec3 side=new Vec3(-(threat.z-cover.z),0,threat.x-cover.x).normalize();
+        for(double offset:new double[]{0,-1.2,1.2}){
+            Boolean result=clear(test.add(side.scale(offset)).add(0,npc.getEyeHeight(),0),threat);
+            if(result==null){deferred=true;return false;}if(!result)return false;
+        }
+        return true;
     }
     private Boolean clear(Vec3 start,Vec3 end) {
         var npc=runtime.entity();if(!AiWorkBudget.of((ServerLevel)npc.level()).ray(npc.getUUID())) return null;

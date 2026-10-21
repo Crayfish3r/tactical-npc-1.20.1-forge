@@ -1396,3 +1396,27 @@ projectile n=0; реальные native reload/BURST/projectile проверен
 
 Human playtest/save-restart/FULL/perf/JFR/soak NOT RUN. 08–14 не начинались.
 **WAITING_PLAYTEST — ОСТАНОВКА.** Следующий этап только после «Этап 07 принят, продолжай».
+
+## 08–14 — разрешённый владельцем пакет, 2026-10-19/20
+
+Владелец: «Этап 07 принят! Запрет снимаю - можно делать подряд. Но инструкции и ручные тесты раздели для каждого этапа по отдельности». Этим подтверждено принятие07 и разрешено последовательное выполнение08–14 без промежуточного barrier. Новые этапы по автоматическим PASS не принимаются. Старт: чистое дерево, HEAD `3f9e810d0ce7684d78f438c91819c71e4db47539`; reset/commit/push/merge не выполнялись.
+
+Отдельные отчёты с diff scope, actual commands/counts/receipts, рисками и3–6 ручными шагами:
+[08](STAGE-08-STAND.md), [09](STAGE-09-SNAPSHOT.md), [10](STAGE-10-QUERIES.md),
+[11](STAGE-11-SECTOR.md), [12](STAGE-12-HEARING.md), [13](STAGE-13-PEEK.md),
+[14](STAGE-14-ACCEPTANCE.md). Сводный статус: [BATCH-08-14](BATCH-08-14.md).
+
+STAGE08–13:21/21,13/13,12/12,8/8,6/6,повтор15/15 PASS. Core792 PASS; FULL standalone98/98, optional combined110/110 PASS; последние affected combined14/14 (STAND/squad) и25/25 (equip/weapon/optional) PASS. Это число выполнений в конкретных receipts, не сумма уникальных тестов. Начальные96/90/6 и108/107/1 FAIL, proof48/50 ray starvation, STAND report FAIL и исправления test-only isolation/teardown сохранены в отчётах, не переписаны в PASS. Production-правки14 минимальны и покрыты затронутыми повторными проверками.
+
+Release: один plain production build25s/5 executed/7 UP-TO-DATE; verifier PASS, main191013bytes/92classes, compat7680/4, Java61. Ordinary standalone startup→reload→save/stop→restart/load/stop PASS128.719s; исходные properties/EULA неизменны. Both ordinary before/after84/84 и JFR analysis PASS,2×120s soak и2 unload/reload30 в каждой матрице. Только5 боевых пар допускают timing comparison после rounds/reaction/owner checks; общего server speedup нет, AI p95≤2ms на30/50 combat не достигнут. Снижение rounds крупных групп указано как существенное ограничение, не ускорение. [Таблица/CSV/JFR](testing/stage14-profile-2026-10-20.md), [полный proof/команды/SHA](testing/stage14-validation-2026-10-20.json).
+
+Итог08–14: **WAITING_PLAYTEST**. Human1v1/1v4, client distribution-JAR playtest и приёмка владельца NOT RUN/PENDING. Исторические метрики Oct11 не являются новым baseline. Commit/push/merge/reset не выполнялись, пакет не ACCEPTED.
+
+
+## Согласованное обновление point1 — team/короткие команды,2026-10-20
+
+HEAD `3f9e810d0ce7684d78f438c91819c71e4db47539`, исходный рабочий пакет08–14 сохранён. Новые NPC активны; native team — единственное membership и источник автоматической squad-координации. Без team — враг остальным NPC и survival/adventure игрокам кроме союзников. Safe count1–16, group spacing4, implicit aimed NPC only; players/console explicit targets. Schema5 сохраняет архив legacy faction/squad, native membership в scoreboard.dat; mutation только server activation.
+
+Core792 PASS; актуальные scoped12/12,placement5/5,финальные targeting5/5 PASS. FULL history109/105/4,121/118/3 и свежий121/120/1 остаётся FAIL с минимальными fixture corrections/affected repeats. Production weapon/AI gates не ослаблены. Native4×4 после размещения:63 rounds,3red/1blue owners;30 lanes:119 rounds,1red/1blue,AI p95=3.859ms,не30 стреляющих/не speedup. Initial crowded0 and one-sided40 FAIL сохранены.
+
+Plain production build18s/verifier PASS (main198277bytes/94classes,compat7680/4); normal dedicated reload/save/stop/restart102.171s PASS, точное native policy/UUID/stack/team и неизменные source properties/EULA. [Полный отчёт/команды/SHA/6 ручных шагов](TEAM-COMMANDS.md),[machine evidence](testing/team-validation-2026-10-20.json). **WAITING_PLAYTEST**, не ACCEPTED; пункт2 интеллекта не начат, commit/push/merge/reset не выполнялись.

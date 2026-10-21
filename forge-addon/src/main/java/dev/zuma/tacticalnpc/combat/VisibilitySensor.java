@@ -27,6 +27,11 @@ public final class VisibilitySensor {
     private int nextCandidate,pageCursor,activationCursor;
     private boolean activationSeen;
     private boolean acquisitionDeferred;
+    public enum Sector { CLEAR, OCCUPIED, SATURATED, DEFERRED, UNSUPPORTED }
+    private Sector lastSector=Sector.UNSUPPORTED;
+    private int sectorCursor;
+    public Sector lastSector(){return lastSector;}
+    private boolean sector(PathfinderMob npc,Sector result){lastSector=result;AiTelemetry.sector((ServerLevel)npc.level(),result);return result!=Sector.CLEAR;}
     public boolean inFov(PathfinderMob npc,LivingEntity target) {
         if(target==null) return false;
         Vec3 d=target.position().subtract(npc.position());
@@ -75,6 +80,7 @@ public final class VisibilitySensor {
             resetAcquisition();acquisitionOwner=npc.getUUID();acquisitionDimension=level.dimension();
         }
         if(pageCursor>=acquisitionPage.size()) {
+            if(!AiWorkBudget.of(level).query(npc.getUUID(),false)){acquisitionDeferred=true;return null;}
             acquisitionPage.clear();pageCursor=0;
             var players=level.players();
             int count=players.size()+RuntimeRegistry.loadedNpcCount(level);
@@ -107,8 +113,9 @@ public final class VisibilitySensor {
     public enum Nearby { PRESENT, ABSENT, DEFERRED }
     /** Proximity grants activation only, never an observation. One budget token, <=16 NPC checks. */
     public Nearby activation(PathfinderMob npc,double range) {
-        if(!(npc.level() instanceof ServerLevel level) || !AiWorkBudget.of(level).candidate(npc.getUUID()))return Nearby.DEFERRED;
+        if(!(npc.level() instanceof ServerLevel level) || !AiWorkBudget.of(level).query(npc.getUUID(),false) || !AiWorkBudget.of(level).candidate(npc.getUUID()))return Nearby.DEFERRED;
         var players=new ArrayList<Player>(1);
+        AiWorkBudget.of(level).worldQuery();
         level.getEntities(EntityTypeTest.forClass(Player.class),npc.getBoundingBox().inflate(range),p->CombatTargets.eligible(npc,p),players,1);
         if(!players.isEmpty())return Nearby.PRESENT;
         int count=RuntimeRegistry.loadedNpcCount(level);activationCursor=count==0?0:Math.floorMod(activationCursor,count);
@@ -125,28 +132,51 @@ public final class VisibilitySensor {
 
     /** Conservative: any other living entity in the corridor blocks a shot, including non-allies. */
     public boolean occupied(PathfinderMob npc, LivingEntity target, Vec3 end) {
-        Vec3 start = npc.getEyePosition();
         var controller=RuntimeRegistry.active(npc);
         if(controller==null) return true;
-        var weapon=controller.weaponState();
-        if(!weapon.supported()) return true;
+        return occupied(npc,target,end,controller.weaponState());
+    }
+    public boolean occupied(PathfinderMob npc,LivingEntity target,Vec3 end,dev.zuma.tacticalnpc.core.WeaponState weapon) {
+        Vec3 start=npc.getEyePosition();
+        if(!weapon.supported()) return sector(npc,Sector.UNSUPPORTED);
         double spread=weapon.spreadDegrees();
-        if (!Double.isFinite(spread) || spread < 0 || spread > 30) return true;
+        if (!Double.isFinite(spread) || spread < 0 || spread > 30 || end.distanceToSqr(start)<1e-8) return sector(npc,Sector.UNSUPPORTED);
         // Check beyond the target too. A probabilistic native spread has no absolute cone guarantee;
         // the server damage-event guard is the final protection for allied living entities.
         Vec3 direction = end.subtract(start).normalize();
         end = start.add(direction.scale(128));
         double slope = Math.tan(Math.toRadians(Math.min(75, spread * 3 + 1)));
-        double maxRadius = 0.6 + slope * 128;
-        List<LivingEntity> nearby = new ArrayList<>();
-        npc.level().getEntities(EntityTypeTest.forClass(LivingEntity.class), new AABB(start, end).inflate(maxRadius),
-                e -> e != npc && e != target && e.isAlive(), nearby, 32);
-        if (nearby.size() == 32) return true; // Saturated work budget fails closed.
-        for (LivingEntity e : nearby) {
-            double along = Math.max(0, Math.min(128, e.getBoundingBox().getCenter().subtract(start).dot(direction)));
-            AABB box = e.getBoundingBox().inflate(0.6 + slope * along);
-            if (box.contains(start) || box.clip(start, end).isPresent()) return true;
+        var level=(ServerLevel)npc.level();var budget=AiWorkBudget.of(level);int first=sectorCursor;
+        for(int section=0;section<4;section++) {
+            int index=(first+section)%4;double low=index*32,high=low+32;
+            if(!budget.query(npc.getUUID(),true)){sectorCursor=index;return sector(npc,Sector.DEFERRED);}
+            List<LivingEntity> nearby=new ArrayList<>(32);int[] scanned={0};boolean[] saturated={false};
+            AABB region=new AABB(start.add(direction.scale(low)),start.add(direction.scale(high))).inflate(.6+slope*high);
+            budget.worldQuery();
+            level.getEntities(EntityTypeTest.forClass(LivingEntity.class),region,e->{
+                if(e==npc || e==target || !e.isAlive())return false;
+                // Bound predicate work too: after 64 checks, fill at most 32 sentinels then stop.
+                if(++scanned[0]>64){saturated[0]=true;return true;}
+                return coneIntersects(e.getBoundingBox(),start,direction,low,high,slope);
+            },nearby,32);
+            sectorCursor=(index+1)%4;
+            if(saturated[0] || nearby.size()==32)return sector(npc,Sector.SATURATED);
+            if(!nearby.isEmpty())return sector(npc,Sector.OCCUPIED);
         }
-        return false;
+        // Every section above was checked now; no CLEAR geometry carries across ticks/rounds.
+        return sector(npc,Sector.CLEAR);
+    }
+    /** Exact slab intersection with the conservative linearly expanding L-infinity envelope. */
+    public static boolean coneIntersects(AABB box,Vec3 start,Vec3 direction,double low,double high,double slope) {
+        double[] origin={start.x,start.y,start.z},delta={direction.x,direction.y,direction.z};
+        double[] min={box.minX,box.minY,box.minZ},max={box.maxX,box.maxY,box.maxZ};
+        for(int axis=0;axis<3;axis++)for(int side=0;side<2;side++){
+            double a=(side==0?delta[axis]:-delta[axis])-slope;
+            double b=side==0?max[axis]+.6-origin[axis]:origin[axis]-min[axis]+.6;
+            if(Math.abs(a)<1e-12){if(b<0)return false;}
+            else if(a>0)high=Math.min(high,b/a);else low=Math.max(low,b/a);
+            if(low>high)return false;
+        }
+        return true;
     }
 }

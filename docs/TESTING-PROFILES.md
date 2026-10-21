@@ -10,11 +10,17 @@ Production-логика не менялась. Этапы 07–14 этим ау�
 `C:/Users/makar/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe`
 и `C:/Program Files/Git/bin/bash.exe`. `--offline` допустим только с готовым pinned cache.
 
+Обновление пакета08–14: [план/приёмка](BATCH-08-14.md). Аудит выше — исторический checkpoint; на новом `3f9e810` владелец принял07 и разрешил пакет08–14 с production изменениями. Отдельные STAGE receipts находятся в отчётах08–13. Новый own native BURST fixture есть в NeutralTests: optional-only запуск ради одного названия больше не нужен. Optional FULL на14 сохраняется.
+
 | Профиль | Когда и обязательный объём | Реальная команда / пример |
 |---|---|---|
 | FAST | После локальной правки: относящиеся core suites или конкретные Forge-методы. Не заменяет STAGE. | `bash ai-core/run-tests.sh territory patrol`; `python tools/testing/run-gametests.py FAST --tests LookControlTests,ModeCommandTests#permissionSuggestionsAndOldCommandSurface --offline` |
 | STAGE | Один согласованный набор новых и затронутых регрессий перед передачей этапа; весь core, если менялся ai-core; production compilation; GameTests по рискам ниже. | `bash ai-core/run-tests.sh`; `python tools/testing/run-gametests.py STAGE --tests CoverTests,AlphaResponsivenessTests,DefendTerritoryTests --offline` — пример для cover, расширить новыми тестами этапа 13 |
 | FULL | Этап 14 / существенные сквозные изменения: весь core, standalone, combined при работающем adapter, production verification, ordinary dedicated startup/stop; отдельные release/perf/human проверки. | `bash ai-core/run-tests.sh`; `python tools/testing/run-gametests.py FULL --offline`; `python tools/testing/run-gametests.py FULL --legacy --offline` |
+
+Ordinary сопоставимый before/after14: `python tools/testing/run-batch-profile.py before`, затем `python tools/testing/run-batch-profile.py after`; эти команды запускаются последовательно, без параллельной сборки/тестового сервера во время профиля. Требуется уже сохранённый pre-09 source manifest в ignored `build/batch-baseline`; отсутствие baseline — BLOCKED сравнения, нельзя подставить Oct11. По2 повтора и actual native projectile в каждой сцене, отдельные CSV/JFR/receipts. `python tools/testing/summarize-batch-jfr.py <actual profile.jfr>` обрабатывает реальную запись; sampling не выдаётся за точный полный server cost.
+
+Фикстуры обязаны обеспечивать entity ticking всей своей structure: Vanilla GameTest force-load around origin недостаточен для64x64. Test-only ScenarioIsolation добавляет только tickets внутри actual bounds, сохраняет общие с новой fixture tickets непрерывно и снимает свои вне её bounds. Launcher с обновления team создаёт отдельный `build/test-runs/<UTC>-runtime` для каждого receipt: мир/config предыдущего запуска не становятся входными данными следующего. Raw evidence сохраняется, автоматического удаления нет; `--plan` по-прежнему NOT RUN. Память/LOS assertions выполняются до уничтожающего цель teardown: порядок GameTest runnable map не гарантирован. Все native round observers проверяют отмену EntityJoin; fake GunFireEvent без projectile не доказывает выстрел/слух.
 
 Примеры selection не являются автоматическим доказательством достаточности для будущего этапа.
 FAST/STAGE требуют явного `--tests` с точными `Class` / `Class#method`, через запятую,
@@ -31,12 +37,12 @@ Launcher всегда включает `compileCompatJava`; `compileJava` уже
 | Этап / риск | Существующие опорные проверки (расширить тестами требований этапа) | Дополнительный запуск только по этому риску |
 |---|---|---|
 | 07, neutral/damage/spawn/NBT | TargetTypeTests, IndependentNpcTests, ModeCommandTests; новые actual-damage, projectile owner, personal hostility, NEUTRAL migration | OptionalTargetTests/WeaponScenarioTests при изменении общей damage/safety политики |
-| 08, stand/границы/фаза | ModeCommandTests, DefendTerritoryTests, DefendPatrolTests, IndependentNpcTests; новые WAIT/COMBAT6/DEFEND32/phase NBT | Native BURST при смене mode/generation gates; optional если затронут общий controller |
-| 09, weapon snapshot | IndependentNpcTests, WeaponProfileTests; nativeModesAndBurst, equip/reload/invalidation/read-only regression | WeaponScenarioTests с `--legacy`, поскольку единственный явный native BURST fixture сейчас optional; измерения lookup/allocations до/после |
-| 10, budgets | PerceptionTests, TargetTypeTests, ActivationTests, CoverTests, AlphaResponsivenessTests + новые query-before-budget/fairness/native fail-closed | Сопоставимая перегрузка/30 NPC; optional если изменён общий native safety |
-| 11, sector | IndependentNpcTests, WeaponProfileTests, TargetTypeTests, SuppressionTests; новые saturation/narrow-phase/moving intersections | Optional allyCrossingAndBehindTarget/nativeModesAndBurst; одинаковая crowded-сцена и реальные projectile до/после |
-| 12, hearing | PerceptionTests, SuppressionTests, SquadTests, TargetTypeTests + новые NEUTRAL/source/delivery/TTL | Сопоставимый automatic-fire delivery профиль; optional NPC shooter при затронутой доставке |
-| 13, cover/peek | CoverTests, AlphaResponsivenessTests, DefendTerritoryTests + новые отдельные TTL/peek geometry/cursor/stand границы | Dynamic-cover measurement при утверждении ускорения; optional если меняется общий adapter contract |
+| 08, stand/границы/фаза | StandTests, ModeCommandTests, NeutralTests; связанные territory/patrol/NBT при риске | Native BURST при смене mode/generation gates; delayed SquadTests при завершении контакта |
+| 09, weapon snapshot | WeaponSnapshotTests, WeaponProfileTests, neutral reload/BURST | WeaponScenarioTests с `--legacy` при общем controller/equip риске; own native BURST уже есть в NeutralTests; lookup/allocations до/после |
+| 10, budgets | QueryBudgetTests, ActivationTests, PerceptionTests, neutral native no-fire | Fixed-order native/optional fairness, cursor, deferred memory; сопоставимая перегрузка/30 NPC |
+| 11, sector | SectorTests, QueryBudgetTests, alliedDamageEventGuard, shotgunNativePellets, neutral BURST | Optional allyCrossingAndBehindTarget/nativeModesAndBurst при общей safety правке; одинаковая crowded-сцена/projectiles |
+| 12, hearing | HearingTests, SuppressionTests, neutral source/TTL/sound | NPC native shooter, invisible Player, bounded actual events/receivers; optional source при adapter риске |
+| 13, cover/peek | PeekRevalidationTests, CoverTests, StandTests, DefendTerritoryTests | DEFERRED/cursor/fair optional cadence; dynamic cover, native PEEK projectiles, existing reservations |
 | 14 | FULL без фильтра; старые команды/PATROL/spawnlegacy, persistence/restart, все новые этапы | Обычный dedicated профиль 1/4/16/30/50, JFR/allocations/GC/soak, manual 1v1/1v4 и приёмка владельца |
 
 Для точечного optional риска использовать тот же launcher с `--legacy` и только требуемыми
@@ -184,3 +190,7 @@ Commit/push/merge не выполнялись.
 > Логи сохраняй на диск; сообщай команду, count, status, краткую причину FAIL и путь.
 > Обязательная проверка недоступна/дефект не исправлен — BLOCKED. После этапа WAITING_PLAYTEST;
 > следующий этап только после явного принятия владельцем. Аудит тестов — WAITING_APPROVAL.
+
+Исключение для текущего пакета 2026-10-19: владелец явно принял07 и разрешил подряд08–14. Промежуточная ручная приёмка не блокирует выполнение пакета; отчёты и ручные шаги остаются отдельными для каждого этапа. Это разрешение не означает ACCEPTED для08–14. Перед общей передачей остаются один plain production build/verifier и обязательные проверки14.
+
+Фактический итог пакета08–14,2026-10-20: [20 GameTest receipts/команды](testing/stage14-validation-2026-10-20.json), полный core792, standalone FULL98/98, optional FULL110/110; после минимальных найденных правок только affected14/14 и25/25, без ещё одного незатронутого FULL. Production build5 executed/7 UP-TO-DATE, обычные runServer после него сохраняют compilation UP-TO-DATE. Физически уникальные тесты не удалялись/не объединялись; дубли invocations сокращались runtime selection, общим Gradle graph и одним final production handoff. Тестовая JFR обработка исправлена на streaming после MemoryError, actual native матрицы не повторялись ради анализа; исходные baseline event counts совпали. Измеренного общего процента экономии testing wall time/tool calls нет; build cache/task reuse подтверждены логами, не выдаются за speed benchmark. [Профиль до/после и ограничения](testing/stage14-profile-2026-10-20.md).

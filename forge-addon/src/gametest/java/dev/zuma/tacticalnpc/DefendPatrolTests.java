@@ -41,7 +41,7 @@ public final class DefendPatrolTests {
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-patrol-03-large",timeoutTicks=650)
     public static void idleRadius128ExploresBeyondLegacyCap(GameTestHelper h){idle(h,128,600);}
     private static void idle(GameTestHelper h,int radius,int duration) {
-        begin(h);var n=npc(h,radius);var anchor=n.position();var points=new HashSet<Vector3>();
+        begin(h);var n=npc(h,radius,new UUID(6,radius));n.getRandom().setSeed(6000+radius);var anchor=n.position();var points=new HashSet<Vector3>();
         boolean[] pause={false},look={false};double[] farthest={0};float[] yaw={Float.NaN};
         h.onEachTick(()->{
             inside(h,n);farthest[0]=Math.max(farthest[0],n.position().subtract(anchor).horizontalDistance());
@@ -54,7 +54,7 @@ public final class DefendPatrolTests {
             }
         });
         h.runAtTickTime(duration,()->{
-            h.assertTrue(points.size()>=3 && pause[0] && look[0] && farthest[0]>(radius==4?.7:10),"real motion, different waypoints and pause/look radius="+radius+" points="+points.size()+" distance="+farthest[0]+" pause="+pause[0]+" look="+look[0]);
+            h.assertTrue(points.size()>=3 && pause[0] && look[0] && farthest[0]>(radius==4?.7:10),"real motion, different waypoints and pause/look radius="+radius+" points="+points.size()+" distance="+farthest[0]+" pause="+pause[0]+" look="+look[0]+" entityTicks="+n.tickCount+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition())+" position="+n.position()+" navigationDone="+n.getNavigation().isDone()+" decision="+(n.controller()==null?null:n.controller().decision()));
             budget(h,n,duration);finish(n);h.succeed();
         });
     }
@@ -123,7 +123,7 @@ public final class DefendPatrolTests {
         });
         h.runAtTickTime(182,()->{
             loaded[0]=(TacticalNpcEntity)EntityType.loadEntityRecursive(saved,h.getLevel(),e->e);
-            h.assertTrue(loaded[0]!=null && order[0].equals(loaded[0].runtime().orderState()) && saved.getCompound("tacticalnpc").getInt("schema")==3,"schema 3 retains persisted order/anchor/radius");
+            h.assertTrue(loaded[0]!=null && order[0].equals(loaded[0].runtime().orderState()) && saved.getCompound("tacticalnpc").getInt("schema")==5,"schema 5 retains persisted order/anchor/radius");
             loaded[0].setOnGround(true);h.assertTrue(h.getLevel().addFreshEntity(loaded[0]),"saved entity re-added with original UUID");
         });
         h.onEachTick(()->{

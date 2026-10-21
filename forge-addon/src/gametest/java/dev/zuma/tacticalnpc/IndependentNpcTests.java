@@ -118,6 +118,7 @@ public final class IndependentNpcTests {
     public static void alliedDamageEventGuard(GameTestHelper h) {
         var npc=spawn(h,"ak47",30,true);
         var ally=NpcEntities.NPC.get().create(h.getLevel());var pos=h.absoluteVec(new Vec3(14,2,7));ally.moveTo(pos.x,pos.y,pos.z);h.getLevel().addFreshEntity(ally);
+        npc.setFaction("guard-allies");ally.setFaction("guard-allies");
         h.runAtTickTime(15,()->{
             var index=TimelessAPI.getCommonGunIndex(new ResourceLocation("tacz:ak47")).orElseThrow();
             var bullet=new com.tacz.guns.entity.EntityKineticBullet(h.getLevel(),npc,npc.getMainHandItem(),index.getGunData().getAmmoId(),new ResourceLocation("tacz:ak47"),false,index.getGunData(),index.getBulletData());

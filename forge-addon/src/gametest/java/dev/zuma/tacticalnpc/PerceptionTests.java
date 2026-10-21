@@ -15,7 +15,13 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.*;
 
 @PrefixGameTestTemplate(false)
+@net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid=TacticalNpcAiMod.ID)
 public final class PerceptionTests {
+    private static java.util.UUID traced;
+    private static String death="none";
+    @net.minecraftforge.eventbus.api.SubscribeEvent public static void death(net.minecraftforge.event.entity.living.LivingDeathEvent event){
+        if(event.getEntity().getUUID().equals(traced))death="tick="+event.getEntity().level().getGameTime()+",source="+event.getSource().getMsgId()+",attacker="+event.getSource().getEntity()+",at="+event.getEntity().position();
+    }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="perception-r2-four",timeoutTicks=40)
     public static void acquisitionContinuesPastFourBlocked(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=acquisitionNpc(h,false);
@@ -138,6 +144,7 @@ public final class PerceptionTests {
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="perception-01",timeoutTicks=260)
     public static void hiddenPositionFrozenAndExpires(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=NpcEntities.NPC.get().create(h.getLevel());
+        traced=n.getUUID();death="none";
         Vec3 origin=h.absoluteVec(new Vec3(3.5,2,7.5));n.moveTo(origin.x,origin.y,origin.z,-90,0);n.setYHeadRot(-90);
         n.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
         n.setItemSlot(EquipmentSlot.MAINHAND,GunSupport.create(new ResourceLocation("tacz:ak47")));n.addTag(RuntimeRegistry.TAG);h.getLevel().addFreshEntity(n);
@@ -145,17 +152,19 @@ public final class PerceptionTests {
         p.setGameMode(GameType.SURVIVAL);p.setInvulnerable(true);Vec3 at=h.absoluteVec(new Vec3(11.5,2,7.5));p.moveTo(at.x,at.y,at.z);h.getLevel().addNewPlayer(p);
         dev.zuma.tacticalnpc.core.Vector3[] known={null};long[] seen={0};
         h.runAtTickTime(35,()->{
+            h.assertTrue(n.controller()!=null,"memory fixture controller missing at35: removed="+n.isRemoved()+" reason="+n.getRemovalReason()+" health="+n.getHealth()+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition()));
             var observation=n.controller().observation();h.assertTrue(observation!=null && observation.visible(),"perception registers visual track");known[0]=observation.position();seen[0]=observation.tick();
             for(int y=2;y<7;y++)for(int z=0;z<16;z++)h.setBlock(new BlockPos(7,y,z),Blocks.STONE);
             p.setPos(at.x+2,at.y,at.z+3);
         });
         h.runAtTickTime(55,()->{
+            h.assertTrue(n.controller()!=null,"memory fixture controller missing at55: removed="+n.isRemoved()+" reason="+n.getRemovalReason()+" health="+n.getHealth()+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition()));
             Observation memory=n.controller().observation();
             h.assertTrue(memory!=null && !memory.visible() && memory.position().equals(known[0]) && memory.tick()==seen[0],"moving occluded player never refreshes known coordinates");
             h.assertTrue(memory.uncertainty()>0 && memory.velocity().lengthSquared()==0,"stale track is uncertain and not predicted");
             p.setPos(at.x+3,at.y,at.z-3);
         });
-        h.runAtTickTime(235,()->{h.assertTrue(n.controller().observation()==null,"visual memory expires");p.discard();n.discard();h.succeed();});
+        h.runAtTickTime(235,()->{h.assertTrue(n.controller()!=null,"memory fixture controller missing at235: removed="+n.isRemoved()+" reason="+n.getRemovalReason()+" health="+n.getHealth()+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition())+" death="+death);h.assertTrue(n.controller().observation()==null,"visual memory expires");p.discard();n.discard();h.succeed();});
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="perception-02",timeoutTicks=100)
     public static void hearingIsRegionAndFovIsSeparate(GameTestHelper h) {
@@ -166,7 +175,9 @@ public final class PerceptionTests {
         h.runAtTickTime(10,()->{
             h.assertTrue(n.controller().targetId()==null,"wall and FOV prevent vision");
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new com.tacz.guns.api.event.common.GunFireEvent(p,p.getMainHandItem(),net.minecraftforge.fml.LogicalSide.SERVER));
-            var heard=n.controller().observation();h.assertTrue(heard!=null && heard.source()==Observation.Source.HEARING && !heard.visible() && heard.uncertainty()>=8,"server gun event reports approximate region");
+            h.assertTrue(n.controller().observation()==null,"empty/fake GunFireEvent without native projectile cannot fabricate hearing");
+            h.assertTrue(n.controller().hear(p),"direct receipt tests hearing eligibility separately from native delivery fixture");
+            var heard=n.controller().observation();h.assertTrue(heard!=null && heard.source()==Observation.Source.HEARING && !heard.visible() && heard.uncertainty()>=8,"delivered sound reports approximate region");
             h.assertFalse(new dev.zuma.tacticalnpc.combat.VisibilitySensor().inFov(n,p),"FOV is an independent gate");
         });
         h.runAtTickTime(80,()->{h.assertTrue(n.controller().observation()==null && n.controller().shots()==0,"sound expires without acquiring hidden target");p.discard();n.discard();h.succeed();});

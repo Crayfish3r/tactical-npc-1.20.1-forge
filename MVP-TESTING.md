@@ -1,5 +1,21 @@
 # Проверка Tactical NPC AI 0.2.0
 
+Новое обновление и актуальные ручные действия: [team/короткие команды](docs/TEAM-COMMANDS.md). Для боя двух групп достаточно `/spawn npc team red count 4` и, в20–30 блоках, `/spawn npc team blue count 4`. Старые цифры/JAR ниже относятся к пакету08–14 до этого обновления; не использовать прежний SHA как проверку нового файла.
+
+Текущий пакет 08–14 и отдельные ручные сценарии: [BATCH-08-14](docs/BATCH-08-14.md).
+07 явно принят владельцем; 08–14 нельзя считать ACCEPTED по автоматическим проверкам.
+Ниже исторические таблицы артефактов/метрик помечены датой; production handoff пакета08–14
+и его результаты FULL/profile зафиксированы в [отчёте 14](docs/STAGE-14-ACCEPTANCE.md).
+
+Handoff пакета08–14 до team-обновления, 2026-10-20: core792, FULL standalone98/98 и combined110/110, affected14/14+25/25 PASS; plain production build/verifier и ordinary dedicated reload/save/restart/stop PASS. [Профиль84+84/сопоставимые данные того среза](docs/testing/stage14-profile-2026-10-20.md): общего ускорения не доказано, AI p95≤2ms на30/50 в бою не достигнут; сниженное число rounds крупных групп не засчитано как улучшение. Human1v1/1v4 и client distribution playtest — NOT RUN, WAITING_PLAYTEST.
+
+| Production JAR пакета08–14 до team-обновления (история) | Bytes/classes | SHA-256 |
+|---|---:|---|
+| `forge-addon/build/libs/tacticalnpcai-0.2.0.jar` | 191013/92 | `70ACF74FBA0C0E1792B94A82936AAD8ED982F89C86AABBA87B8302EEF3A533A0` |
+| `forge-addon/build/libs/tacticalnpcai-0.2.0-npcs-compat.jar` | 7680/4 | `5DEEBFC0E9FAF3347EDBE42CDA4CA2C72D775CD63DFB7579E16DD7EE4F138DE1` |
+
+[Исторические проверки/команды/SHA](docs/testing/stage14-validation-2026-10-20.json). Актуальный handoff team-обновления указан в отдельном отчёте выше; optional compat используется вместе с NPCs2.1.0. Ниже старая таблица сохранена как история.
+
 ## Версии и файлы
 
 Закреплены Minecraft Java **1.20.1**, Forge **47.4.20**, Java **17** (проверено Microsoft OpenJDK 17.0.19), TaCZ **1.1.8-hotfix2**. Gradle 8.8 / ForgeGradle 6.0.54. Версии не обновлялись попутно с ИИ. SHA-256 оригинальных зависимостей и ссылки — [INTEGRATION-AUDIT](docs/INTEGRATION-AUDIT.md).
@@ -13,7 +29,7 @@
 
 Это экспериментальный MVP. Факт существования JAR проверяется отдельно от боя; текущие фактические результаты и логи приведены в [IMPLEMENTATION-STATUS](docs/IMPLEMENTATION-STATUS.md). Успешная сборка сама по себе не означает завершённый PvP-релиз.
 
-Артефакты последней сборки:
+Исторические артефакты сборки 2026-10-11 (не текущий handoff пакета 08–14):
 
 | JAR | Размер | SHA-256 |
 |---|---|---|
@@ -31,7 +47,7 @@
 /tacticalnpc spawn
 ```
 
-В трёх блоках к востоку появляется **собственный** `tacticalnpcai:npc`, vanilla humanoid renderer, пустой AK-47, тег `tactical_ai`. Native reload работает без цели. Без тега NPC не получает тактического контроллера. Простой summon также доступен; затем выдайте оружие:
+Безопасно рядом с источником появляется собственный активный `tacticalnpcai:npc` в ATTACK: vanilla renderer, пустой AK-47, тег `tactical_ai`; `/spawn npc` использует тот же путь. Без team он враг остальным NPC и survival/adventure игрокам. Для готовых групп используйте `/spawn npc team red count 4`; team автоматически определяет союзников и squad-координацию. Native reload работает без цели. Без тега NPC не получает тактического контроллера. Низкоуровневый summon также доступен; затем выдайте оружие:
 
 ```mcfunction
 /summon tacticalnpcai:npc ~3 ~ ~ {PersistenceRequired:1b}
@@ -48,7 +64,7 @@
 
 По умолчанию резерв бесконечный, магазин расходуется и перезаряжается штатно. FINITE хранит native DummyAmmo: расходуется реальное конечное число патронов, после исчерпания повторной перезарядки нет. Смена ammo policy явно отменяет текущую reload и инвалидирует старые команды. Выдача оружия командой задаёт пустой магазин; смена loadout в FINITE задаёт настроенный начальный резерв для нового оружия. Подбор патронов с земли и полноценный инвентарь не реализованы.
 
-## Приказы и фракция
+## Приказы и team
 
 ```mcfunction
 /tacticalnpc order @e[type=tacticalnpcai:npc,sort=nearest,limit=1] HOLD_POSITION 24
@@ -56,20 +72,24 @@
 /tacticalnpc order @e[type=tacticalnpcai:npc,sort=nearest,limit=1] ASSAULT 24
 /tacticalnpc order @e[type=tacticalnpcai:npc,sort=nearest,limit=1] PATROL 16
 /tacticalnpc faction @e[type=tacticalnpcai:npc,sort=nearest,limit=1] red
+/npc team red
+/npc team red @s
+/npc team clear
+/npc info
 ```
 
-Якорь задаётся текущей позицией NPC при выдаче приказа. HOLD_POSITION допускает локальное движение до 6 блоков; DEFEND_AREA ограничивает радиус и возвращает к якорю; PATROL проходит локальные точки вокруг него; ASSAULT продвигается к рабочей дистанции оружия и использует локальные укрытия. Радиус команды 4..64. Приказ и боевое состояние независимы. NPC одинаковой фракции — союзники; scoreboard allies также учитываются. Радиус обнаружения не расширяется приказом или классом оружия.
+Якорь задаётся текущей позицией NPC при выдаче приказа. STAND/HOLD_POSITION фиксирует WAIT без движения → COMBAT XZ6 после реального native shot/прошедшего допустимого damage → обычный DEFEND32 после окончания контакта с исходным anchor. Старый HOLD radius не заменяет фиксированные6/32. DEFEND_AREA/`npc mode defend` принимает4–128, ограничивает все добровольные сегменты/тело по XZ и возвращает к якорю; PATROL — отдельный прежний маршрут. ASSAULT/attack свободно ищет легитимно известную цель. Остальные старые radius аргументы остаются4–64. Одна native team — союзники; без team NPC не союзны друг другу. Сохранённый legacy NEUTRAL отвечает только личному допустимому attacker. Radius территории не увеличивает detection/weapon range и не загружает дальние chunks.
 
-Приказы, якорь, фракция, loadout, ammo policy и serviceId сохраняются в NBT schema 2; schema 1 мигрирует с новым локальным якорем. Живые цели, память и пути не сохраняются. Неизвестная будущая schema отключает тактическое управление с диагностикой.
+Приказы, якорь, standPhase, loadout, ammo policy и serviceId сохраняются в NBT schema5; native team — в штатном scoreboard.dat. Schema1–4 явно мигрируют, архивируя прежние faction/squad UUID; существующая vanilla team имеет приоритет. Живые цели, память и пути не сохраняются. Неизвестная будущая schema отключает тактическое управление с диагностикой.
 
-## Небольшой squad
+## Автоматическая координация team
 
 ```mcfunction
-/tacticalnpc squad @e[type=tacticalnpcai:npc,distance=..30] 00000000-0000-0000-0000-000000000041
-/tacticalnpc squad @e[type=tacticalnpcai:npc,distance=..30] clear
+/spawn npc team red count 4
+/npc team red @e[type=tacticalnpcai:npc,distance=..30]
 ```
 
-Squad UUID сохраняется; фракции должны быть союзными. В пределах одного измерения передаются только реальные зрительные наблюдения с задержкой 10 тиков и радиусом связи 48 блоков. Исходный tick и известная позиция сохраняются, report TTL ≤80, confidence уменьшается, uncertainty растёт. Нет доступа к скрытой сущности через squad. Локальные роли: anchor дольше держит укрытие, один flanker предпочитает боковые проверенные cover candidates, остальные suppressors используют тот же ограниченный огневой контракт. Это простая локальная координация; сложного обхода/командного штурма нет. Cover claims имеют TTL 80 и освобождаются при stop/death/unload/смене цели; смерть лидера допускает пересмотр ролей до обычного cooldown 80.
+Одинаковая native team автоматически образует группу; отдельный squad UUID назначать не нужно. Старые faction/squad команды сохранены как алиасы назначения team: squad UUID становится её именем, clear удаляет принадлежность. В пределах одного измерения передаются только реальные зрительные наблюдения с задержкой 10 тиков и радиусом связи 48 блоков. Исходный tick и известная позиция сохраняются, report TTL ≤80, confidence уменьшается, uncertainty растёт. Нет доступа к скрытой сущности через squad. Локальные роли и ограниченный огневой контракт сохранены. Cover claims имеют TTL80 и освобождаются при stop/death/unload/смене цели или team.
 
 ## Включение и сравнение исходного ИИ
 
@@ -132,7 +152,7 @@ Activation query возвращает только boolean присутстви�
 
 Последний реальный клиентский smoke без NPCs: **rendered=691 armed=true loaded=true noNpcs=true**, [лог](docs/testing/stage7-client-smoke-2026-10-11.log). Новый NPC отрисован, оружие и загруженный после server reload магазин получены клиентом. Первая попытка соединения не завершилась; повтор localhost прошёл без изменения игрового кода. Причина первого прерывания не установлена, [неуспешный лог](docs/testing/stage7-first-client-connect-2026-10-11.log) сохранён.
 
-В текущем коде повторены ordinary server startup и настоящий disk save/restart: сохранились entity UUID, serviceId, schema 2, DEFEND_AREA/anchor/radius 16, faction blue, squad UUID, FINITE 17, magazine 29 и chamber=true. До/после native data compounds совпали: [проверка](docs/testing/stage7-restart-verification-2026-10-11.json), [save log](docs/testing/stage7-dedicated-client-save-2026-10-11.log), [restart log](docs/testing/stage7-dedicated-restart-2026-10-11.log). Ordinary dedicated профиль отдельно выгрузил и загрузил 30 NPC из чанков. Исторические проверки этапа 2 сохранены, но не подменяют эти новые результаты.
+Историческая проверка 2026-10-11: ordinary server startup и настоящий disk save/restart сохранили entity UUID, serviceId, schema2, DEFEND_AREA/anchor/radius 16, faction blue, squad UUID, FINITE 17, magazine 29 и chamber=true. До/после native data compounds совпали: [проверка](docs/testing/stage7-restart-verification-2026-10-11.json), [save log](docs/testing/stage7-dedicated-client-save-2026-10-11.log), [restart log](docs/testing/stage7-dedicated-restart-2026-10-11.log). Ordinary dedicated профиль отдельно выгрузил и загрузил 30 NPC из чанков. Исторические проверки этапа 2 сохранены, но не подменяют эти новые результаты.
 
 Ручные человеческие дуэли, баланс, полная матрица сложного рельефа/сторонних gunpacks и длительный массовый прогон пока не подтверждены. Ballistic lead, сложные обходы, новые модели/анимации, редактор/UI и inventory pickup не реализованы. Слух не моделирует точно затухание глушителей. Небольшие арены с большим числом союзников могут консервативно блокировать большую часть стрельбы. В коротких измеренных combat-фазах достигнуто около 20 TPS; финальный AI p95 30/50 NPC — 4.7520/4.0663 ms, **ориентир 2 ms не достигнут**. [Методика, оборудование и все данные](docs/PROFILE-REPORT-2026-10-11.md). Short soak длится 120 секунд; отсутствие утечек или релизная устойчивость этим не доказаны.
 

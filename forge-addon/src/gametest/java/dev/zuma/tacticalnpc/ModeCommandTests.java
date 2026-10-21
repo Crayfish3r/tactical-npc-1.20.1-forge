@@ -46,13 +46,13 @@ public final class ModeCommandTests {
             run(h,source,"tacticalnpc order "+id+" DEFEND_AREA 12");var defend=n.runtime().orderState();
             run(h,source,"npc mode defend 12 "+id);h.assertTrue(defend.equals(n.runtime().orderState()),"defend shares legacy DEFEND_AREA state");
             run(h,source,"tacticalnpc order "+id+" HOLD_POSITION 27");var stand=n.runtime().orderState();
-            run(h,source,"npc mode stand "+id);h.assertTrue(stand.equals(n.runtime().orderState()),"stand shares HOLD_POSITION and retains radius");
+            run(h,source,"npc mode stand "+id);h.assertTrue(stand.equals(n.runtime().orderState()) && stand.radius()==6,"stand and HOLD_POSITION share fixed combat radius 6");
             h.assertTrue(gun.getCurrentAmmoCount(stack)==rounds && gun.getDummyAmmoAmount(stack)==reserve && gun.hasBulletInBarrel(stack)==chamber && n.runtime().operator().getSynShootCoolDown()==cooldown,"mode/order commands preserve native magazine/reserve/chamber/cooldown");
             h.assertTrue(n.controller()==controller,"aliases do not install a second controller");
             run(h,source,"tacticalnpc order "+id+" PATROL 9");h.assertTrue(n.runtime().orderState().kind()==OrderState.Kind.PATROL,"PATROL remains independent");
             run(h,source,"npc mode defend 14 "+id);var expected=n.runtime().orderState();
             var saved=new CompoundTag();n.save(saved);
-            h.assertTrue(saved.getCompound("tacticalnpc").getInt("schema")==3 && !saved.getCompound("tacticalnpc").contains("mode"),"schema 3 adds neutral policy without duplicating the order/mode source of truth");
+            h.assertTrue(saved.getCompound("tacticalnpc").getInt("schema")==5 && !saved.getCompound("tacticalnpc").contains("mode"),"schema 5 persists stand phase without duplicating the order/mode source of truth");
             var restored=(TacticalNpcEntity)EntityType.loadEntityRecursive(saved,h.getLevel(),e->e);
             h.assertTrue(restored!=null && expected.equals(restored.runtime().orderState()) && n.serviceId().equals(restored.serviceId()),"new command mode persists via actual entity save/load");
             n.discard();restored.discard();h.succeed();
@@ -126,9 +126,16 @@ public final class ModeCommandTests {
     public static void aimRangeAndUnsupportedFrontEntity(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,38.5,7.5);var player=player(h);
         h.runAtTickTime(10,()->{
+            var origin=h.absoluteVec(new Vec3(3.5,2,7.5));
+            player.moveTo(origin.x,origin.y,origin.z,-90,0);player.setYHeadRot(-90);player.setYBodyRot(-90);player.setXRot(0);
             var source=player.createCommandSourceStack().withPermission(2).withSuppressedOutput();
             reject(h,source,"npc mode attack");h.assertTrue(n.order().equals("HOLD_POSITION"),"35-block target is outside aim range");
             var at=h.absoluteVec(new Vec3(34.5,2,7.5));n.moveTo(at.x,at.y,at.z);
+            var eye=player.getEyePosition();var end=eye.add(player.getViewVector(1).scale(32));
+            var block=h.getLevel().clip(new net.minecraft.world.level.ClipContext(eye,end,net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,player));
+            h.assertTrue(n.getBoundingBox().clip(eye,end).isPresent(),"31-block fixture intersects aim: eye="+eye+" end="+end+" body="+n.getBoundingBox());
+            h.assertTrue(block.getType()==net.minecraft.world.phys.HitResult.Type.MISS,"31-block fixture has real block LOS: "+block.getBlockPos()+" type="+h.getLevel().getBlockState(block.getBlockPos()));
+            h.assertTrue(h.getLevel().getEntities(player,new net.minecraft.world.phys.AABB(eye,end).inflate(1)).contains(n),"31-block fixture is in native spatial index; npcTicks="+n.tickCount+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition()));
             run(h,source,"npc mode defend 4");h.assertTrue(n.order().equals("DEFEND_AREA") && n.runtime().orderState().radius()==4,"31-block target and minimum defend radius accepted");
             run(h,source,"npc mode defend 64");h.assertTrue(n.runtime().orderState().radius()==64,"64-block defend radius remains accepted");
             var front=h.absoluteVec(new Vec3(6.5,2,7.5));var stand=new ArmorStand(h.getLevel(),front.x,front.y,front.z);h.getLevel().addFreshEntity(stand);

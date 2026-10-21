@@ -13,6 +13,8 @@ import org.luaj.vm2.LuaValue;
 /** Conservative contract: native kinetic shooting, no arbitrary Lua shooting/property hooks. */
 public final class GunSupport {
     private static volatile boolean auditedReloadScript;
+    private static long resourceGeneration;
+    public static long resourceGeneration(){return resourceGeneration;}
     private static final Set<String> MAINTENANCE = Set.of("start_reload", "tick_reload", "interrupt_reload", "start_bolt", "tick_bolt");
     public static String rejection(ItemStack stack, CommonGunIndex index) {
         IGun gun = IGun.getIGunOrNull(stack);
@@ -39,6 +41,7 @@ public final class GunSupport {
         return "";
     }
     public static void verifyResources(net.minecraft.server.packs.resources.ResourceManager manager) {
+        resourceGeneration++;
         auditedReloadScript=false;
         try {
             var resource=manager.getResource(new ResourceLocation("tacz:scripts/xmag_reload_logic.lua"));

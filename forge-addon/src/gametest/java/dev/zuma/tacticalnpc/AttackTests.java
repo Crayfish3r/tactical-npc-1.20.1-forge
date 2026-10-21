@@ -70,7 +70,7 @@ public final class AttackTests {
             farthest[0]=Math.max(farthest[0],n.position().distanceTo(origin));
         });
         h.runAtTickTime(600,()->{
-            h.assertTrue(advance[0] && run[0] && adsAfterRun[0] && nearest[0]<=n.controller().weaponState().effectiveRange() && farthest[0]>4,"real weapon approach outside old anchor, RUN -> native ADS: nearest="+nearest[0]+" farthest="+farthest[0]+" run="+run[0]+" ads="+adsAfterRun[0]+" decision="+decision(n));
+            h.assertTrue(advance[0] && run[0] && adsAfterRun[0] && nearest[0]<=n.controller().weaponState().effectiveRange() && farthest[0]>4,"real weapon approach outside old anchor, RUN -> native ADS: nearest="+nearest[0]+" farthest="+farthest[0]+" run="+run[0]+" ads="+adsAfterRun[0]+" decision="+decision(n)+" playerAlive="+p.isAlive()+" removed="+p.isRemoved()+" pos="+p.position()+" npcTicks="+n.tickCount+" observation="+n.controller().observation());
             h.assertTrue(n.controller().shots()>0 && ProjectileProbe.count(n.getUUID())>bulletsBefore,"new native TaCZ projectile after this approach");
             var gun=com.tacz.guns.api.item.IGun.getIGunOrNull(n.getMainHandItem());h.assertTrue(n.ammoPolicy()==TacticalNpcEntity.AmmoPolicy.FINITE && gun.getDummyAmmoAmount(n.getMainHandItem())==0 && gun.getCurrentAmmoCount(n.getMainHandItem())<25,"finite native ammunition is consumed, never replenished by movement");
             budget(h,600);p.discard();finish(n);h.succeed();

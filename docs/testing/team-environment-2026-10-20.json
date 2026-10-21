@@ -1,0 +1,53 @@
+{
+  "java": "17.0.19+10-LTS",
+  "cpu": "Intel64 Family 6 Model 165 Stepping 2, GenuineIntel",
+  "processors": 8,
+  "seed": 8675309,
+  "jvm": [
+    "-Dforge.enableGameTest\u003dtrue",
+    "-Dforge.logging.console.level\u003dinfo",
+    "-DignoreList\u003dbootstraplauncher,securejarhandler,asm-commons,asm-util,asm-analysis,asm-tree,asm,JarJarFileSystems,client-extra,fmlcore,javafmllanguage,lowcodelanguage,mclanguage,forge-",
+    "-Djava.net.preferIPv6Addresses\u003dsystem",
+    "-DlegacyClassPath.file\u003dC:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\classpath\\runServer_minecraftClasspath.txt",
+    "-DmergeModules\u003djna-5.10.0.jar,jna-platform-5.10.0.jar",
+    "-Dmixin.env.refMapRemappingFile\u003dC:\\MCDev\\[TACZ] Military NPC\\forge-addon/build/createSrgToMcp/output.srg",
+    "-Dmixin.env.remapRefMap\u003dtrue",
+    "-Dtactical.profile.batch\u003dfalse",
+    "-Dtactical.profile.legacy\u003dfalse",
+    "-Dtactical.profile.quick\u003dfalse",
+    "-Dtactical.profile.team\u003dtrue",
+    "-Dtactical.profile.team.count\u003d15",
+    "-Dtactical.profile.team.crowded\u003dfalse",
+    "--module-path\u003dC:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\cpw.mods\\bootstraplauncher\\1.1.2\\c546e00443d8432cda6baa1c860346980742628\\bootstraplauncher-1.1.2.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\cpw.mods\\securejarhandler\\2.1.10\\51e6a22c6c716beb11e244bf5b8be480f51dd6b5\\securejarhandler-2.1.10.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-commons\\9.9.1\\ab35de4c537184a09339069f1a3b3aacf2289149\\asm-commons-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-util\\9.9.1\\e51f5b0ae0b0c1960687ae970a2a3434d39d8abb\\asm-util-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-analysis\\9.9.1\\1ab8d9316ef7a67240087919a708246c37ed1660\\asm-analysis-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-tree\\9.9.1\\b6b1b3366296163b4b1f540731aad0a2baa484d8\\asm-tree-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm\\9.9.1\\2ceea6ab43bcae1979b2a6d85fc0ca429877e5ab\\asm-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\net.minecraftforge\\JarJarFileSystems\\0.3.19\\2464eb7d6b9ddb9db36a82cf8a95193e5c6fe020\\JarJarFileSystems-0.3.19.jar",
+    "--add-modules\u003dALL-MODULE-PATH",
+    "--add-opens\u003djava.base/java.util.jar\u003dcpw.mods.securejarhandler",
+    "--add-opens\u003djava.base/java.lang.invoke\u003dcpw.mods.securejarhandler",
+    "--add-exports\u003djava.base/sun.security.util\u003dcpw.mods.securejarhandler",
+    "--add-exports\u003djdk.naming.dns/com.sun.jndi.dns\u003djava.naming",
+    "-XX:StartFlightRecording\u003dfilename\u003dprofile.jfr,settings\u003dprofile,dumponexit\u003dtrue,maxsize\u003d256m",
+    "-Xms1G",
+    "-Xmx4G",
+    "-Dfile.encoding\u003dwindows-1251",
+    "-Duser.country\u003dRU",
+    "-Duser.language\u003dru",
+    "-Duser.variant"
+  ],
+  "mods": [
+    "minecraft:1.20.1",
+    "tacz:1.1.8-hotfix2",
+    "tacticalnpcai:0.2.0",
+    "mixinextras:0.3.6",
+    "forge:47.4.20",
+    "simplebedrockmodel:2.2.2-forge+mc1.20.1"
+  ],
+  "weapon": "native default AK47/INFINITE reserve, empty initial magazine, natural reload; cohort invulnerable, not human PvP",
+  "warmup": 200,
+  "aiConfig": {
+    "memory": 160,
+    "perception": 1,
+    "reaction": 3,
+    "suppression": true,
+    "turn": 17.0
+  },
+  "geometry": "30 NPCs in parallel lanes 6 blocks apart; fixture-only relocation after real spawn commands"
+}

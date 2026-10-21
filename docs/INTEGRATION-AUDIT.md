@@ -164,3 +164,45 @@ Conclusion: an independent NPC runtime using TaCZ has a binary-supported path wo
   existing TaCZ pre-damage guard. It does not change faction/team alliances; any other ally is
   protected. Existing optional spawn/operator/equipment code is unchanged.
 
+## Stages 08–14 native boundaries, 2026-10-19/20
+
+Pinned `javap` inspection confirms the existing `IGunOperator.draw`, `getCacheProperty`,
+`getDataHolder`, `shoot/reload/bolt/aim` interfaces; no invented API, new dependency or Mixin.
+Native property maps remain mutable: metadata caching never freezes ammo, cooldown, sprint,
+range/spread or unsupported script/charge/heat/explosion gates. The already registered resource
+verification at startup/datapack reload increments an in-memory generation, not a guessed reload hook.
+
+Hearing observes successfully joined `EntityKineticBullet` at LOWEST Forge join priority,
+ignores canceled joins and resolves the genuine living owner. Pinned bullet type builder calls
+`noSummon`, `noSave`, `fireImmune` (`m_20698_`, `m_20716_`, `m_20719_` in the pinned mappings):
+loading a saved bullet cannot fabricate a new gunshot. Already flying projectiles remain distinct
+from uncreated BURST rounds; the existing native event/safety ownership is retained.
+
+Independent NBT schema4 adds STAND phase only; schema1/2/3 migration preserves configured
+order/radius128 and does not silently neutralize old entities. No live target/path/LOS is serialized.
+The optional adapter source/equipment/spawn integration is unchanged; common tactical controller
+and tagged `/equip` use explicit tick draw maintenance. Untagged native optional equipment keeps
+the prior direct draw path. Runtime failures stay fail closed.
+
+## Native teams / command update, 2026-10-20
+
+Pinned mapped Minecraft/Forge bytecode confirms `LivingEntity.getTeam`,
+`Entity.getScoreboardName`, `Scoreboard.addPlayerTeam/addPlayerToTeam/removePlayerFromTeam`,
+`Team.isAlliedTo`, and `ScoreboardSaveData.save/load`. NPC entries use entity UUIDs;
+players use scoreboard names. Membership is persisted by the ordinary server scoreboard,
+not duplicated in independent entity schema5. Native packet team names use `readUtf()`;
+the new command bounds names to64 characters and rejects blank/control/surrounding whitespace.
+Local inspection: `forge-addon/build/team-native-bytecode.txt`.
+
+`EntityStorage.loadEntities` uses `thenApplyAsync` on `entityDeserializerQueue` in this pinned
+version (`forge-addon/build/team-entity-storage-bytecode.txt`). Schema1–4 decoding therefore
+only records a pending migration; native team mutation occurs at explicit server activation.
+Pending migration survives resave. Native membership wins over archived legacy faction;
+schema5 does not resurrect a removed scoreboard team. Original faction/squad UUID are archived.
+
+Independent entities use native team membership for ally checks and transient per-team squad
+boards. Team changes invalidate the controller before the next native gate; suppression also
+revalidates subject eligibility without inspecting hidden coordinates. No TaCZ API, weapon
+cooldown/damage rule, dependency, optional adapter class or Mixin was added. Native BURST
+regression counts actual joined projectiles while the target joins/leaves an allied team.
+

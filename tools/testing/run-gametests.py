@@ -48,6 +48,12 @@ def main():
     output = ROOT / "forge-addon/build/test-runs"
     output.mkdir(parents=True, exist_ok=True)
     name = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
+    # Preserve a fresh world/config per receipt; stale native forced chunks and
+    # structure remnants from earlier selections must not become test inputs.
+    runtime = output / f"{name}-runtime"
+    runtime.mkdir(exist_ok=False)
+    (runtime / "server.properties").write_text("# Isolated GameTest defaults\n", encoding="utf-8")
+    command.append(f"-PgameTestDir={runtime}")
     log = output / f"{name}-{args.profile}{'-compat' if args.legacy else ''}.log"
     started = time.monotonic()
     with log.open("w", encoding="utf-8") as stream:
@@ -58,6 +64,7 @@ def main():
     summary = dict(status=status, profile=args.profile, legacy=args.legacy, executed=count,
                    selected=selected, seconds=round(time.monotonic()-started, 3),
                    exit_code=result.returncode, command=command, log=str(log.relative_to(ROOT)),
+                   runtime=str(runtime.relative_to(ROOT)),
                    tasks=re.findall(r"^> Task (.+)$", text, flags=re.MULTILINE))
     log.with_suffix(".json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(json.dumps(summary, indent=2))

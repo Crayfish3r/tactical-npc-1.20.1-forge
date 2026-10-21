@@ -41,6 +41,7 @@ public final class ServerProfile {
     }
     private static final Path csv=Path.of("profile-summary.csv");
     @SubscribeEvent public static void started(net.minecraftforge.event.server.ServerStartedEvent event) throws Exception {
+        if(Boolean.getBoolean("tactical.profile.batch") || Boolean.getBoolean("tactical.profile.team"))return;
         server=event.getServer();level=server.overworld();legacy=Boolean.getBoolean("tactical.profile.legacy");
         if(!legacy && net.minecraftforge.fml.ModList.get().isLoaded("tacznpcs"))throw new IllegalStateException("Standalone profile must not contain NPCs");
         dev.zuma.tacticalnpc.config.ServerConfig.DEBUG.set(false);dev.zuma.tacticalnpc.config.ServerConfig.TELEMETRY.set(false);

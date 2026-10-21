@@ -87,7 +87,9 @@ public final class TargetTypeTests {
     public static void occludedNpcResolutionNeverRefreshesHiddenCoordinates(GameTestHelper h) {
         begin(h);var a=npc(h,2.5,7.5,"red",true);var b=npc(h,13.5,7.5,"blue",false);Observation[] frozen={null};
         h.runAtTickTime(40,()->{h.assertTrue(a.controller().observation()!=null && a.controller().observation().visible(),"NPC genuinely observed before wall");frozen[0]=a.controller().observation();wall(h);var at=h.absoluteVec(new Vec3(13.5,2,3.5));b.moveTo(at.x,at.y,at.z);});
-        h.onEachTick(()->{if(h.getTick()<=42 || frozen[0]==null || a.controller()==null)return;var memory=a.controller().observation();h.assertTrue(memory!=null && !memory.visible() && memory.position().equals(frozen[0].position()) && memory.tick()==frozen[0].tick() && memory.velocity().lengthSquared()==0,"UUID validity cannot reveal hidden NPC position or velocity");h.assertFalse(a.controller().allowNativeFire(),"wall still gates every native round");});
+        // At tick 100 teardown kills the subject. GameTest's runnable map has no callback order;
+        // the memory assertion is meaningful only before that deliberately invalidating teardown.
+        h.onEachTick(()->{if(h.getTick()<=42 || h.getTick()>=100 || frozen[0]==null || a.controller()==null)return;var memory=a.controller().observation();h.assertTrue(memory!=null && !memory.visible() && memory.position().equals(frozen[0].position()) && memory.tick()==frozen[0].tick() && memory.velocity().lengthSquared()==0,"UUID validity cannot reveal hidden NPC position or velocity: tick="+h.getTick()+" frozen="+frozen[0]+" actual="+memory+" phase="+a.standPhase());h.assertFalse(a.controller().allowNativeFire(),"wall still gates every native round");});
         h.runAtTickTime(100,()->finish(h));
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="targets-06-death",timeoutTicks=150)
@@ -99,12 +101,14 @@ public final class TargetTypeTests {
     private static void lifecycle(GameTestHelper h,int change) {
         begin(h);var a=npc(h,2.5,7.5,"red",true);var b=npc(h,13.5,7.5,"blue",false);long[] shots={0},generation={0};Entity[] moved={null};
         h.runAtTickTime(55,()->{
+            h.assertTrue(a.controller()!=null,"lifecycle source must retain controller; change="+change+" alive="+a.isAlive()+" removed="+a.isRemoved()+" tags="+a.getTags()+" ticks="+a.tickCount+" ticking="+h.getLevel().isPositionEntityTicking(a.blockPosition())+" position="+a.position());
             h.assertTrue(b.getUUID().equals(a.controller().contactId()) && a.controller().shots()>0,"real NPC combat before lifecycle change");generation[0]=a.controller().generation();
             if(change==0){b.setInvulnerable(false);b.hurt(h.getLevel().damageSources().genericKill(),1000);}
             else if(change==1)b.remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
             else {var nether=h.getLevel().getServer().getLevel(Level.NETHER);moved[0]=b.changeDimension(nether,new net.minecraftforge.common.util.ITeleporter(){
                 @Override public net.minecraft.world.level.portal.PortalInfo getPortalInfo(Entity e,ServerLevel dest,java.util.function.Function<ServerLevel,net.minecraft.world.level.portal.PortalInfo> fallback){return new net.minecraft.world.level.portal.PortalInfo(new Vec3(8,110,8),Vec3.ZERO,0,0);}
             });h.assertTrue(moved[0]!=null && moved[0].level()==nether,"real cross-dimension transfer");}
+            h.assertTrue(a.controller()!=null,"lifecycle source controller lost during target transfer; alive="+a.isAlive()+" removed="+a.isRemoved()+" tags="+a.getTags()+" position="+a.position());
             h.assertTrue(a.controller().generation()!=generation[0] && a.controller().contactId()==null && a.controller().targetId()==null && a.controller().observation()==null && !a.controller().allowNativeFire(),"lifecycle invalidates target/generation/memory/native gate immediately");shots[0]=a.controller().shots();
             if(change!=0)h.assertTrue(CombatTargets.resolve(h.getLevel(),b.getUUID())==null && RuntimeRegistry.loadedNpcCount(h.getLevel())==1,"old level index and resolver exclude departed NPC");
         });

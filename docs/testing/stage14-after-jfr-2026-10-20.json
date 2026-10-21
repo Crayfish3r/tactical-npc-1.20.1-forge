@@ -1,0 +1,1142 @@
+{
+  "status": "PASS",
+  "recording": "forge-addon\\build\\batch14-profile\\20261020T044253-after\\profile.jfr",
+  "event_counts": {
+    "jdk.ExecutionSample": 9986,
+    "jdk.ObjectAllocationSample": 25682,
+    "jdk.GCHeapSummary": 170,
+    "jdk.GarbageCollection": 85
+  },
+  "first_event": "2026-10-20T06:43:13.102068293+02:00",
+  "last_event": "2026-10-20T07:03:03.099581752+02:00",
+  "server_cpu_samples": 6842,
+  "tactical_server_samples": 359,
+  "measured_phase_event_coverage": {
+    "unload:30:1": 1684,
+    "unload:30:2": 1105,
+    "neutral:1:1": 28,
+    "idle:1:1": 29,
+    "patrol:1:1": 201,
+    "combat:1:1": 32,
+    "crowded:1:1": 57,
+    "npc_only:1:1": 56,
+    "dynamic:1:1": 94,
+    "overload:1:1": 38,
+    "neutral:4:1": 44,
+    "idle:4:1": 40,
+    "patrol:4:1": 89,
+    "combat:4:1": 51,
+    "crowded:4:1": 55,
+    "npc_only:4:1": 69,
+    "dynamic:4:1": 112,
+    "overload:4:1": 66,
+    "neutral:16:1": 57,
+    "idle:16:1": 50,
+    "patrol:16:1": 196,
+    "combat:16:1": 102,
+    "crowded:16:1": 138,
+    "npc_only:16:1": 218,
+    "dynamic:16:1": 214,
+    "overload:16:1": 96,
+    "neutral:30:1": 64,
+    "idle:30:1": 58,
+    "patrol:30:1": 184,
+    "combat:30:1": 192,
+    "crowded:30:1": 194,
+    "npc_only:30:1": 190,
+    "dynamic:30:1": 376,
+    "overload:30:1": 160,
+    "neutral:50:1": 84,
+    "idle:50:1": 85,
+    "patrol:50:1": 493,
+    "combat:50:1": 331,
+    "crowded:50:1": 261,
+    "npc_only:50:1": 365,
+    "dynamic:50:1": 640,
+    "overload:50:1": 273,
+    "neutral:1:2": 36,
+    "idle:1:2": 24,
+    "patrol:1:2": 74,
+    "combat:1:2": 38,
+    "crowded:1:2": 54,
+    "npc_only:1:2": 64,
+    "dynamic:1:2": 68,
+    "overload:1:2": 46,
+    "neutral:4:2": 38,
+    "idle:4:2": 30,
+    "patrol:4:2": 77,
+    "combat:4:2": 55,
+    "crowded:4:2": 55,
+    "npc_only:4:2": 87,
+    "dynamic:4:2": 100,
+    "overload:4:2": 74,
+    "neutral:16:2": 44,
+    "idle:16:2": 44,
+    "patrol:16:2": 120,
+    "combat:16:2": 120,
+    "crowded:16:2": 102,
+    "npc_only:16:2": 246,
+    "dynamic:16:2": 289,
+    "overload:16:2": 98,
+    "neutral:30:2": 53,
+    "idle:30:2": 51,
+    "patrol:30:2": 241,
+    "combat:30:2": 212,
+    "crowded:30:2": 150,
+    "npc_only:30:2": 261,
+    "dynamic:30:2": 509,
+    "overload:30:2": 199,
+    "neutral:50:2": 54,
+    "idle:50:2": 68,
+    "patrol:50:2": 396,
+    "combat:50:2": 302,
+    "crowded:50:2": 220,
+    "npc_only:50:2": 405,
+    "dynamic:50:2": 914,
+    "overload:50:2": 456,
+    "soak:50:1": 4337,
+    "soak:50:2": 4442
+  },
+  "excluded": "startup,warmup,teardown; phase boundaries from actual CSV",
+  "server_cpu_categories": {
+    "other_server": 6521,
+    "profiling_fixture": 60,
+    "goal_or_native_safety": 145,
+    "native_maintenance": 105,
+    "native_shoot": 8,
+    "hearing_delivery": 2,
+    "projectile_physics": 1
+  },
+  "top_server_stacks": [
+    [
+      "net/minecraft/server/level/ChunkMap.processUnloads <- net/minecraft/server/level/ChunkMap.tick <- net/minecraft/server/level/ServerChunkCache.tick <- net/minecraft/server/level/ServerLevel.tick <- net/minecraft/server/MinecraftServer.tickChildren",
+      669
+    ],
+    [
+      "it/unimi/dsi/fastutil/longs/Long2LongOpenHashMap.getOrDefault <- net/minecraft/server/level/ChunkMap.saveChunkIfNeeded <- net/minecraft/server/level/ChunkMap.processUnloads <- net/minecraft/server/level/ChunkMap.tick <- net/minecraft/server/level/ServerChunkCache.tick",
+      504
+    ],
+    [
+      "java/util/concurrent/CompletableFuture.reportJoin <- java/util/concurrent/CompletableFuture.getNow <- net/minecraft/server/level/ChunkHolder.getTickingChunk <- net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick",
+      475
+    ],
+    [
+      "net/minecraft/world/level/chunk/LevelChunkSection.isRandomlyTickingFluids <- net/minecraft/world/level/chunk/LevelChunkSection.isRandomlyTicking <- net/minecraft/server/level/ServerLevel.tickChunk <- net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick",
+      292
+    ],
+    [
+      "it/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap.get <- net/minecraft/world/level/entity/PersistentEntitySectionManager.canPositionTick <- net/minecraft/server/level/ServerLevel.isNaturalSpawningAllowed <- net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick",
+      266
+    ],
+    [
+      "net/minecraft/world/level/BlockCollisions.computeNext <- com/google/common/collect/AbstractIterator.tryToComputeNext <- com/google/common/collect/AbstractIterator.hasNext <- com/google/common/collect/ImmutableCollection$Builder.addAll <- com/google/common/collect/ImmutableList$Builder.addAll",
+      145
+    ],
+    [
+      "net/minecraft/server/level/ChunkMap.tick <- net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick <- net/minecraft/server/level/ServerLevel.tick <- net/minecraft/server/MinecraftServer.tickChildren",
+      126
+    ],
+    [
+      "java/util/Arrays.copyOf <- java/util/ArrayList.grow <- java/util/ArrayList.grow <- java/util/ArrayList.add <- java/util/ArrayList.add",
+      115
+    ],
+    [
+      "net/minecraft/server/level/DistanceManager.purgeStaleTickets <- net/minecraft/server/level/ServerChunkCache.tick <- net/minecraft/server/level/ServerLevel.tick <- net/minecraft/server/MinecraftServer.tickChildren <- net/minecraft/server/dedicated/DedicatedServer.tickChildren",
+      114
+    ],
+    [
+      "net/minecraft/world/level/BlockCollisions.computeNext <- com/google/common/collect/AbstractIterator.tryToComputeNext <- com/google/common/collect/AbstractIterator.hasNext <- net/minecraft/world/level/CollisionGetter.findSupportingBlock <- net/minecraft/world/entity/Entity.checkSupportingBlock",
+      113
+    ],
+    [
+      "it/unimi/dsi/fastutil/longs/LongOpenHashSet.contains <- net/minecraft/server/level/ChunkMap$DistanceManager.isChunkToRemove <- net/minecraft/server/level/DistanceManager$ChunkTicketTracker.getLevel <- net/minecraft/server/level/ChunkTracker.getComputedLevel <- net/minecraft/world/level/lighting/DynamicGraphMinFixedPoint.checkEdge",
+      109
+    ],
+    [
+      "net/minecraft/server/level/ChunkMap.getPlayers <- net/minecraft/server/level/ChunkHolder.broadcastChanges <- net/minecraft/server/level/ServerChunkCache.lambda$tickChunks$5 <- net.minecraft.server.level.ServerChunkCache$$Lambda$7252+0x0000020f9cfdeaa0/436587369.accept <- java/util/ArrayList.forEach",
+      106
+    ],
+    [
+      "java/util/concurrent/CompletableFuture.waitingGet <- java/util/concurrent/CompletableFuture.join <- net/minecraft/server/level/ServerChunkCache.getChunk <- net/minecraft/world/level/Level.getChunk <- net/minecraft/world/level/LevelReader.getChunk",
+      93
+    ],
+    [
+      "it/unimi/dsi/fastutil/longs/Long2ObjectLinkedOpenHashMap$MapIterator.nextEntry <- it/unimi/dsi/fastutil/longs/Long2ObjectLinkedOpenHashMap$ValueIterator.next <- com/google/common/collect/Iterators$1.next <- net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick",
+      86
+    ],
+    [
+      "it/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap.get <- net/minecraft/world/level/entity/EntitySectionStorage.forEachAccessibleNonEmptySection <- net/minecraft/world/level/entity/EntitySectionStorage.getEntities <- net/minecraft/world/level/entity/LevelEntityGetterAdapter.get <- net/minecraft/world/level/Level.getEntities",
+      67
+    ],
+    [
+      "java/lang/ThreadLocal$ThreadLocalMap.cleanSomeSlots <- java/lang/ThreadLocal$ThreadLocalMap.set <- java/lang/ThreadLocal.set <- java/util/concurrent/locks/ReentrantReadWriteLock$Sync.tryAcquireShared <- java/util/concurrent/locks/AbstractQueuedSynchronizer.acquireShared",
+      59
+    ],
+    [
+      "it/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap$MapIterator.nextEntry <- it/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap$FastEntryIterator.next <- it/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap$FastEntryIterator.next <- net/minecraft/server/level/DistanceManager.purgeStaleTickets <- net/minecraft/server/level/ServerChunkCache.tick",
+      58
+    ],
+    [
+      "net/minecraft/resources/ResourceKey.equals <- java/util/Objects.equals <- java/lang/invoke/DirectMethodHandle$Holder.invokeStatic <- java.lang.invoke.LambdaForm$MH+0x0000020f9c528c00/2106129052.invoke <- java.lang.invoke.LambdaForm$MH+0x0000020f9c529400/892299047.guard",
+      57
+    ],
+    [
+      "java/lang/ThreadLocal$ThreadLocalMap.remove <- java/lang/ThreadLocal.remove <- java/util/concurrent/locks/ReentrantReadWriteLock$Sync.tryReleaseShared <- java/util/concurrent/locks/AbstractQueuedSynchronizer.releaseShared <- java/util/concurrent/locks/ReentrantReadWriteLock$ReadLock.unlock",
+      55
+    ],
+    [
+      "it/unimi/dsi/fastutil/longs/Long2ObjectLinkedOpenHashMap.get <- net/minecraft/server/level/ChunkMap.getVisibleChunkIfPresent <- net/minecraft/server/level/ServerChunkCache.getVisibleChunkIfPresent <- net/minecraft/server/level/ServerChunkCache.getChunkFutureMainThread <- net/minecraft/server/level/ServerChunkCache.getChunk",
+      46
+    ]
+  ],
+  "server_cpu_categories_by_phase": {
+    "unload:30:1": {
+      "other_server": 96,
+      "profiling_fixture": 3
+    },
+    "unload:30:2": {
+      "other_server": 109,
+      "profiling_fixture": 3,
+      "goal_or_native_safety": 2,
+      "native_maintenance": 1
+    },
+    "neutral:1:1": {
+      "other_server": 22
+    },
+    "idle:1:1": {
+      "other_server": 22,
+      "profiling_fixture": 1
+    },
+    "patrol:1:1": {
+      "other_server": 31,
+      "profiling_fixture": 1
+    },
+    "combat:1:1": {
+      "other_server": 18
+    },
+    "crowded:1:1": {
+      "other_server": 30
+    },
+    "npc_only:1:1": {
+      "other_server": 25,
+      "native_maintenance": 1
+    },
+    "dynamic:1:1": {
+      "other_server": 60,
+      "profiling_fixture": 1,
+      "goal_or_native_safety": 1
+    },
+    "overload:1:1": {
+      "other_server": 24
+    },
+    "neutral:4:1": {
+      "other_server": 34,
+      "profiling_fixture": 1
+    },
+    "idle:4:1": {
+      "other_server": 30,
+      "profiling_fixture": 1
+    },
+    "patrol:4:1": {
+      "other_server": 24,
+      "goal_or_native_safety": 2
+    },
+    "combat:4:1": {
+      "other_server": 26
+    },
+    "crowded:4:1": {
+      "other_server": 24,
+      "profiling_fixture": 3,
+      "native_maintenance": 1
+    },
+    "npc_only:4:1": {
+      "other_server": 26,
+      "profiling_fixture": 1
+    },
+    "dynamic:4:1": {
+      "other_server": 57,
+      "native_maintenance": 1,
+      "goal_or_native_safety": 1,
+      "profiling_fixture": 1
+    },
+    "overload:4:1": {
+      "other_server": 39,
+      "native_maintenance": 1
+    },
+    "neutral:16:1": {
+      "other_server": 40
+    },
+    "idle:16:1": {
+      "other_server": 33
+    },
+    "patrol:16:1": {
+      "other_server": 45,
+      "native_maintenance": 2,
+      "goal_or_native_safety": 1,
+      "profiling_fixture": 1
+    },
+    "combat:16:1": {
+      "other_server": 42,
+      "native_maintenance": 2
+    },
+    "crowded:16:1": {
+      "other_server": 47
+    },
+    "npc_only:16:1": {
+      "goal_or_native_safety": 2,
+      "other_server": 40
+    },
+    "dynamic:16:1": {
+      "other_server": 66,
+      "native_maintenance": 2,
+      "profiling_fixture": 1
+    },
+    "overload:16:1": {
+      "other_server": 42,
+      "goal_or_native_safety": 1
+    },
+    "neutral:30:1": {
+      "other_server": 42,
+      "native_maintenance": 1
+    },
+    "idle:30:1": {
+      "other_server": 36,
+      "goal_or_native_safety": 1,
+      "profiling_fixture": 1,
+      "native_maintenance": 1
+    },
+    "patrol:30:1": {
+      "other_server": 38,
+      "native_maintenance": 1
+    },
+    "combat:30:1": {
+      "other_server": 63,
+      "goal_or_native_safety": 2,
+      "profiling_fixture": 1
+    },
+    "crowded:30:1": {
+      "other_server": 52,
+      "goal_or_native_safety": 1
+    },
+    "npc_only:30:1": {
+      "other_server": 43,
+      "goal_or_native_safety": 1
+    },
+    "dynamic:30:1": {
+      "other_server": 87,
+      "native_maintenance": 2,
+      "goal_or_native_safety": 3
+    },
+    "overload:30:1": {
+      "other_server": 51,
+      "goal_or_native_safety": 1,
+      "profiling_fixture": 1,
+      "native_maintenance": 1
+    },
+    "neutral:50:1": {
+      "other_server": 46,
+      "native_maintenance": 1
+    },
+    "idle:50:1": {
+      "other_server": 36,
+      "goal_or_native_safety": 2,
+      "native_maintenance": 3,
+      "native_shoot": 1
+    },
+    "patrol:50:1": {
+      "other_server": 62,
+      "native_maintenance": 2,
+      "profiling_fixture": 1
+    },
+    "combat:50:1": {
+      "other_server": 69,
+      "native_maintenance": 3,
+      "goal_or_native_safety": 3,
+      "native_shoot": 1
+    },
+    "crowded:50:1": {
+      "other_server": 69,
+      "goal_or_native_safety": 1,
+      "native_maintenance": 2
+    },
+    "npc_only:50:1": {
+      "other_server": 61,
+      "goal_or_native_safety": 4,
+      "native_maintenance": 2,
+      "profiling_fixture": 2,
+      "hearing_delivery": 1
+    },
+    "dynamic:50:1": {
+      "native_shoot": 2,
+      "goal_or_native_safety": 5,
+      "other_server": 121,
+      "native_maintenance": 1
+    },
+    "overload:50:1": {
+      "other_server": 55,
+      "native_maintenance": 3,
+      "goal_or_native_safety": 1
+    },
+    "neutral:1:2": {
+      "other_server": 30
+    },
+    "idle:1:2": {
+      "other_server": 19
+    },
+    "patrol:1:2": {
+      "other_server": 32
+    },
+    "combat:1:2": {
+      "other_server": 26
+    },
+    "crowded:1:2": {
+      "other_server": 33
+    },
+    "npc_only:1:2": {
+      "other_server": 26
+    },
+    "dynamic:1:2": {
+      "other_server": 34,
+      "profiling_fixture": 1
+    },
+    "overload:1:2": {
+      "other_server": 27
+    },
+    "neutral:4:2": {
+      "other_server": 30,
+      "goal_or_native_safety": 1
+    },
+    "idle:4:2": {
+      "other_server": 22
+    },
+    "patrol:4:2": {
+      "other_server": 26,
+      "goal_or_native_safety": 1
+    },
+    "combat:4:2": {
+      "other_server": 27
+    },
+    "crowded:4:2": {
+      "goal_or_native_safety": 1,
+      "other_server": 28,
+      "profiling_fixture": 1
+    },
+    "npc_only:4:2": {
+      "other_server": 30
+    },
+    "dynamic:4:2": {
+      "other_server": 49
+    },
+    "overload:4:2": {
+      "other_server": 46,
+      "native_maintenance": 1
+    },
+    "neutral:16:2": {
+      "other_server": 35,
+      "goal_or_native_safety": 2,
+      "profiling_fixture": 1
+    },
+    "idle:16:2": {
+      "other_server": 36,
+      "goal_or_native_safety": 1
+    },
+    "patrol:16:2": {
+      "other_server": 50,
+      "native_maintenance": 1
+    },
+    "combat:16:2": {
+      "other_server": 42,
+      "native_maintenance": 4,
+      "profiling_fixture": 2
+    },
+    "crowded:16:2": {
+      "other_server": 48,
+      "native_maintenance": 2,
+      "profiling_fixture": 1
+    },
+    "npc_only:16:2": {
+      "other_server": 47,
+      "native_maintenance": 1,
+      "profiling_fixture": 1
+    },
+    "dynamic:16:2": {
+      "other_server": 91,
+      "profiling_fixture": 2,
+      "native_maintenance": 1
+    },
+    "overload:16:2": {
+      "other_server": 37,
+      "goal_or_native_safety": 1,
+      "profiling_fixture": 1,
+      "native_maintenance": 1
+    },
+    "neutral:30:2": {
+      "other_server": 32,
+      "native_maintenance": 2
+    },
+    "idle:30:2": {
+      "other_server": 29,
+      "native_maintenance": 3
+    },
+    "patrol:30:2": {
+      "other_server": 47,
+      "native_maintenance": 1,
+      "goal_or_native_safety": 2
+    },
+    "combat:30:2": {
+      "other_server": 64,
+      "profiling_fixture": 1,
+      "native_maintenance": 1
+    },
+    "crowded:30:2": {
+      "other_server": 48,
+      "goal_or_native_safety": 4,
+      "native_maintenance": 1,
+      "profiling_fixture": 1
+    },
+    "npc_only:30:2": {
+      "other_server": 51,
+      "goal_or_native_safety": 4,
+      "native_maintenance": 2
+    },
+    "dynamic:30:2": {
+      "other_server": 99,
+      "profiling_fixture": 1,
+      "goal_or_native_safety": 4,
+      "native_maintenance": 1
+    },
+    "overload:30:2": {
+      "other_server": 76,
+      "goal_or_native_safety": 1,
+      "profiling_fixture": 2
+    },
+    "neutral:50:2": {
+      "other_server": 21,
+      "goal_or_native_safety": 1
+    },
+    "idle:50:2": {
+      "other_server": 27,
+      "profiling_fixture": 2,
+      "native_maintenance": 1,
+      "goal_or_native_safety": 1
+    },
+    "patrol:50:2": {
+      "profiling_fixture": 1,
+      "other_server": 46,
+      "native_maintenance": 2,
+      "goal_or_native_safety": 1
+    },
+    "combat:50:2": {
+      "other_server": 65,
+      "goal_or_native_safety": 1
+    },
+    "crowded:50:2": {
+      "other_server": 48,
+      "native_maintenance": 1,
+      "native_shoot": 1,
+      "goal_or_native_safety": 3
+    },
+    "npc_only:50:2": {
+      "other_server": 42,
+      "profiling_fixture": 1
+    },
+    "dynamic:50:2": {
+      "other_server": 105,
+      "goal_or_native_safety": 3,
+      "profiling_fixture": 1,
+      "native_maintenance": 1
+    },
+    "overload:50:2": {
+      "other_server": 86,
+      "native_maintenance": 4,
+      "goal_or_native_safety": 3,
+      "profiling_fixture": 1
+    },
+    "soak:50:1": {
+      "goal_or_native_safety": 32,
+      "other_server": 1369,
+      "native_maintenance": 18,
+      "hearing_delivery": 1,
+      "profiling_fixture": 5,
+      "native_shoot": 2
+    },
+    "soak:50:2": {
+      "other_server": 1412,
+      "native_maintenance": 22,
+      "goal_or_native_safety": 43,
+      "profiling_fixture": 10,
+      "projectile_physics": 1,
+      "native_shoot": 1
+    }
+  },
+  "server_allocation_categories_estimated_bytes": {
+    "other_server": 14981346816,
+    "native_maintenance": 294317080,
+    "native_shoot": 65176184,
+    "goal_or_native_safety": 1209964208,
+    "profiling_fixture": 26608752,
+    "projectile_physics": 41170072,
+    "hearing_delivery": 11170080
+  },
+  "server_allocation_categories_by_phase_estimated_bytes": {
+    "unload:30:1": {
+      "other_server": 1550543416,
+      "native_maintenance": 6251168,
+      "native_shoot": 1721272,
+      "goal_or_native_safety": 1048000
+    },
+    "unload:30:2": {
+      "other_server": 1159280344,
+      "native_maintenance": 1039192,
+      "goal_or_native_safety": 1047984
+    },
+    "neutral:1:1": {
+      "other_server": 5037288
+    },
+    "idle:1:1": {
+      "other_server": 4940736
+    },
+    "patrol:1:1": {
+      "other_server": 53845144
+    },
+    "combat:1:1": {
+      "other_server": 10627280,
+      "goal_or_native_safety": 1048000
+    },
+    "crowded:1:1": {
+      "other_server": 17015840,
+      "goal_or_native_safety": 1047992
+    },
+    "npc_only:1:1": {
+      "other_server": 19257432
+    },
+    "dynamic:1:1": {
+      "other_server": 17695568
+    },
+    "overload:1:1": {
+      "other_server": 13341520
+    },
+    "neutral:4:1": {
+      "native_maintenance": 2031272,
+      "other_server": 5641648
+    },
+    "idle:4:1": {
+      "other_server": 6091320
+    },
+    "patrol:4:1": {
+      "other_server": 37253784
+    },
+    "combat:4:1": {
+      "other_server": 23549384,
+      "native_shoot": 1048000,
+      "goal_or_native_safety": 1015632
+    },
+    "crowded:4:1": {
+      "other_server": 27452000,
+      "goal_or_native_safety": 3127720
+    },
+    "npc_only:4:1": {
+      "other_server": 35081632,
+      "goal_or_native_safety": 1047984
+    },
+    "dynamic:4:1": {
+      "goal_or_native_safety": 3111632,
+      "other_server": 36214800
+    },
+    "overload:4:1": {
+      "other_server": 25598224,
+      "goal_or_native_safety": 3079272,
+      "profiling_fixture": 1047984
+    },
+    "neutral:16:1": {
+      "other_server": 22767336
+    },
+    "idle:16:1": {
+      "other_server": 20714504
+    },
+    "patrol:16:1": {
+      "other_server": 94151136,
+      "native_maintenance": 6223248,
+      "profiling_fixture": 1047968
+    },
+    "combat:16:1": {
+      "goal_or_native_safety": 6287848,
+      "other_server": 73074408
+    },
+    "crowded:16:1": {
+      "native_shoot": 2095992,
+      "goal_or_native_safety": 7123800,
+      "other_server": 90829776
+    },
+    "npc_only:16:1": {
+      "other_server": 71863440,
+      "goal_or_native_safety": 8326896,
+      "native_maintenance": 1048000
+    },
+    "dynamic:16:1": {
+      "other_server": 102798504,
+      "goal_or_native_safety": 7335744,
+      "profiling_fixture": 1048000
+    },
+    "overload:16:1": {
+      "other_server": 55583496,
+      "goal_or_native_safety": 6287872
+    },
+    "neutral:30:1": {
+      "other_server": 30846648,
+      "goal_or_native_safety": 2095984,
+      "native_maintenance": 1047984
+    },
+    "idle:30:1": {
+      "other_server": 31638912,
+      "native_maintenance": 2095952
+    },
+    "patrol:30:1": {
+      "other_server": 184040088
+    },
+    "combat:30:1": {
+      "other_server": 130904224,
+      "goal_or_native_safety": 13623672,
+      "native_maintenance": 1047984,
+      "profiling_fixture": 2095944
+    },
+    "crowded:30:1": {
+      "other_server": 133163048,
+      "goal_or_native_safety": 13623728,
+      "native_shoot": 2093008,
+      "native_maintenance": 2095984,
+      "projectile_physics": 1047952
+    },
+    "npc_only:30:1": {
+      "other_server": 124871128,
+      "native_maintenance": 2095976,
+      "goal_or_native_safety": 2095968
+    },
+    "dynamic:30:1": {
+      "goal_or_native_safety": 27596680,
+      "other_server": 165393176,
+      "native_maintenance": 6287960,
+      "profiling_fixture": 1047968
+    },
+    "overload:30:1": {
+      "other_server": 97044536,
+      "goal_or_native_safety": 17815592,
+      "native_shoot": 2095992
+    },
+    "neutral:50:1": {
+      "other_server": 47479464,
+      "native_maintenance": 4191944,
+      "profiling_fixture": 2095960
+    },
+    "idle:50:1": {
+      "other_server": 39663536,
+      "native_shoot": 4152464,
+      "goal_or_native_safety": 4191904,
+      "native_maintenance": 6248400
+    },
+    "patrol:50:1": {
+      "other_server": 327615728,
+      "goal_or_native_safety": 6139680,
+      "native_maintenance": 2095976
+    },
+    "combat:50:1": {
+      "goal_or_native_safety": 19532704,
+      "other_server": 215493832,
+      "native_maintenance": 7691752,
+      "profiling_fixture": 1047984
+    },
+    "crowded:50:1": {
+      "other_server": 196240896,
+      "goal_or_native_safety": 16703200,
+      "native_shoot": 1048000,
+      "native_maintenance": 4191936
+    },
+    "npc_only:50:1": {
+      "other_server": 190318800,
+      "goal_or_native_safety": 16742112,
+      "native_maintenance": 2095984
+    },
+    "dynamic:50:1": {
+      "goal_or_native_safety": 36557976,
+      "other_server": 284980240,
+      "native_shoot": 1047992,
+      "profiling_fixture": 2095968
+    },
+    "overload:50:1": {
+      "goal_or_native_safety": 18863512,
+      "other_server": 179269112,
+      "projectile_physics": 3143992,
+      "native_shoot": 2095968,
+      "hearing_delivery": 2095912,
+      "native_maintenance": 1048000
+    },
+    "neutral:1:2": {
+      "other_server": 5584960
+    },
+    "idle:1:2": {
+      "other_server": 6008688
+    },
+    "patrol:1:2": {
+      "other_server": 18059432
+    },
+    "combat:1:2": {
+      "hearing_delivery": 4882224,
+      "profiling_fixture": 3055032,
+      "other_server": 6169336
+    },
+    "crowded:1:2": {
+      "other_server": 17553064
+    },
+    "npc_only:1:2": {
+      "other_server": 17494744
+    },
+    "dynamic:1:2": {
+      "other_server": 20962832
+    },
+    "overload:1:2": {
+      "other_server": 14935632
+    },
+    "neutral:4:2": {
+      "other_server": 8143648
+    },
+    "idle:4:2": {
+      "other_server": 8165376
+    },
+    "patrol:4:2": {
+      "other_server": 27737536
+    },
+    "combat:4:2": {
+      "other_server": 19638080,
+      "native_maintenance": 3122632,
+      "goal_or_native_safety": 1990920
+    },
+    "crowded:4:2": {
+      "projectile_physics": 10383712,
+      "other_server": 22460128
+    },
+    "npc_only:4:2": {
+      "other_server": 28747920
+    },
+    "dynamic:4:2": {
+      "other_server": 30147232,
+      "native_maintenance": 519696,
+      "goal_or_native_safety": 3784104
+    },
+    "overload:4:2": {
+      "other_server": 22185576
+    },
+    "neutral:16:2": {
+      "native_maintenance": 4144856,
+      "other_server": 15525568
+    },
+    "idle:16:2": {
+      "other_server": 16574024,
+      "goal_or_native_safety": 5145728
+    },
+    "patrol:16:2": {
+      "other_server": 81351664,
+      "goal_or_native_safety": 683296
+    },
+    "combat:16:2": {
+      "other_server": 80076880,
+      "goal_or_native_safety": 6240624,
+      "native_shoot": 1047992
+    },
+    "crowded:16:2": {
+      "other_server": 50591120,
+      "projectile_physics": 2095960,
+      "native_maintenance": 2095936,
+      "goal_or_native_safety": 4191960
+    },
+    "npc_only:16:2": {
+      "other_server": 70116552,
+      "goal_or_native_safety": 4505696,
+      "native_maintenance": 1383056,
+      "native_shoot": 691520
+    },
+    "dynamic:16:2": {
+      "other_server": 94373928,
+      "goal_or_native_safety": 16764752,
+      "native_maintenance": 4191944,
+      "native_shoot": 1048000
+    },
+    "overload:16:2": {
+      "native_maintenance": 3048952,
+      "other_server": 52517488,
+      "goal_or_native_safety": 4191768
+    },
+    "neutral:30:2": {
+      "other_server": 27080360,
+      "goal_or_native_safety": 2095984,
+      "native_maintenance": 5185432
+    },
+    "idle:30:2": {
+      "other_server": 33316576,
+      "native_maintenance": 2095992
+    },
+    "patrol:30:2": {
+      "other_server": 116331440,
+      "native_maintenance": 2095944
+    },
+    "combat:30:2": {
+      "other_server": 134239928,
+      "goal_or_native_safety": 14616960,
+      "native_maintenance": 2095976,
+      "native_shoot": 2095968
+    },
+    "crowded:30:2": {
+      "other_server": 82059848,
+      "native_shoot": 2095984,
+      "goal_or_native_safety": 11427408,
+      "native_maintenance": 3067264
+    },
+    "npc_only:30:2": {
+      "other_server": 110361616,
+      "goal_or_native_safety": 13240480,
+      "native_maintenance": 5239944
+    },
+    "dynamic:30:2": {
+      "goal_or_native_safety": 18863696,
+      "other_server": 183848536,
+      "native_maintenance": 1047992
+    },
+    "overload:30:2": {
+      "other_server": 84572168,
+      "goal_or_native_safety": 12534520,
+      "profiling_fixture": 2095976,
+      "native_maintenance": 3116432
+    },
+    "neutral:50:2": {
+      "other_server": 45903544,
+      "native_shoot": 2095992,
+      "native_maintenance": 4150712,
+      "goal_or_native_safety": 1047976
+    },
+    "idle:50:2": {
+      "other_server": 49128800,
+      "native_maintenance": 2054712,
+      "goal_or_native_safety": 4150688,
+      "profiling_fixture": 1047456
+    },
+    "patrol:50:2": {
+      "other_server": 177977856,
+      "native_maintenance": 4949304
+    },
+    "combat:50:2": {
+      "other_server": 228723360,
+      "goal_or_native_safety": 20956680,
+      "native_maintenance": 3143952,
+      "profiling_fixture": 1047992
+    },
+    "crowded:50:2": {
+      "other_server": 123702800,
+      "goal_or_native_safety": 23979064,
+      "native_maintenance": 5237192,
+      "native_shoot": 1047992
+    },
+    "npc_only:50:2": {
+      "other_server": 178667984,
+      "goal_or_native_safety": 18832472,
+      "native_shoot": 4129680,
+      "native_maintenance": 1047992
+    },
+    "dynamic:50:2": {
+      "other_server": 291578368,
+      "goal_or_native_safety": 28727008,
+      "native_maintenance": 8328472,
+      "native_shoot": 2095968,
+      "projectile_physics": 1047984
+    },
+    "overload:50:2": {
+      "other_server": 238414880,
+      "goal_or_native_safety": 16424072,
+      "projectile_physics": 1047968,
+      "native_maintenance": 1047976,
+      "profiling_fixture": 3143704,
+      "native_shoot": 1047976
+    },
+    "soak:50:1": {
+      "other_server": 2475083920,
+      "goal_or_native_safety": 374395648,
+      "native_maintenance": 70869640,
+      "projectile_physics": 13584536,
+      "native_shoot": 15765368,
+      "hearing_delivery": 1047968,
+      "profiling_fixture": 1047464
+    },
+    "soak:50:2": {
+      "other_server": 3706020096,
+      "native_shoot": 14615056,
+      "goal_or_native_safety": 354653616,
+      "profiling_fixture": 3643352,
+      "native_maintenance": 92206368,
+      "projectile_physics": 8817968,
+      "hearing_delivery": 3143976
+    }
+  },
+  "top_server_allocation_stacks": [
+    [
+      "net/minecraft/world/level/chunk/PalettedContainer.pack <- net/minecraft/world/level/chunk/PalettedContainer.lambda$codec$5 <- net.minecraft.world.level.chunk.PalettedContainer$$Lambda$7376+0x0000020f9d00eaf8/1830694435.apply <- com/mojang/serialization/Encoder$1.encode <- com/mojang/serialization/Codec$2.encode",
+      2925003144
+    ],
+    [
+      "net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick <- net/minecraft/server/level/ServerLevel.tick <- net/minecraft/server/MinecraftServer.tickChildren <- net/minecraft/server/dedicated/DedicatedServer.tickChildren",
+      732554904
+    ],
+    [
+      "net/minecraft/world/level/chunk/DataLayer.copy <- net/minecraft/network/protocol/game/ClientboundLightUpdatePacketData.prepareSectionData <- net/minecraft/network/protocol/game/ClientboundLightUpdatePacketData.<init> <- net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.<init> <- net/minecraft/server/level/ChunkMap.playerLoadedChunk",
+      716050256
+    ],
+    [
+      "java/util/Arrays.copyOfRange <- java/lang/StringLatin1.newString <- java/lang/String.substring <- java/lang/String.substring <- net/minecraft/resources/ResourceLocation.decompose",
+      300647520
+    ],
+    [
+      "java/util/Arrays.copyOfRange <- java/lang/StringLatin1.newString <- java/lang/String.substring <- net/minecraft/resources/ResourceLocation.decompose <- net/minecraft/resources/ResourceLocation.<init>",
+      275878944
+    ],
+    [
+      "java/lang/StringLatin1.newString <- java/lang/String.substring <- java/lang/String.substring <- net/minecraft/resources/ResourceLocation.decompose <- net/minecraft/resources/ResourceLocation.<init>",
+      259825304
+    ],
+    [
+      "dev/zuma/tacticalnpc/combat/VisibilitySensor.coneIntersects <- dev/zuma/tacticalnpc/combat/VisibilitySensor.lambda$occupied$1 <- dev.zuma.tacticalnpc.combat.VisibilitySensor$$Lambda$7395+0x0000020f9d00b9b8/220178668.test <- net/minecraft/world/level/Level.lambda$getEntities$2 <- net.minecraft.world.level.Level$$Lambda$7299+0x0000020f9cff0fb0/1318263585.accept",
+      254432112
+    ],
+    [
+      "com/mojang/serialization/DataResult.success <- com/mojang/serialization/ListBuilder$Builder.<init> <- com/mojang/serialization/DynamicOps.listBuilder <- com/mojang/serialization/codecs/ListCodec.encode <- com/mojang/serialization/codecs/ListCodec.encode",
+      242444768
+    ],
+    [
+      "net/minecraft/world/level/Level.getBlockRandomPos <- net/minecraft/server/level/ServerLevel.tickChunk <- net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick <- net/minecraft/server/level/ServerLevel.tick",
+      235728072
+    ],
+    [
+      "net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.<init> <- net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.<init> <- net/minecraft/server/level/ChunkMap.playerLoadedChunk <- net/minecraft/server/level/ChunkMap.updateChunkTracking <- net/minecraft/server/level/ChunkMap.updatePlayerStatus",
+      231163176
+    ],
+    [
+      "java/lang/StringLatin1.newString <- java/lang/String.substring <- net/minecraft/resources/ResourceLocation.decompose <- net/minecraft/resources/ResourceLocation.<init> <- net/minecraft/resources/ResourceLocation.tryParse",
+      206013640
+    ],
+    [
+      "java/util/stream/SpinedBuffer.<init> <- java/util/stream/StreamSpliterators$WrappingSpliterator.initPartialTraversalState <- java/util/stream/StreamSpliterators$AbstractWrappingSpliterator.doAdvance <- java/util/stream/StreamSpliterators$WrappingSpliterator.tryAdvance <- java/util/Spliterators$1Adapter.hasNext",
+      174277232
+    ],
+    [
+      "io/netty/util/internal/PlatformDependent.allocateUninitializedArray <- io/netty/buffer/UnpooledUnsafeHeapByteBuf.allocateArray <- io/netty/buffer/UnpooledByteBufAllocator$InstrumentedUnpooledUnsafeHeapByteBuf.allocateArray <- io/netty/buffer/UnpooledHeapByteBuf.<init> <- io/netty/buffer/UnpooledUnsafeHeapByteBuf.<init>",
+      164482608
+    ],
+    [
+      "java/lang/Object.clone <- it/unimi/dsi/fastutil/longs/Long2ObjectLinkedOpenHashMap.clone <- net/minecraft/server/level/ChunkMap.promoteChunkMap <- net/minecraft/server/level/ServerChunkCache.runDistanceManagerUpdates <- net/minecraft/server/level/ServerChunkCache$MainThreadExecutor.pollTask",
+      160332912
+    ],
+    [
+      "java/util/Arrays.copyOf <- java/util/ArrayList.grow <- java/util/ArrayList.grow <- java/util/ArrayList.add <- java/util/ArrayList.add",
+      139554136
+    ],
+    [
+      "java/util/ArrayList.iterator <- java/util/Collections$UnmodifiableCollection$1.<init> <- java/util/Collections$UnmodifiableCollection.iterator <- net/minecraft/world/level/entity/EntitySection.getEntities <- net/minecraft/world/level/entity/EntitySectionStorage.lambda$getEntities$2",
+      137423152
+    ],
+    [
+      "java/util/stream/ReferencePipeline.flatMap <- net/minecraft/world/entity/Entity.getIndirectPassengersStream <- net/minecraft/world/entity/Entity.lambda$getIndirectPassengers$26 <- net.minecraft.world.entity.Entity$$Lambda$7176+0x0000020f9cfb7628/743026870.iterator <- net/minecraft/server/level/ChunkMap$TrackedEntity.getEffectiveRange",
+      137269552
+    ],
+    [
+      "net/minecraft/core/SectionPos.of <- net/minecraft/core/SectionPos.of <- net/minecraft/server/level/ChunkMap.tick <- net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick",
+      135627568
+    ],
+    [
+      "java/util/ArrayList.<init> <- dev/zuma/tacticalnpc/combat/VisibilitySensor.occupied <- dev/zuma/tacticalnpc/combat/TacticalCombatGoal.combatTick <- dev/zuma/tacticalnpc/combat/TacticalCombatGoal.tick <- net/minecraft/world/entity/ai/goal/WrappedGoal.tick",
+      134222848
+    ],
+    [
+      "net/minecraft/world/phys/shapes/VoxelShape.move <- net/minecraft/world/level/BlockCollisions.computeNext <- com/google/common/collect/AbstractIterator.tryToComputeNext <- com/google/common/collect/AbstractIterator.hasNext <- com/google/common/collect/ImmutableCollection$Builder.addAll",
+      127752416
+    ]
+  ],
+  "server_allocation_estimated_bytes": [
+    [
+      "[I",
+      2995330440
+    ],
+    [
+      "[B",
+      2004629040
+    ],
+    [
+      "[Ljava/lang/Object;",
+      763754888
+    ],
+    [
+      "net/minecraft/server/level/ServerChunkCache$ChunkAndHolder",
+      732554904
+    ],
+    [
+      "java/lang/String",
+      658749648
+    ],
+    [
+      "com/mojang/serialization/DataResult",
+      480809320
+    ],
+    [
+      "net/minecraft/core/BlockPos",
+      439945344
+    ],
+    [
+      "[D",
+      366599688
+    ],
+    [
+      "net/minecraft/world/phys/AABB",
+      363522008
+    ],
+    [
+      "net/minecraft/world/phys/Vec3",
+      332583576
+    ],
+    [
+      "java/util/stream/ReferencePipeline$Head",
+      307881776
+    ],
+    [
+      "[J",
+      256308024
+    ],
+    [
+      "net/minecraft/core/SectionPos",
+      254277864
+    ],
+    [
+      "[Ljava/lang/String;",
+      254160096
+    ],
+    [
+      "net/minecraft/resources/ResourceLocation",
+      252802488
+    ],
+    [
+      "java/util/ArrayList$Itr",
+      193751168
+    ],
+    [
+      "net/minecraft/world/level/ChunkPos",
+      182864152
+    ],
+    [
+      "java/util/Optional",
+      181961368
+    ],
+    [
+      "net/minecraft/world/phys/shapes/OffsetDoubleList",
+      165515008
+    ],
+    [
+      "dev/zuma/tacticalnpc/core/Vector3",
+      165208008
+    ]
+  ],
+  "note": "Sampling estimates; categories are mutually exclusive by priority; fixture separated. Goal scope is not total server cost."
+}

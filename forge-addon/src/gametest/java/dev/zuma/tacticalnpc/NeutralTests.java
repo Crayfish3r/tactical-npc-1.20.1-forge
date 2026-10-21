@@ -50,14 +50,14 @@ public final class NeutralTests {
             h.getLevel().getAllEntities().forEach(e->{if(e instanceof TacticalNpcEntity n)all.add(n);});
             h.assertTrue(all.size()==2,"one independent NPC per alias");
             for(var n:all) {
-                h.assertTrue(n.neutral() && n.reactiveAttacker()==null && h.getLevel().noCollision(n),"safe neutral, no reactive identity");
+                h.assertTrue(!n.neutral() && n.order().equals("ASSAULT") && n.getTeam()==null && n.reactiveAttacker()==null && h.getLevel().noCollision(n),"safe teamless attack spawn, no reactive identity");
                 h.assertFalse(h.getLevel().getBlockState(n.blockPosition().below()).is(Blocks.MAGMA_BLOCK),"hazard candidate skipped");
                 h.assertTrue(IGun.getIGunOrNull(n.getMainHandItem())!=null,"AK loadout preserved");
             }
             var n=all.get(0);String id=n.getUUID().toString();
             h.assertTrue(run(h,source,"tacticalnpc equip "+id+" tacz:glock_17")==1,"old equip");
             h.assertTrue(run(h,source,"tacticalnpc ammo "+id+" finite 7")==1,"old ammo");
-            h.assertTrue(n.neutral() && n.ammoPolicy()==TacticalNpcEntity.AmmoPolicy.FINITE,"equipment does not activate neutral");
+            h.assertTrue(!n.neutral() && n.ammoPolicy()==TacticalNpcEntity.AmmoPolicy.FINITE,"equipment preserves active spawn policy");
             h.assertTrue(run(h,source,"npc mode attack "+id)==1 && !n.neutral(),"explicit mode activates same controller");
             all.forEach(Entity::discard);h.succeed();
         });
@@ -65,7 +65,7 @@ public final class NeutralTests {
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="neutral-02-idle",timeoutTicks=180)
     public static void proximitySoundAndSquadCannotStartCombat(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,"ak47",30);var p=player(h,11.5,7.5);
-        UUID squad=UUID.randomUUID(),reporter=UUID.randomUUID();n.setSquad(squad);
+        UUID reporter=UUID.randomUUID();n.setSquad(UUID.randomUUID());UUID squad=n.runtime().squadId();
         h.runAtTickTime(10,()->{
             n.controller().hear(p);
             var board=SquadRuntime.of(h.getLevel());long tick=h.getLevel().getGameTime();
@@ -103,6 +103,7 @@ public final class NeutralTests {
     public static void actualAlliedDamageIsPersonalAndNewAttackerReplacesIt(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,"ak47",30);var ally=NpcEntities.NPC.get().create(h.getLevel());
         var at=h.absoluteVec(new Vec3(11.5,2,7.5));ally.moveTo(at.x,at.y,at.z);h.getLevel().addFreshEntity(ally);
+        n.setFaction("legacy-ally");ally.setFaction("legacy-ally");
         var p=player(h,3.5,1.5);
         h.runAtTickTime(10,()->{
             h.assertTrue(n.runtime().allied(ally),"same faction fixture");
@@ -161,16 +162,22 @@ public final class NeutralTests {
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="neutral-08-reload",timeoutTicks=230)
     public static void retaliationCannotBypassNativeReload(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,"ak47",0);var p=player(h,11.5,7.5);
-        boolean[] damagedDuringReload={false};
+        // This fixture isolates native reload/retaliation. Real movement/cover is covered
+        // separately; random strafing must not remove the shooter's legitimate contact.
+        n.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(0);
+        boolean[] damagedDuringReload={false},previousReload={false};long[] previousShots={0};int[] previousRounds={0};
         h.onEachTick(()->{
             boolean reloading=n.runtime().operator().getSynReloadState().getStateType().isReloading();
             if(reloading && !damagedDuringReload[0]) {
                 damagedDuringReload[0]=true;hit(n,h.getLevel().damageSources().playerAttack(p));
                 h.assertTrue(n.runtime().operator().getSynReloadState().getStateType().isReloading(),"damage does not cancel native reload");
             }
-            if(reloading)h.assertTrue(n.controller().shots()==0 && ProjectileProbe.count(n.getUUID())==0,"native busy forbids accepted requests and real rounds");
+            // A later reload may follow legitimate earlier shots. Check new work within
+            // consecutive busy samples, rather than requiring lifetime counters to be zero.
+            if(reloading && previousReload[0])h.assertTrue(n.controller().shots()==previousShots[0] && ProjectileProbe.count(n.getUUID())==previousRounds[0],"native busy forbids new accepted requests and real rounds");
+            previousReload[0]=reloading;previousShots[0]=n.controller()==null?0:n.controller().shots();previousRounds[0]=ProjectileProbe.count(n.getUUID());
         });
-        h.runAtTickTime(180,()->{h.assertTrue(damagedDuringReload[0] && ProjectileProbe.count(n.getUUID())>0,"neutral reload starts; response resumes after native reload/ADS/cooldown");finish(h,n,p);});
+        h.runAtTickTime(180,()->{h.assertTrue(damagedDuringReload[0] && ProjectileProbe.count(n.getUUID())>0,"neutral reload starts; response resumes after native reload/ADS/cooldown: damaged="+damagedDuringReload[0]+" rounds="+ProjectileProbe.count(n.getUUID())+" ticks="+n.tickCount+" position="+n.position()+" player="+p.position()+" decision="+(n.controller()==null?null:n.controller().decision())+" reload="+n.runtime().operator().getSynReloadState());finish(h,n,p);});
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="neutral-09-burst",timeoutTicks=180)
     public static void returningNeutralCancelsUncreatedNativeBurstRounds(GameTestHelper h) {
@@ -197,7 +204,7 @@ public final class NeutralTests {
             h.assertTrue(loaded.faction().equals(n.faction()) && loaded.runtime().squadId().equals(n.runtime().squadId()),"faction/squad intact");
             h.assertTrue(IGun.getIGunOrNull(loaded.getMainHandItem()).getDummyAmmoAmount(loaded.getMainHandItem())==17 && IGun.getIGunOrNull(loaded.getMainHandItem()).getCurrentAmmoCount(loaded.getMainHandItem())==29,"finite reserve/magazine intact");
             n.setOrder(OrderState.Kind.DEFEND_AREA,128);n.save(saved);
-            for(int schema:new int[]{1,2,3}) {
+            for(int schema:new int[]{1,2,3,4}) {
                 var migrated=saved.copy();var data=migrated.getCompound("tacticalnpc");data.putInt("schema",schema);data.remove("neutral");
                 var old=(TacticalNpcEntity)EntityType.loadEntityRecursive(migrated,h.getLevel(),e->e);
                 h.assertTrue(!old.neutral() && old.order().equals("DEFEND_AREA") && old.runtime().orderState().radius()==128,"schema "+schema+" missing neutral preserves configured behavior/radius128");

@@ -8,12 +8,18 @@
 
 ```mcfunction
 /gamemode creative
-/tacticalnpc spawn
-/tacticalnpc order @e[type=tacticalnpcai:npc,sort=nearest,limit=1] ASSAULT 24
-/gamemode survival
+/spawn npc team red count 4
+# Перейти на 20–30 блоков, повернуться к первой группе и создать противников:
+/spawn npc team blue count 4
 ```
 
-NPC появляется в трёх блоках к востоку, с пустым AK-47 и тегом `tactical_ai`; штатная перезарядка работает даже без цели. По умолчанию приказ HOLD_POSITION. Creative/spectator не атакуются. Консервативная безопасность блокирует стены и занятый сектор; случайный native разброс дополнительно ограничен союзным pre-damage guard. Неизвестные shooting scripts, charge, inventory-fed, explosive/incendiary свойства блокируются с диагностикой.
+`/spawn npc` и `/tacticalnpc spawn` безопасно создают активного независимого NPC с native AK-47. Без team он враждебен другим NPC, включая таких же одиночек; survival/adventure игроки — противники кроме союзников. `/spawn npc team red count 4` сразу создаёт вооружённую группу; одна native Minecraft team определяет союз и автоматически включает прежнюю squad-координацию. `/npc team red` назначает NPC в прицеле, `/npc team red @s` присоединяет игрока, `/npc team clear` убирает принадлежность, `/npc info` показывает режим и патроны. Имена с пробелами/кириллицей заключайте в кавычки. Старые сохранённые режимы, включая NEUTRAL, сохраняются. [Правила, миграция и ручная приёмка обновления](docs/TEAM-COMMANDS.md).
+
+Creative/spectator не атакуются. Стены, защищённые тела и незавершённая safety-проверка запрещают новый native round; союзный pre-damage guard защищает и от уже летящих bullets. Неизвестные shooting scripts, charge, inventory-fed, heat, explosive/incendiary свойства заблокированы.
+
+Пакет 08–14: [постоянный план и отдельные отчёты](docs/BATCH-08-14.md). Владелец принял 07 и разрешил последовательную работу, но автоматический PASS не является приёмкой владельца. STAND/HOLD_POSITION теперь WAIT на anchor → COMBAT XZ6 после реального native shot/damage → обычный DEFEND32 после окончания контакта. DEFEND принимает радиусы 4–128; PATROL остаётся отдельным. У `/npc mode attack|defend <radius>|stand [targets]` без targets выбирается NPC в прицеле до 32 блоков при LOS; консоль требует targets; permission 2.
+
+Handoff пакета08–14 до team-обновления, 2026-10-20: core792, FULL98/98+110/110 и affected14/14+25/25 PASS; production main/compat и ordinary restart. [Исторические SHA/ручные действия](docs/STAGE-14-ACCEPTANCE.md), [ordinary профиль того среза](docs/testing/stage14-profile-2026-10-20.md). Общего ускорения сервера не доказано; для30/50 combat AI p95>2ms, часть больших сцен стреляет реже baseline и не получает performance credit. Human1v1/1v4 и приёмка08–14 — WAITING_PLAYTEST. Актуальные проверки/JAR отдельного обновления команд — в [TEAM-COMMANDS](docs/TEAM-COMMANDS.md).
 
 ```bash
 bash ai-core/run-tests.sh
@@ -39,7 +45,7 @@ cd forge-addon
 git clone https://github.com/Crayfish3r/tactical-npc-1.20.1-forge.git
 cd tactical-npc-1.20.1-forge/forge-addon
 .\fetch-dependencies.ps1
-.\gradlew.bat compileJava compileCompatJava build
+.\gradlew.bat build
 ```
 
 `fetch-dependencies.ps1` загружает ровно TaCZ 1.1.8-hotfix2 и NPCs 2.1.0 и проверяет SHA-256. NPCs нужен для сборки optional adapter, самостоятельный runtime от него не зависит. Сторонние mod JAR, декомпилированные исходники, сборки, тестовые миры, резервные копии, raw logs и JFR в Git не включаются. Собственные NBT GameTest fixtures и Gradle wrapper входят в репозиторий. Сводные результаты сохранены в `docs/testing/`; ссылки исторических отчётов на raw logs относятся к локальным материалам испытаний.

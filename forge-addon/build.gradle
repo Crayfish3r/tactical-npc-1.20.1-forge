@@ -39,11 +39,15 @@ minecraft {
             }
         }
         server {
-            args '--nogui'; workingDirectory project.file(project.hasProperty('profile')?'run/profile':'run/standalone')
+            args '--nogui'; workingDirectory project.file(project.hasProperty('profile')?(project.findProperty('profileDir') ?: 'run/profile'):(project.findProperty('dedicatedDir') ?: 'run/standalone'))
             if(project.hasProperty('profile')) {
+                property 'tactical.profile.batch',project.hasProperty('batchProfile').toString()
+                property 'tactical.profile.team',project.hasProperty('teamProfile').toString()
+                property 'tactical.profile.team.count',(project.findProperty('teamCount') ?: '15').toString()
+                property 'tactical.profile.team.crowded',project.hasProperty('teamCrowded').toString()
                 property 'tactical.profile.legacy',project.hasProperty('profileLegacy').toString()
                 property 'tactical.profile.quick',project.hasProperty('profileQuick').toString()
-                jvmArgs '-Xms1G','-Xmx4G','-XX:StartFlightRecording=filename=profile.jfr,settings=profile,dumponexit=true,maxsize=64m'
+                jvmArgs '-Xms1G','-Xmx4G','-XX:StartFlightRecording=filename=profile.jfr,settings=profile,dumponexit=true,maxsize=256m'
             }
         }
         client {
@@ -51,7 +55,7 @@ minecraft {
             if(project.hasProperty('clientSmoke')) args '--username','TacticalSmoke','--quickPlayMultiplayer','127.0.0.1:25585'
         }
         gameTestServer {
-            workingDirectory project.file(project.hasProperty('legacyCompatibility') ? 'run/gametest-compat' : 'run/gametest-standalone')
+            workingDirectory project.file(project.findProperty('gameTestDir') ?: (project.hasProperty('legacyCompatibility') ? 'run/gametest-compat' : 'run/gametest-standalone'))
             property 'forge.enabledGameTestNamespaces', 'tacticalnpcai'
             property 'tactical.tests.noNpcs', (!project.hasProperty('legacyCompatibility')).toString()
         }

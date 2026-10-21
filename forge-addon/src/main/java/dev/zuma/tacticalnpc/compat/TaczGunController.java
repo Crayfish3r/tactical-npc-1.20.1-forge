@@ -29,20 +29,53 @@ public final class TaczGunController implements GunController {
     private long nextVolley;
     private int volleyRequests;
     private String lastRejection = "";
+    private long reads,lookups,draws,profiles;
+    public long[] measurements(){return new long[]{reads,lookups,draws,profiles};}
+    private java.util.Optional<com.tacz.guns.resource.index.CommonGunIndex> index(net.minecraft.resources.ResourceLocation id){lookups++;return TimelessAPI.getCommonGunIndex(id);}
+    private WeaponProfile profile(com.tacz.guns.resource.index.CommonGunIndex index){profiles++;return WeaponProfiles.from(index);}
+    private record Metadata(ItemStack stack,net.minecraft.resources.ResourceLocation id,com.tacz.guns.api.item.gun.FireMode mode,long generation,
+                            Object properties,com.tacz.guns.resource.index.CommonGunIndex index,WeaponProfile profile){}
+    private Metadata metadata;
+    private long maintained=Long.MIN_VALUE,drawnGeneration=-1;
+    private Metadata metadata(ItemStack stack,IGun gun) {
+        if(gun==null)return null;
+        var id=gun.getGunId(stack);var mode=gun.getFireMode(stack);long generation=GunSupport.resourceGeneration();
+        if(metadata==null || metadata.stack()!=stack || !metadata.id().equals(id) || metadata.mode()!=mode || metadata.generation()!=generation || metadata.properties()!=operator.getCacheProperty()) {
+            var index=index(id).orElse(null);
+            metadata=new Metadata(stack,id,mode,generation,operator.getCacheProperty(),index,index==null?WeaponProfile.of(WeaponProfile.Kind.CONSERVATIVE):profile(index));
+        }
+        return metadata;
+    }
+    /** Native state changes belong only to this explicit server tick point. */
+    @Override public void maintain(long tick) {
+        runtime.requireServer();if(maintained==tick)return;long started=System.nanoTime();
+        try{maintainTick(tick);}finally{dev.zuma.tacticalnpc.combat.AiTelemetry.component((net.minecraft.server.level.ServerLevel)npc.level(),dev.zuma.tacticalnpc.combat.AiTelemetry.Component.NATIVE_MAINTENANCE,System.nanoTime()-started);}
+    }
+    private void maintainTick(long tick) {
+        runtime.requireServer();if(maintained==tick)return;maintained=tick;
+        var stack=npc.getMainHandItem();var gun=IGun.getIGunOrNull(stack);var data=metadata(stack,gun);
+        if(data==null || data.index()==null || !GunSupport.rejection(stack,data.index()).isEmpty())return;
+        if(stack!=drawnStack || !data.id().equals(drawnId) || drawnGeneration!=data.generation()) {
+            draws++;operator.draw(npc::getMainHandItem);drawnStack=stack;drawnId=data.id();drawnGeneration=data.generation();
+            nextVolley=0;volleyRequests=0;
+        }
+    }
 
     public TaczGunController(NpcRuntimeAdapter runtime) {
         this.runtime=runtime; this.npc=runtime.entity(); this.operator=runtime.operator();
     }
     @Override public WeaponState snapshot() {
+        runtime.requireServer();
+        reads++;
         var state=observe(); var gun=IGun.getIGunOrNull(npc.getMainHandItem());
-        var index=gun==null?java.util.Optional.<com.tacz.guns.resource.index.CommonGunIndex>empty():TimelessAPI.getCommonGunIndex(gun.getGunId(npc.getMainHandItem()));
-        WeaponProfile profile=index.map(WeaponProfiles::from).orElse(WeaponProfile.of(WeaponProfile.Kind.CONSERVATIVE));
+        var data=metadata(npc.getMainHandItem(),gun);
+        WeaponProfile profile=data==null?WeaponProfile.of(WeaponProfile.Kind.CONSERVATIVE):data.profile();
         double range=profile.maximum(),spread=Double.NaN;
         if(operator.getCacheProperty()!=null) {
             Float falloff=operator.getCacheProperty().getCache(GunProperties.EFFECTIVE_RANGE);
             if(falloff!=null && Float.isFinite(falloff) && falloff>0) range=Math.min(range,falloff);
             java.util.Map<com.tacz.guns.resource.pojo.data.gun.InaccuracyType,Float> spreads=operator.getCacheProperty().getCache(GunProperties.INACCURACY);
-            if(spreads!=null && !spreads.isEmpty()) spread=spreads.values().stream().mapToDouble(Float::doubleValue).max().orElse(Double.NaN);
+            if(spreads!=null && !spreads.isEmpty()) {spread=0;for(Float value:spreads.values())spread=Math.max(spread,value);}
         }
         return new WeaponState(gun==null?"none":gun.getGunId(npc.getMainHandItem()).toString(),state.rounds(),state.reserve(),state.bolt(),state.busy(),state.ready(),state.supported(),range,
                 gun==null?"NONE":gun.getFireMode(npc.getMainHandItem()).name(),profile,spread);
@@ -50,23 +83,16 @@ public final class TaczGunController implements GunController {
     @Override public void aim(boolean aiming) { runtime.requireServer(); operator.aim(aiming); }
 
     public GunSnapshot observe() {
+        runtime.requireServer();
         ItemStack stack = npc.getMainHandItem();
         IGun gun = IGun.getIGunOrNull(stack);
         if (gun == null) return new GunSnapshot(false, 0, false, false, true, false);
-        var index = TimelessAPI.getCommonGunIndex(gun.getGunId(stack));
+        var data=metadata(stack,gun);var index=data.index();
         // Inventory-fed and charge/explosive weapons are outside the MVP weapon contract.
-        String rejection = index.isEmpty() ? "missing gun index" : GunSupport.rejection(stack, index.get());
-        if(rejection.isEmpty() && operator.needCheckAmmo() && index.get().getGunData().getReloadData().isInfinite()) rejection="native infinite reload conflicts with FINITE ammo policy";
+        String rejection = index==null ? "missing gun index" : GunSupport.rejection(stack, index);
+        if(rejection.isEmpty() && operator.needCheckAmmo() && index.getGunData().getReloadData().isInfinite()) rejection="native infinite reload conflicts with FINITE ammo policy";
         if (!rejection.isEmpty()) return blocked(rejection,gun.getGunId(stack).toString());
-        if (stack != drawnStack || !gun.getGunId(stack).equals(drawnId)) {
-            runtime.requireServer();
-            operator.draw(npc::getMainHandItem);
-            drawnStack = stack;
-            drawnId=gun.getGunId(stack);
-            if(WeaponProfiles.from(index.get()).kind()==WeaponProfile.Kind.CONSERVATIVE)
-                TacticalNpcAiMod.LOGGER.warn("NPC {} weapon {} unknown type {}; conservative 6..16 profile",npc.getUUID(),drawnId,index.get().getType());
-            nextVolley=0;volleyRequests=0;
-        }
+        if(stack!=drawnStack || !data.id().equals(drawnId) || drawnGeneration!=data.generation())return new GunSnapshot(false,0,false,false,true,false);
         var cache=operator.getCacheProperty();
         if(cache==null) return new GunSnapshot(false,0,false,false,true,false);
         com.tacz.guns.resource.pojo.data.gun.ExplosionData explosion=cache.getCache(com.tacz.guns.api.GunProperties.EXPLOSION);
@@ -75,7 +101,7 @@ public final class TaczGunController implements GunController {
             return blocked("explosive/incendiary attachment projectile",gun.getGunId(stack).toString());
         }
         lastRejection="";
-        Bolt bolt = index.get().getGunData().getBolt();
+        Bolt bolt = index.getGunData().getBolt();
         boolean chamber = bolt != Bolt.OPEN_BOLT && gun.hasBulletInBarrel(stack);
         int rounds = Math.max(0, gun.getCurrentAmmoCount(stack)) + (chamber ? 1 : 0);
         // hasInventoryAmmo is inventory-fed only in 1.1.8-hotfix2; it returns false for magazines.
@@ -107,11 +133,11 @@ public final class TaczGunController implements GunController {
             ShootResult result = operator.shoot(npc::getXRot, npc::getYHeadRot);
             if (result == ShootResult.SUCCESS) {
                 shots++;debug("shot SUCCESS");
-                var profile=snapshot().profile();
+                var profile=metadata.profile();
                 if(++volleyRequests>=profile.volleyRequests()) {volleyRequests=0;nextVolley=tick+profile.pauseTicks();}
             }
             else if (result == ShootResult.NEED_BOLT) operator.bolt();
-            else if (result == ShootResult.NOT_DRAW) operator.draw(npc::getMainHandItem);
+            else if (result == ShootResult.NOT_DRAW) drawnStack=ItemStack.EMPTY;
             else if (tick % 20 == 0) debug("shot gated: " + result);
         }
     }

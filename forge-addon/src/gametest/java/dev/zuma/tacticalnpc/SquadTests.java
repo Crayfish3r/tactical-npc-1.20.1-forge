@@ -30,29 +30,30 @@ public final class SquadTests {
             var report=receiver.controller().observation();
             h.assertTrue(report!=null && report.source()==Observation.Source.SQUAD && !report.visible() && report.tick()<h.getLevel().getGameTime(),"receiver gets delayed real observation behind wall: "+report);
             frozen[0]=report.position();Vec3 hidden=h.absoluteVec(new Vec3(14,2,14));p.moveTo(hidden.x,hidden.y,hidden.z);
-            h.assertTrue(board.claim(squad,leader.getUUID(),new Vector3(5,1,5),h.getLevel().getGameTime()),"claim owned by leader");
+            h.assertTrue(board.claim(leader.runtime().squadId(),leader.getUUID(),new Vector3(5,1,5),h.getLevel().getGameTime()),"claim owned by leader");
         });
         h.runAtTickTime(75,()->{
             var report=receiver.controller().observation();h.assertTrue(report!=null && report.position().equals(frozen[0]),"radio does not track hidden new player coordinates");
             leader.discard();
         });
         h.runAtTickTime(90,()->{
-            h.assertTrue(board.members(squad)==1 && board.role(squad,receiver.getUUID())==SquadBlackboard.Role.ANCHOR,"dead leader releases membership and roles");
-            h.assertTrue(board.available(squad,receiver.getUUID(),new Vector3(5,1,5),h.getLevel().getGameTime()),"dead leader claim released");
+            h.assertTrue(board.members(receiver.runtime().squadId())==1 && board.role(receiver.runtime().squadId(),receiver.getUUID())==SquadBlackboard.Role.ANCHOR,"dead leader releases membership and roles");
+            h.assertTrue(board.available(receiver.runtime().squadId(),receiver.getUUID(),new Vector3(5,1,5),h.getLevel().getGameTime()),"dead leader claim released");
             receiver.removeTag(RuntimeRegistry.TAG);
         });
-        h.runAtTickTime(100,()->{h.assertTrue(board.members(squad)==0,"tag ownership release clears squad references");receiver.discard();p.discard();h.succeed();});
+        h.runAtTickTime(100,()->{h.assertTrue(board.members(receiver.runtime().squadId())==0,"tag ownership release clears squad references");receiver.discard();p.discard();h.succeed();});
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="squad-02-coordinated-1v4",timeoutTicks=220)
     public static void coordinatedFourNativeFire(GameTestHelper h) {
         ScenarioIsolation.begin(h);UUID group=UUID.randomUUID();var actors=new ArrayList<TacticalNpcEntity>();
         for(int i=0;i<4;i++)actors.add(npc(h,new Vec3(3.5,2,1.5+4*i),group));
+        UUID coordination=actors.get(0).runtime().squadId();
         var p=player(h,new Vec3(13.5,2,7.5));
         h.runAtTickTime(180,()->{
-            var board=SquadRuntime.of(h.getLevel());long flankers=actors.stream().filter(n->board.role(group,n.getUUID())==SquadBlackboard.Role.FLANKER).count();
-            h.assertTrue(flankers==1 && board.members(group)==4,"bounded stable squad roles");
+            var board=SquadRuntime.of(h.getLevel());long flankers=actors.stream().filter(n->board.role(coordination,n.getUUID())==SquadBlackboard.Role.FLANKER).count();
+            h.assertTrue(flankers==1 && board.members(coordination)==4,"bounded stable squad roles");
             for(var n:actors)h.assertTrue(n.controller()!=null && !n.controller().failed() && ProjectileProbe.count(n.getUUID())>0 && n.getHealth()==n.getMaxHealth(),"each coordinated NPC fires real native rounds without allied damage");
-            actors.forEach(TacticalNpcEntity::discard);h.assertTrue(board.members(group)==0,"squad cleanup after all actors leave");p.discard();h.succeed();
+            actors.forEach(TacticalNpcEntity::discard);h.assertTrue(board.members(coordination)==0,"squad cleanup after all actors leave");p.discard();h.succeed();
         });
     }
     private static TacticalNpcEntity npc(GameTestHelper h,Vec3 local,UUID squad) {

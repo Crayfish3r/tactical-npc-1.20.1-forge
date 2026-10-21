@@ -1,0 +1,542 @@
+{
+  "head": "3f9e810d0ce7684d78f438c91819c71e4db47539",
+  "core": {
+    "command": "bash ai-core/run-tests.sh",
+    "executed": 792,
+    "status": "PASS"
+  },
+  "gametests": [
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T194346.633748Z-STAGE.json",
+      "status": "PASS",
+      "executed": 21,
+      "selected": 21,
+      "seconds": 146.5,
+      "legacy": false,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=STAGE",
+        "--console=plain",
+        "-PtestSelection=StandTests,ModeCommandTests,NeutralTests",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T194636.877069Z-FAST.json",
+      "status": "PASS",
+      "executed": 1,
+      "selected": 1,
+      "seconds": 45.953,
+      "legacy": false,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=FAST",
+        "--console=plain",
+        "-PtestSelection=WeaponSnapshotTests",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T195005.928663Z-STAGE.json",
+      "status": "PASS",
+      "executed": 13,
+      "selected": 13,
+      "seconds": 149.422,
+      "legacy": false,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=STAGE",
+        "--console=plain",
+        "-PtestSelection=WeaponSnapshotTests,WeaponProfileTests,NeutralTests#retaliationCannotBypassNativeReload,NeutralTests#returningNeutralCancelsUncreatedNativeBurstRounds",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T195355.647732Z-STAGE.json",
+      "status": "PASS",
+      "executed": 12,
+      "selected": 12,
+      "seconds": 87.61,
+      "legacy": false,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=STAGE",
+        "--console=plain",
+        "-PtestSelection=QueryBudgetTests,ActivationTests,PerceptionTests,NeutralTests#returningNeutralCancelsUncreatedNativeBurstRounds",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T195809.114273Z-STAGE.json",
+      "status": "PASS",
+      "executed": 8,
+      "selected": 8,
+      "seconds": 72.547,
+      "legacy": false,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=STAGE",
+        "--console=plain",
+        "-PtestSelection=SectorTests,QueryBudgetTests,IndependentNpcTests#alliedDamageEventGuard,WeaponProfileTests#shotgunNativePellets,NeutralTests#returningNeutralCancelsUncreatedNativeBurstRounds",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T200130.842518Z-STAGE.json",
+      "status": "PASS",
+      "executed": 6,
+      "selected": 6,
+      "seconds": 84.547,
+      "legacy": false,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=STAGE",
+        "--console=plain",
+        "-PtestSelection=HearingTests,SuppressionTests,NeutralTests#proximitySoundAndSquadCannotStartCombat,NeutralTests#hiddenAttackerGrantsNoAimAndExpiresWithoutThirdParty",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T200450.924063Z-STAGE.json",
+      "status": "FAIL",
+      "executed": 15,
+      "selected": 15,
+      "seconds": 155.204,
+      "legacy": false,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=STAGE",
+        "--console=plain",
+        "-PtestSelection=PeekRevalidationTests,CoverTests,StandTests,DefendTerritoryTests",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T200817.805246Z-FAST.json",
+      "status": "PASS",
+      "executed": 1,
+      "selected": 1,
+      "seconds": 61.735,
+      "legacy": false,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=FAST",
+        "--console=plain",
+        "-PtestSelection=CoverTests#moveReloadAndPeek",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T200954.268361Z-STAGE.json",
+      "status": "PASS",
+      "executed": 15,
+      "selected": 15,
+      "seconds": 150.797,
+      "legacy": false,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=STAGE",
+        "--console=plain",
+        "-PtestSelection=PeekRevalidationTests,CoverTests,StandTests,DefendTerritoryTests",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T201506.055218Z-FULL.json",
+      "status": "FAIL",
+      "executed": 96,
+      "selected": 96,
+      "seconds": 837.75,
+      "legacy": false,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=FULL",
+        "--console=plain",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T202953.236102Z-FAST.json",
+      "status": "FAIL",
+      "executed": 6,
+      "selected": 6,
+      "seconds": 126.375,
+      "legacy": false,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=FAST",
+        "--console=plain",
+        "-PtestSelection=TargetTypeTests#occludedNpcResolutionNeverRefreshesHiddenCoordinates,DefendPatrolTests#idleRadius128ExploresBeyondLegacyCap,DefendPatrolTests#persistedDefendRebuildsPatrolAfterEntityLoad,SectorTests#thirtyTwoSideObjectsNoLongerSaturateAndMeasure,PerceptionTests#hiddenPositionFrozenAndExpires,PerceptionTests#hearingIsRegionAndFovIsSeparate",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T203304.251419Z-FULL-compat.json",
+      "status": "FAIL",
+      "executed": 108,
+      "selected": 108,
+      "seconds": 900.625,
+      "legacy": true,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=FULL",
+        "--console=plain",
+        "-PlegacyCompatibility",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T205020.241136Z-FAST-compat.json",
+      "status": "FAIL",
+      "executed": 3,
+      "selected": 3,
+      "seconds": 64.5,
+      "legacy": true,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=FAST",
+        "--console=plain",
+        "-PtestSelection=QueryBudgetTests#persistentRayPressureCannotStarveLastOfFifty,PerceptionTests#hiddenPositionFrozenAndExpires,WeaponSnapshotTests#measureSnapshotReads",
+        "-PlegacyCompatibility",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T205229.444706Z-STAGE-compat.json",
+      "status": "PASS",
+      "executed": 23,
+      "selected": 23,
+      "seconds": 127.625,
+      "legacy": true,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=STAGE",
+        "--console=plain",
+        "-PtestSelection=QueryBudgetTests,PerceptionTests,AlphaResponsivenessTests,NeutralTests#returningNeutralCancelsUncreatedNativeBurstRounds,WeaponScenarioTests",
+        "-PlegacyCompatibility",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T205633.413723Z-FAST.json",
+      "status": "PASS",
+      "executed": 8,
+      "selected": 8,
+      "seconds": 67.328,
+      "legacy": false,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=FAST",
+        "--console=plain",
+        "-PtestSelection=QueryBudgetTests,CoverTests,PeekRevalidationTests",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T205800.694355Z-FULL.json",
+      "status": "PASS",
+      "executed": 98,
+      "selected": 98,
+      "seconds": 824.141,
+      "legacy": false,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=FULL",
+        "--console=plain",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T211237.193817Z-FULL-compat.json",
+      "status": "PASS",
+      "executed": 110,
+      "selected": 110,
+      "seconds": 888.766,
+      "legacy": true,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=FULL",
+        "--console=plain",
+        "-PlegacyCompatibility",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T212803.114046Z-FAST.json",
+      "status": "FAIL",
+      "executed": 1,
+      "selected": 1,
+      "seconds": 60.453,
+      "legacy": false,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=FAST",
+        "--console=plain",
+        "-PtestSelection=StandTests#deliveredReportIsProcessedBeforeEndingCombatPhase",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261019T213011.529964Z-STAGE-compat.json",
+      "status": "PASS",
+      "executed": 14,
+      "selected": 14,
+      "seconds": 119.937,
+      "legacy": true,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=STAGE",
+        "--console=plain",
+        "-PtestSelection=StandTests,SquadTests,ModeCommandTests,NeutralTests#proximitySoundAndSquadCannotStartCombat,NeutralTests#returningNeutralCancelsUncreatedNativeBurstRounds",
+        "-PlegacyCompatibility",
+        "--offline"
+      ]
+    },
+    {
+      "receipt": "forge-addon\\build\\test-runs\\20261020T043854.136293Z-STAGE-compat.json",
+      "status": "PASS",
+      "executed": 25,
+      "selected": 25,
+      "seconds": 188.828,
+      "legacy": true,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=STAGE",
+        "--console=plain",
+        "-PtestSelection=WeaponSnapshotTests,WeaponProfileTests,ModeCommandTests,NeutralTests#retaliationCannotBypassNativeReload,WeaponScenarioTests",
+        "-PlegacyCompatibility",
+        "--offline"
+      ]
+    }
+  ],
+  "production": {
+    "result": "PASS",
+    "artifacts": [
+      {
+        "file": "forge-addon\\build\\libs\\tacticalnpcai-0.2.0.jar",
+        "bytes": 191013,
+        "sha256": "70ACF74FBA0C0E1792B94A82936AAD8ED982F89C86AABBA87B8302EEF3A533A0",
+        "classes": 92,
+        "java_major": 61,
+        "npc_compat": false
+      },
+      {
+        "file": "forge-addon\\build\\libs\\tacticalnpcai-0.2.0-npcs-compat.jar",
+        "bytes": 7680,
+        "sha256": "5DEEBFC0E9FAF3347EDBE42CDA4CA2C72D775CD63DFB7579E16DD7EE4F138DE1",
+        "classes": 4,
+        "java_major": 61,
+        "npc_compat": true
+      }
+    ]
+  },
+  "dedicated": {
+    "status": "PASS",
+    "world": "batch14-normal-20261020T050509",
+    "seconds": 128.719,
+    "output": "forge-addon\\build\\dedicated-check\\20261020T050509",
+    "scope": "plain dedicated startup, real reload, aliases, PATROL, STAND, DEFEND128, faction/squad/finite/native stack save/restart, clean stop; no human combat"
+  },
+  "preservation": {
+    "properties_sha256": "e0f9353dd613ef3e426b1b1c4ca4097881568c6f6c9bbb78fde89563c9375658",
+    "eula_sha256": "e4db182aa77b5e31657f4b83f8973c79a8c65217a4383200f9f59f7c94752fad",
+    "original_files_unchanged": true,
+    "isolated_runtime": "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\dedicated-check\\20261020T050509\\runtime"
+  },
+  "profile_before": {
+    "status": "PASS",
+    "variant": "before",
+    "rows": 84,
+    "exit_code": 0,
+    "seconds": 1209.484,
+    "command": [
+      "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\batch-baseline\\forge-addon\\gradlew.bat",
+      "runServer",
+      "compileCompatJava",
+      "-Pprofile",
+      "-PbatchProfile",
+      "-PprofileDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\batch14-profile\\20261019T214624-before\\runtime",
+      "--offline",
+      "--console=plain"
+    ],
+    "output": "forge-addon\\build\\batch14-profile\\20261019T214624-before",
+    "world": "batch14-before-20261019T214624",
+    "environment": {
+      "seed": 8675309,
+      "java": "17.0.19+10-LTS",
+      "jvm": [
+        "-Dforge.enableGameTest=true",
+        "-Dforge.logging.console.level=info",
+        "-DignoreList=bootstraplauncher,securejarhandler,asm-commons,asm-util,asm-analysis,asm-tree,asm,JarJarFileSystems,client-extra,fmlcore,javafmllanguage,lowcodelanguage,mclanguage,forge-",
+        "-Djava.net.preferIPv6Addresses=system",
+        "-DlegacyClassPath.file=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\batch-baseline\\forge-addon\\build\\classpath\\runServer_minecraftClasspath.txt",
+        "-DmergeModules=jna-5.10.0.jar,jna-platform-5.10.0.jar",
+        "-Dmixin.env.refMapRemappingFile=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\batch-baseline\\forge-addon/build/createSrgToMcp/output.srg",
+        "-Dmixin.env.remapRefMap=true",
+        "-Dtactical.profile.batch=true",
+        "-Dtactical.profile.legacy=false",
+        "-Dtactical.profile.quick=false",
+        "--module-path=C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\cpw.mods\\bootstraplauncher\\1.1.2\\c546e00443d8432cda6baa1c860346980742628\\bootstraplauncher-1.1.2.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\cpw.mods\\securejarhandler\\2.1.10\\51e6a22c6c716beb11e244bf5b8be480f51dd6b5\\securejarhandler-2.1.10.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-commons\\9.9.1\\ab35de4c537184a09339069f1a3b3aacf2289149\\asm-commons-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-util\\9.9.1\\e51f5b0ae0b0c1960687ae970a2a3434d39d8abb\\asm-util-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-analysis\\9.9.1\\1ab8d9316ef7a67240087919a708246c37ed1660\\asm-analysis-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-tree\\9.9.1\\b6b1b3366296163b4b1f540731aad0a2baa484d8\\asm-tree-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm\\9.9.1\\2ceea6ab43bcae1979b2a6d85fc0ca429877e5ab\\asm-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\net.minecraftforge\\JarJarFileSystems\\0.3.19\\2464eb7d6b9ddb9db36a82cf8a95193e5c6fe020\\JarJarFileSystems-0.3.19.jar",
+        "--add-modules=ALL-MODULE-PATH",
+        "--add-opens=java.base/java.util.jar=cpw.mods.securejarhandler",
+        "--add-opens=java.base/java.lang.invoke=cpw.mods.securejarhandler",
+        "--add-exports=java.base/sun.security.util=cpw.mods.securejarhandler",
+        "--add-exports=jdk.naming.dns/com.sun.jndi.dns=java.naming",
+        "-XX:StartFlightRecording=filename=profile.jfr,settings=profile,dumponexit=true,maxsize=256m",
+        "-Xms1G",
+        "-Xmx4G",
+        "-Dfile.encoding=windows-1251",
+        "-Duser.country=RU",
+        "-Duser.language=ru",
+        "-Duser.variant"
+      ],
+      "cpu": "Intel64 Family 6 Model 165 Stepping 2, GenuineIntel",
+      "processors": 8,
+      "mods": [
+        "minecraft:1.20.1",
+        "tacz:1.1.8-hotfix2",
+        "tacticalnpcai:0.2.0",
+        "mixinextras:0.3.6",
+        "forge:47.4.20",
+        "simplebedrockmodel:2.2.2-forge+mc1.20.1"
+      ],
+      "warmupTicks": 80,
+      "weapon": "tacz:ak47; native finite magazine30+chamber1 reserve120 (soak100000); 280 tick native warmup; deterministic actor UUID/RNG; DEFEND6"
+    }
+  },
+  "profile_after": {
+    "status": "PASS",
+    "variant": "after",
+    "rows": 84,
+    "exit_code": 0,
+    "seconds": 1212.031,
+    "command": [
+      "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+      "runServer",
+      "compileCompatJava",
+      "-Pprofile",
+      "-PbatchProfile",
+      "-PprofileDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\batch14-profile\\20261020T044253-after\\runtime",
+      "--offline",
+      "--console=plain"
+    ],
+    "output": "forge-addon\\build\\batch14-profile\\20261020T044253-after",
+    "world": "batch14-after-20261020T044253",
+    "environment": {
+      "seed": 8675309,
+      "java": "17.0.19+10-LTS",
+      "jvm": [
+        "-Dforge.enableGameTest=true",
+        "-Dforge.logging.console.level=info",
+        "-DignoreList=bootstraplauncher,securejarhandler,asm-commons,asm-util,asm-analysis,asm-tree,asm,JarJarFileSystems,client-extra,fmlcore,javafmllanguage,lowcodelanguage,mclanguage,forge-",
+        "-Djava.net.preferIPv6Addresses=system",
+        "-DlegacyClassPath.file=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\classpath\\runServer_minecraftClasspath.txt",
+        "-DmergeModules=jna-5.10.0.jar,jna-platform-5.10.0.jar",
+        "-Dmixin.env.refMapRemappingFile=C:\\MCDev\\[TACZ] Military NPC\\forge-addon/build/createSrgToMcp/output.srg",
+        "-Dmixin.env.remapRefMap=true",
+        "-Dtactical.profile.batch=true",
+        "-Dtactical.profile.legacy=false",
+        "-Dtactical.profile.quick=false",
+        "--module-path=C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\cpw.mods\\bootstraplauncher\\1.1.2\\c546e00443d8432cda6baa1c860346980742628\\bootstraplauncher-1.1.2.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\cpw.mods\\securejarhandler\\2.1.10\\51e6a22c6c716beb11e244bf5b8be480f51dd6b5\\securejarhandler-2.1.10.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-commons\\9.9.1\\ab35de4c537184a09339069f1a3b3aacf2289149\\asm-commons-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-util\\9.9.1\\e51f5b0ae0b0c1960687ae970a2a3434d39d8abb\\asm-util-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-analysis\\9.9.1\\1ab8d9316ef7a67240087919a708246c37ed1660\\asm-analysis-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-tree\\9.9.1\\b6b1b3366296163b4b1f540731aad0a2baa484d8\\asm-tree-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm\\9.9.1\\2ceea6ab43bcae1979b2a6d85fc0ca429877e5ab\\asm-9.9.1.jar;C:\\Users\\makar\\.gradle\\caches\\modules-2\\files-2.1\\net.minecraftforge\\JarJarFileSystems\\0.3.19\\2464eb7d6b9ddb9db36a82cf8a95193e5c6fe020\\JarJarFileSystems-0.3.19.jar",
+        "--add-modules=ALL-MODULE-PATH",
+        "--add-opens=java.base/java.util.jar=cpw.mods.securejarhandler",
+        "--add-opens=java.base/java.lang.invoke=cpw.mods.securejarhandler",
+        "--add-exports=java.base/sun.security.util=cpw.mods.securejarhandler",
+        "--add-exports=jdk.naming.dns/com.sun.jndi.dns=java.naming",
+        "-XX:StartFlightRecording=filename=profile.jfr,settings=profile,dumponexit=true,maxsize=256m",
+        "-Xms1G",
+        "-Xmx4G",
+        "-Dfile.encoding=windows-1251",
+        "-Duser.country=RU",
+        "-Duser.language=ru",
+        "-Duser.variant"
+      ],
+      "cpu": "Intel64 Family 6 Model 165 Stepping 2, GenuineIntel",
+      "processors": 8,
+      "mods": [
+        "minecraft:1.20.1",
+        "tacz:1.1.8-hotfix2",
+        "tacticalnpcai:0.2.0",
+        "mixinextras:0.3.6",
+        "forge:47.4.20",
+        "simplebedrockmodel:2.2.2-forge+mc1.20.1"
+      ],
+      "warmupTicks": 80,
+      "weapon": "tacz:ak47; native finite magazine30+chamber1 reserve120 (soak100000); 280 tick native warmup; deterministic actor UUID/RNG; DEFEND6"
+    }
+  },
+  "human_playtest": "NOT RUN",
+  "owner_acceptance": "PENDING",
+  "status": "WAITING_PLAYTEST",
+  "final_review": {
+    "diff_check": "PASS",
+    "python_syntax": "PASS",
+    "head_unchanged": true,
+    "conflicts": false,
+    "working_files": 58,
+    "core_production_changed": false,
+    "compat_source_changed": false,
+    "dependency_changed": false,
+    "commit_push_merge": false
+  }
+}

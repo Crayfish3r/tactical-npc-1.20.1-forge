@@ -24,11 +24,6 @@ public final class ShotSafetyEvents {
         TacticalCombatGoal goal = RuntimeRegistry.active(event.getShooter());
         if (goal != null && !goal.allowNativeFire()) event.setCanceled(true);
     }
-    @SubscribeEvent(priority=EventPriority.LOWEST)
-    public void heard(GunFireEvent event) {
-        if(event.getLogicalSide()!=LogicalSide.SERVER || event.isCanceled() || !(event.getShooter() instanceof net.minecraft.server.level.ServerPlayer player)) return;
-        for(var goal:RuntimeRegistry.activeIn(player.serverLevel())) goal.hear(player);
-    }
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void hurt(EntityHurtByGunEvent.Pre event) {
         if (event.getLogicalSide() != LogicalSide.SERVER) return;
@@ -41,9 +36,11 @@ public final class ShotSafetyEvents {
         if (!(event.getHurtEntity() instanceof LivingEntity victim) ||
                 !dev.zuma.tacticalnpc.combat.CombatTargets.eligible(runtime.entity(),victim)) event.setCanceled(true);
     }
-    @SubscribeEvent
+    @SubscribeEvent(priority=EventPriority.LOWEST)
     public void projectile(net.minecraftforge.event.entity.EntityJoinLevelEvent event) {
-        if (event.getLevel().isClientSide) return;
+        if (event.getLevel().isClientSide || event.isCanceled()) return;
+        if(event.getEntity() instanceof com.tacz.guns.entity.EntityKineticBullet round && round.getOwner() instanceof LivingEntity source)
+            dev.zuma.tacticalnpc.combat.GunHearing.deliver(source);
         if (event.getEntity() instanceof com.tacz.guns.entity.EntityKineticBullet bullet &&
                 bullet.getOwner() instanceof LivingEntity npc && RuntimeRegistry.active(npc) != null) {
             bullet.addTag("tactical_projectile");RuntimeRegistry.active(npc).recordProjectile(event.getLevel().getGameTime());
