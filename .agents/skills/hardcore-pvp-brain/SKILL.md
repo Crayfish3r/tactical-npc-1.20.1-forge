@@ -1,20 +1,19 @@
 ---
 name: hardcore-pvp-brain
-description: Implement fair but extremely challenging PvP-style NPC combat decisions: perception, reaction latency, velocity prediction, strafing and utility tactics.
+description: Develop snapshot-based PvP combat policy with useful state commitment and explicit Hard versus authorized Unfair information rules.
 ---
 
 # hardcore-pvp-brain
 
-## Inputs
-`ai-core` code, perception contracts, balance profile and combat logs.
+Inputs: current core policy, observation provenance, effective profile and combat evidence. Apply [project rules](../../../AGENTS.md).
 
 ## Procedure
-1. Keep `ai-core` independent of Forge and deterministic given a snapshot.
-2. Reject knowledge from unseen targets except aged last-seen/heard/hit/squad report with confidence decay.
-3. Use `TacticalIntent` utility decisions with state commitment and emergency interrupts; no per-tick oscillation.
-4. Separate movement, aiming and firing. Bound turn rate and human-like response; cap speed prediction; no perfect headshots.
-5. Introduce weapon-class profiles (SMG/AR/DMR/sniper/shotgun) only after observing real TaCZ gun metadata.
-6. Compare win rate, accuracy by range, TTK and cover use on consistent maps; tune challenge without increasing base damage arbitrarily.
+1. Keep decisions deterministic from immutable snapshots and keep game interaction in the adapter. Validate identity/generation/TTL before execution.
+2. In Hard, use only legitimate observations with expiry/uncertainty. In Unfair, accept only the implemented nonvisual UNFAIR_HINT channel described in AGENTS.md; do not invent visual velocity, relay it as VISION or bypass neutral/eligibility restrictions.
+3. Keep acquisition, reaction, turn, accuracy and observed-velocity prediction separate. Read effective settings from [ServerConfig](../../../forge-addon/src/main/java/dev/zuma/tacticalnpc/config/ServerConfig.java) and validity caps from their checking classes, rather than adding another numeric profile in this skill.
+4. Evaluate useful actions with commitment/hysteresis and explicit emergency interrupts. Separate tactical goal selection from route execution; a routine decision refresh must not restart a committed action without progress.
+5. Use actual weapon metadata through the existing weapon adapter/profiles. Preserve physical and allied-fire gates and native cooldown/reload/bolt behavior in both difficulties.
+6. Compare range accuracy, first-fire/hit latency, cover use and action success on comparable maps. Human TTK/win rate and counterplay require human playtest; do not manufacture challenge by arbitrary damage or hidden DIRECT tracking.
 
 ## Verify
-Run `bash ai-core/run-tests.sh` and combat GameTests; no invisible-target perfect tracking; deterministic test seeds; record fairness settings.
+Run affected [core suites](../../../ai-core/run-tests.sh) and scoped combat GameTests using [testing profiles](../../../docs/TESTING-PROFILES.md). Include expiry/provenance, emergency interruption and profile-switch regressions when touched. Report the effective settings and reproducible seeds, without promoting historical results to current PASS.

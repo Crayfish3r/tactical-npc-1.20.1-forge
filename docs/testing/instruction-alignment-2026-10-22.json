@@ -1,0 +1,77 @@
+{
+  "status": "PASS",
+  "utc": "2026-10-22T08:10:04.649538+00:00",
+  "scope": "instructions and directly related documentation only",
+  "base_head": "f990246dea8e876cbacb3be2fd36540c7c0a20b7",
+  "remote_at_start": {
+    "repository": "Crayfish3r/tactical-npc-1.20.1-forge",
+    "default_branch": "main",
+    "branches": {
+      "feature": "f990246dea8e876cbacb3be2fd36540c7c0a20b7",
+      "main": "3077098f1338c3c8fdb1f564257fd71f8ea98701"
+    },
+    "verified_using": "GitHub get_repo + GET branches API"
+  },
+  "frontmatter": {
+    "status": "PASS",
+    "schema": "strict YAML plain-scalar subset with name/description",
+    "skills": [
+      {
+        "path": ".agents/skills/forge-ai-profiling/SKILL.md",
+        "name": "forge-ai-profiling",
+        "description": "Validate and profile Forge combat AI with risk-scoped tests and explicitly identified comparable before-after or third-party baselines."
+      },
+      {
+        "path": ".agents/skills/forge-compat-hook/SKILL.md",
+        "name": "forge-compat-hook",
+        "description": "Extend the existing Forge adapter and optional NPCs compatibility source set with verified APIs and a single owner of combat control."
+      },
+      {
+        "path": ".agents/skills/hardcore-pvp-brain/SKILL.md",
+        "name": "hardcore-pvp-brain",
+        "description": "Develop snapshot-based PvP combat policy with useful state commitment and explicit Hard versus authorized Unfair information rules."
+      },
+      {
+        "path": ".agents/skills/squad-tactics/SKILL.md",
+        "name": "squad-tactics",
+        "description": "Develop per-level squad coordination with delayed visual reports stable implemented roles and bounded reservations."
+      },
+      {
+        "path": ".agents/skills/tactical-navigation/SKILL.md",
+        "name": "tactical-navigation",
+        "description": "Develop bounded tactical navigation and specify action-route doors and ladders with native execution and narrow-passage coordination."
+      },
+      {
+        "path": ".agents/skills/tacz-npc-audit/SKILL.md",
+        "name": "tacz-npc-audit",
+        "description": "Verify pinned Minecraft Forge and TaCZ APIs for the changed layer and audit optional NPCs signatures only when that adapter is involved."
+      },
+      {
+        "path": ".agents/skills/tacz-weapon-control/SKILL.md",
+        "name": "tacz-weapon-control",
+        "description": "Implement native server TaCZ aiming firing ammo reload and bolt control with distinct visual and known-area permissions."
+      }
+    ]
+  },
+  "local_links_checked": 57,
+  "linked_files_committed_or_in_this_diff": true,
+  "unrelated_files_sha_verified": 575,
+  "semantic_consistency_checks": "PASS",
+  "diff_check": "PASS",
+  "files": [
+    "AGENTS.md",
+    ".agents/skills/tacz-npc-audit/SKILL.md",
+    ".agents/skills/forge-compat-hook/SKILL.md",
+    ".agents/skills/tacz-weapon-control/SKILL.md",
+    ".agents/skills/hardcore-pvp-brain/SKILL.md",
+    ".agents/skills/squad-tactics/SKILL.md",
+    ".agents/skills/tactical-navigation/SKILL.md",
+    ".agents/skills/forge-ai-profiling/SKILL.md",
+    "docs/ARCHITECTURE.md",
+    "docs/TESTING-PROFILES.md",
+    "docs/INSTRUCTION-ALIGNMENT-2026-10-22.md",
+    "docs/testing/instruction-alignment-2026-10-22.json"
+  ],
+  "gameplay_tests": "NOT REQUIRED for this instruction-only change; earlier navigation receipts are separate",
+  "implementation_files_modified_by_this_stage": 0
+}

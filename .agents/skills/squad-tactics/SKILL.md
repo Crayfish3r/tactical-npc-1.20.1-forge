@@ -1,19 +1,19 @@
 ---
 name: squad-tactics
-description: Create squad-based PvP NPC coordination: delayed sightings, suppressor/flanker roles, cover claims and fair information sharing.
+description: Develop per-level squad coordination with delayed visual reports stable implemented roles and bounded reservations.
 ---
 
 # squad-tactics
 
-## Inputs
-Squad membership mapping, target knowledge events, visibility/hearing policies, server level.
+Inputs: current native-team membership, observation events and per-level [SquadBlackboard](../../../ai-core/src/main/java/dev/zuma/tacticalnpc/core/SquadBlackboard.java). Apply [project rules](../../../AGENTS.md).
 
 ## Procedure
-1. Store per-level squad blackboard keyed by squad UUID; include target last-known location, confidence and TTL; never static leak between dimensions.
-2. Propagate only genuine spotted/heard/hit events. Apply configurable radio/speech delay and radius, not instant global omniscience.
-3. Assign roles (anchor, flanker, suppressor, rusher) with cooldown and maximum simultaneous flankers.
-4. Prevent duplicate cover points; expire reservations on removal/target switch/unload.
-5. Respect friendly-fire geometry and explosions, use coordination to generate difficult but counterplay-friendly encounters.
+1. Verify membership through the runtime/team adapter; do not create a parallel faction source. Store immutable coordinates/UUIDs with expiry, never live enemy entities in the board.
+2. Preserve the current visual-report contract: the publisher accepts confirmed VISION and the receiver gets delayed nonvisual SQUAD knowledge with original observation age. Personal hearing/damage are not automatically implemented report sources.
+3. Read effective delivery delay/radius at the [TacticalCombatGoal](../../../forge-addon/src/main/java/dev/zuma/tacticalnpc/combat/TacticalCombatGoal.java) call site and enforce board TTL/validity in core. Authorized Unfair accelerates this existing delivery; UNFAIR_HINT is never promoted or forwarded as a visual report.
+4. Use the implemented ANCHOR, FLANKER and SUPPRESSOR roles. Keep stable assignments and evaluate coordination utility/progress before changing a role; new roles require implementation and tests, not just documentation.
+5. Prevent duplicate cover claims and bound narrow-passage reservations by level, owner and expiry. Release claims on invalidation/removal/unload; waiting for a lease is distinct from physical stuckness.
+6. Preserve per-round ally geometry and native safety. Coordinate suppression and actual flank routes using permitted knowledge, without instant shared hidden coordinates.
 
 ## Verify
-1v4 coordinated combat, communication behind walls, squad death/respawn, dimension separation, 30 NPC mass load and no stale coordinates.
+Use scoped delayed-report/expiry, profile-switch, leader-death, dimension and reservation GameTests. Add actual coordinated combat and multi-group load when this behavior/performance is affected or requested. Follow [testing profiles](../../../docs/TESTING-PROFILES.md); report actual active actors, native rounds and arrivals rather than role labels alone.

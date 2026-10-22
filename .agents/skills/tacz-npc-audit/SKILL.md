@@ -1,20 +1,19 @@
 ---
 name: tacz-npc-audit
-description: Audit exact TACZ NPCs and TaCZ versions, decompile or inspect JARs, locate verified entity AI hooks and versioned APIs before any Forge integration or Mixin.
+description: Verify pinned Minecraft Forge and TaCZ APIs for the changed layer and audit optional NPCs signatures only when that adapter is involved.
 ---
 
 # tacz-npc-audit
 
-## Inputs
-Exact installed JARs, Forge version, mod list, hashes, relevant source links.
+Apply [project rules](../../../AGENTS.md) to the API surface actually used. Inputs: changed subsystem, pinned dependency/source manifest and [integration evidence](../../../docs/INTEGRATION-AUDIT.md).
 
 ## Procedure
-1. Read `docs/INTEGRATION-AUDIT.md` and existing audit evidence first.
-2. List JAR files; read `META-INF/mods.toml`, exact modIds, versions, mapped package names and entity IDs; record SHA256 hashes.
-3. Use legally obtained source or `javap`/decompiler to identify NPC entity, brain tick, AI goals/sensors, shot controller, ownership and registry. Treat legacy Corrinedev code as history only.
-4. Confirm the TaCZ `IGunOperator`/`IGun` API version and NPC entity's actual support before writing calls; record all relevant class/method signatures.
-5. Choose extension API > verified source fork > narrowly version-gated Mixin. Document how to stop the base AI without duplicate firing.
-6. Fill audit table with references and a compatibility risk register.
+1. Classify the work as pure core, independent Minecraft/Forge navigation, TaCZ control or optional NPCs integration. Reuse verified evidence when its version/signature still matches.
+2. Inspect relevant JAR metadata, mod IDs, registry IDs, hashes and source/bytecode signatures. Minecraft/Forge and TaCZ evidence does not require NPCs internal classes.
+3. For NPCs-specific work, inspect the pinned NPCs 2.1.0 entity, ownership hook and API; older branches are references, not signature evidence. Missing artifacts block only that affected work/check.
+4. For TaCZ calls, verify IGunOperator/IGun, entity support, native operation/event semantics and server/client separation. Never guess class or method names.
+5. Choose a supported API/interface/event first. Document ownership transfer and fallback; justify a source fork or narrowly gated Mixin only when needed.
+6. Update the audit with reproducible commands, signatures, versions and unresolved compatibility risks. Preserve license/attribution evidence if reusing code.
 
-## Output / validation
-An evidence-based compatibility report; no speculative class imports; explicit go/no-go for adapter. Stop implementation when 2.1.0 artifacts are unavailable.
+## Verify
+Give an explicit go/no-go per affected API/adapter. Continue independent work when only the optional NPCs audit is unavailable; mark optional compilation/runtime checks NOT RUN or BLOCKED rather than inventing a result. Numerical behavior comes from the source owners in AGENTS.md.

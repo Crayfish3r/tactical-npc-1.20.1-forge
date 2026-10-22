@@ -1,5 +1,7 @@
 # Профили проверок Tactical NPC
 
+Согласование инструкций2026-10-22: общие правила находятся в [AGENTS.md](../AGENTS.md), специализированное измерение — в [forge-ai-profiling](../.agents/skills/forge-ai-profiling/SKILL.md). Даты/checkpoint ниже сохраняют исторический контекст; актуальный каталог, состав core suites и фактические количества берутся из текущих скриптов и receipts. Before/after AI репозитория и сравнение с оригинальным NPCs — разные эксперименты. Для правок только инструкций достаточно ссылок/frontmatter/diff; игровые матрицы выбираются по риску и явному запросу.
+
 Новый боевой срез2026-10-22: [combat upgrade](COMBAT-UPGRADE-2026-10-22.md). Для его before/after используйте `run-combat-upgrade.py before|after` и `compare-combat-upgrade.py`; source baseline сохранён отдельно от batch14. Нижеследующий аудит и исторические пакеты остаются своими checkpoint.
 
 Аудит 2026-10-19: HEAD `eb1f04eefb2141adaefd91c90fb82b56a0d9c030`, начальное дерево чистое.
@@ -78,8 +80,8 @@ selected = completed = required passed. `NO-SOURCE`, skipped, dry-run, ноль/
 не GameTest PASS. Сейчас все тесты required; если появятся optional tests, парсер нужно
 явно расширить, а не объявлять их прошедшими автоматически.
 
-Core: один javac на вызов, пять suite JVM по умолчанию (792 checks на этом HEAD).
-FAST может выбрать policy/temporal/territory/patrol/attack; неизвестные/повторные suite — ошибка.
+Core: один javac на вызов; текущие default/допустимые suites определены в `ai-core/run-tests.sh`, количества — в фактическом выводе. Не копировать их из старого checkpoint в новые требования.
+FAST может выбрать релевантные suites этого скрипта; неизвестные/повторные suite — ошибка.
 Компиляция core намеренно остаётся полной и свежей в temporary directory: stale cache не добавлен.
 `tools/review/run-alpha-probe.sh` — отдельный исторический диагностический probe, не core suite;
 его assertions не объявлены дублями. Не включать автоматически в каждый этап.
