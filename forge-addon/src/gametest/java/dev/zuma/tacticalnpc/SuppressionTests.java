@@ -14,11 +14,12 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.*;
 @PrefixGameTestTemplate(false)
 public final class SuppressionTests {
-    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="suppress-01",timeoutTicks=220)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="suppress-01",timeoutTicks=300)
     public static void knownOpenPointWithoutHiddenTracking(GameTestHelper h) {
-        ScenarioIsolation.begin(h);var n=NpcEntities.NPC.get().create(h.getLevel());Vec3 at=h.absoluteVec(new Vec3(3.5,2,7.5));n.moveTo(at.x,at.y,at.z,-90,0);n.setYHeadRot(-90);n.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
+        ScenarioIsolation.begin(h);dev.zuma.tacticalnpc.config.ServerConfig.MEMORY.set(320);var n=NpcEntities.NPC.get().create(h.getLevel());Vec3 at=h.absoluteVec(new Vec3(3.5,2,7.5));n.moveTo(at.x,at.y,at.z,-90,0);n.setYHeadRot(-90);n.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
         var stack=GunSupport.create(new ResourceLocation("tacz:ak47"));var gun=IGun.getIGunOrNull(stack);gun.setCurrentAmmoCount(stack,30);gun.setBulletInBarrel(stack,true);n.setItemSlot(EquipmentSlot.MAINHAND,stack);n.addTag(RuntimeRegistry.TAG);h.getLevel().addFreshEntity(n);
-        var p=net.minecraftforge.common.util.FakePlayerFactory.get(h.getLevel(),new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"suppression-test"));p.setGameMode(GameType.SURVIVAL);p.setInvulnerable(true);p.moveTo(at.x+8,at.y,at.z);h.getLevel().addNewPlayer(p);
+        var p=net.minecraftforge.common.util.FakePlayerFactory.get(h.getLevel(),new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"suppression-test"));p.setGameMode(GameType.SURVIVAL);p.setInvulnerable(true);p.moveTo(at.x+10,at.y,at.z);h.getLevel().addNewPlayer(p);
+        // Keep the immobile fixture outside AR minimum distance; a real retreat must not be deliberately made unreachable.
         int[] bullets={0},after={0};dev.zuma.tacticalnpc.core.Vector3[] known={null};
         h.runAtTickTime(35,()->{
             h.assertTrue(n.controller().observation()!=null && n.controller().observation().visible(),"visual track precedes suppression");known[0]=n.controller().observation().position();bullets[0]=ProjectileProbe.count(n.getUUID());
@@ -28,10 +29,10 @@ public final class SuppressionTests {
         h.runAtTickTime(70,()->{
             var memory=n.controller().observation();after[0]=ProjectileProbe.count(n.getUUID());
             h.assertTrue(memory!=null && !memory.visible() && memory.position().equals(known[0]),"aim region stays at old open point");
-            h.assertTrue(after[0]>bullets[0] && after[0]-bullets[0]<=6,"limited real native suppression projectiles: "+(after[0]-bullets[0]));
+            h.assertTrue(after[0]>bullets[0] && after[0]-bullets[0]<=48,"bounded sustained real native suppression projectiles: "+(after[0]-bullets[0])+" decision="+n.controller().decision()+" weapon="+n.controller().weaponState()+" "+dev.zuma.tacticalnpc.combat.AiTelemetry.diagnostics(h.getLevel()));
             p.setPos(at.x+10,at.y,at.z+5);
         });
-        h.runAtTickTime(100,()->after[0]=ProjectileProbe.count(n.getUUID()));
-        h.runAtTickTime(145,()->{h.assertTrue(ProjectileProbe.count(n.getUUID())==after[0],"expired fire permit stops shooting while general memory may remain");p.discard();n.discard();h.succeed();});
+        h.runAtTickTime(240,()->after[0]=ProjectileProbe.count(n.getUUID()));
+        h.runAtTickTime(270,()->{h.assertTrue(ProjectileProbe.count(n.getUUID())==after[0],"expired fire permit stops shooting while general memory may remain");p.discard();n.discard();h.succeed();});
     }
 }

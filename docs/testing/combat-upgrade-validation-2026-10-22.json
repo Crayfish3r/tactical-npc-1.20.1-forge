@@ -1,0 +1,372 @@
+{
+  "status": "SCOPED_PASS_FULL_HISTORY_FAIL",
+  "human_acceptance": "WAITING_PLAYTEST",
+  "baseline_commit": "3077098f1338c3c8fdb1f564257fd71f8ea98701",
+  "versions": {
+    "minecraft": "1.20.1",
+    "forge": "47.4.20",
+    "java": "17.0.19",
+    "tacz": "1.1.8-hotfix2",
+    "optional_npcs": "2.1.0"
+  },
+  "production_matches_measured_after": true,
+  "new_dependencies": [],
+  "new_mixins": [],
+  "core": "docs/testing/combat-upgrade-core-2026-10-22.json",
+  "stage": "docs/testing/combat-upgrade-stage-2026-10-22.json",
+  "build": "docs/testing/combat-upgrade-build-2026-10-22.json",
+  "artifacts": "docs/testing/combat-upgrade-artifacts-2026-10-22.json",
+  "dedicated": "docs/testing/combat-upgrade-dedicated-2026-10-22.json",
+  "preservation": "docs/testing/combat-upgrade-preservation-2026-10-22.json",
+  "comparison": "docs/testing/combat-upgrade-comparison-2026-10-22.json",
+  "environment": "docs/testing/combat-upgrade-environment-2026-10-22.json",
+  "history": [
+    {
+      "status": "FAIL",
+      "profile": "FULL",
+      "legacy": false,
+      "executed": 115,
+      "selected": 115,
+      "seconds": 952.0,
+      "exit_code": 1,
+      "log": "forge-addon\\build\\test-runs\\20261021T224152.145426Z-FULL.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261021T224152.145426Z-FULL.json",
+      "failures": [
+        [
+          "lostvisualcontactkeepsfrozenmemorythenreturnsneutral",
+          "Didn't succeed or fail within 300 ticks"
+        ],
+        [
+          "detection96",
+          "real native projectiles at 96: CombatDecision[intent=ENGAGE, firePermitted=false, reason=weapon fire gated, weaponAction=NONE, movement=MovementCommand[mode=HOLD, destination=null, forward=0.0, sideways=0.0, speed=0.0, locomotion=WALK], aim=AimCommand[mode=DIRECT, point=Vector3[x=10096.5, y=103.03859335872711, z=10000.5]], frame=Frame[owner=c325b201-09e3-4365-bf89-9ae34ef4e846, dimension=minecraft:overworld, tick=2677, generation=108], expires=2685] firstProjectile{n=12,meanTicks=6.333333333333333,overflow=0} reacquireProjectile{n=0} gates=[NO_CONTACT:206, LOS_BLOCKED:645, REACTION:42, TURN:4, WEAPON_BUSY:67, COOLDOWN:615, ALLY:454, POLICY:9] routes[failed,alternative,arrived,exhausted]=[10, 7, 3, 0] queries=1,denials=0,deferredAgeMax=0,pending=0 sectors[CLEAR,OCCUPIED,SATURATED,DEFERRED,UNSUPPORTED]=[973, 464, 0, 1, 0] living=[entity.minecraft.cow:2f95fe36-74a0-4f9c-be53-15486cd25cc9:(9980.0, 71.0, 10016.899999976158):self=false:target=false, entity.minecraft.cow:19d73847-bb45-4ae2-9e13-80d5ba7963c9:(9981.0, 71.0, 10016.899999976158):self=false:target=false, entity.minecraft.cow:624dc24b-ef78-4c3b-97d3-368eea9eeb14:(9982.0, 71.0, 10018.0):self=false:target=false, entity.minecraft.cow:41bcc941-a63e-4923-9676-2c9b17825e61:(9983.0, 71.0, 10018.0):self=false:target=false, entity.minecraft.horse:6036255f-84dd-421d-9486-9680de3d4251:(10004.922803135876, 68.0, 9983.96120973097):self=false:target=false, entity.minecraft.horse:c5554f66-b122-4406-a5e9-11e9f08223f3:(10008.901323026297, 68.0, 9986.757823065676):self=false:target=false, entity.minecraft.horse:9c9e3696-eda0-4dac-a712-265a7554bb82:(10009.082125339051, 68.0, 9985.18073109708):self=false:target=false, entity.minecraft.horse:431a78b7-e95b-4927-b2ab-5443fa617236:(10005.454740165167, 67.0, 9988.432715804147):self=false:target=false, entity.tacticalnpcai.npc:c325b201-09e3-4365-bf89-9ae34ef4e846:(10000.5, 101.0, 10000.5):self=true:target=false, entity.minecraft.chicken:952b8edb-4cb3-45bb-a1a2-1c946b61812b:(10020.0, 70.0, 10040.0):self=false:target=false, entity.minecraft.chicken:34081094-9356-4480-876c-5bfddd97a429:(10018.0, 70.0, 10040.0):self=false:target=false, entity.minecraft.chicken:0eb726f0-d3ea-40c4-8ae9-36495786e845:(10018.0, 70.0, 10040.0):self=false:target=false, entity.minecraft.chicken:d3ce75fc-9443-481f-95aa-a4119dbcb9ea:(10017.0, 70.0, 10039.0):self=false:target=false, entity.minecraft.sheep:02a92492-6931-4d40-aba7-3e694e0a332b:(10023.0, 69.0, 10060.0):self=false:target=false, entity.minecraft.chicken:9c9db8d3-ce99-4fad-9b16-ff47e03836d5:(10057.0, 69.0, 9961.0):self=false:target=false, entity.minecraft.chicken:7506a1f5-8c09-4272-a4c6-c7e44d662c07:(10061.0, 69.0, 9961.0):self=false:target=false, entity.minecraft.chicken:341b0305-3518-4332-a74c-b1d9ad0c887c:(10060.0, 69.0, 9962.0):self=false:target=false, entity.minecraft.chicken:6e3be7cc-ac1f-4e58-bfc5-7c6165db188d:(10058.0, 69.0, 9964.0):self=false:target=false, entity.minecraft.chicken:4e0d70ac-5e1c-4aad-b8de-c31a7393665f:(10069.0, 70.0, 9987.0):self=false:target=false, entity.minecraft.chicken:84714941-06b4-4b02-bbb8-ed206496a669:(10070.50470816776, 71.0, 9994.619201395943):self=false:target=false, entity.minecraft.chicken:286fdd16-c73b-4ed8-93e2-7fbb392026ca:(10069.026672386766, 70.0, 9989.240613038413):self=false:target=false, entity.minecraft.chicken:a486462e-640c-4f48-9985-2e11794c657a:(10066.0, 71.0, 9993.0):self=false:target=false, entity.minecraft.player:439cba14-afce-43d4-95c9-e52abc9eceb5:(10096.5, 101.0, 10000.5):self=false:target=true, entity.minecraft.sheep:171ce015-1111-4bbd-83ec-d5b7e277d764:(10117.288347923573, 69.0, 10010.778611666952):self=false:target=false, entity.minecraft.sheep:12681771-072f-4ae1-8493-c7ec16a88d1b:(10116.320567309875, 69.0, 10011.337935306015):self=false:target=false, entity.minecraft.sheep:9808f059-81d4-44c6-82e9-85ac054d94d2:(10116.327981829889, 69.0, 10013.492592667952):self=false:target=false, entity.minecraft.sheep:2e34cad8-aa41-48a6-a293-7faca7c0d33a:(10118.422878705594, 68.0, 10011.291472412364):self=false:target=false, entity.minecraft.sheep:08ca00c0-b515-472f-bef5-dee55d7708bf:(10115.0, 69.0, 10011.0):self=false:target=false, entity.minecraft.sheep:eea4afc5-1199-49e6-9fe8-ea67b895e4ab:(10117.939529450712, 69.0, 10013.477200662826):self=false:target=false, entity.minecraft.sheep:ae3f26f0-a9ba-440e-89a8-fb4ad91db9df:(10119.408711446486, 68.0, 10012.15544545287):self=false:target=false, entity.minecraft.sheep:c6dee59d-a200-4ad2-9c7a-d88932851a3d:(10113.988009599025, 69.0, 10007.037824495377):self=false:target=false, entity.minecraft.sheep:7c6b58f5-4c67-4666-a865-2ab60387fea7:(10152.0, 68.0, 10048.899999976158):self=false:target=false, entity.minecraft.chicken:160d07e0-9187-44f6-a57e-7937eb9267b4:(10180.0, 63.0, 10035.0):self=false:target=false, entity.minecraft.chicken:593a4d7d-8876-4f00-b6dd-40425281c6fe:(10179.0, 63.0, 10035.0):self=false:target=false, entity.minecraft.chicken:a3b2b568-4746-44b9-9cfc-9ff0a685ff32:(10181.0, 63.0, 10036.0):self=false:target=false, entity.minecraft.chicken:710a8cbc-9c84-4f71-aeb5-1a2872981002:(10180.0, 63.0, 10035.0):self=false:target=false]"
+        ],
+        [
+          "weapondistancereallymoves",
+          "sniper really retreats toward a distant position: (2377.4588181481163, -57.23363200604248, 21.46622524229866) decision=CombatDecision[intent=REPOSITION, firePermitted=false, reason=blocked route, weaponAction=NONE, movement=MovementCommand[mode=NAVIGATE, destination=Vector3[x=2377.2132629389666, y=-57.07840000152588, z=18.5630842209351], forward=0.0, sideways=0.0, speed=1.25, locomotion=RELOCATION], aim=AimCommand[mode=DIRECT, point=Vector3[x=2391.5, y=-56.83000003099441, z=20.5]], frame=Frame[owner=b57f5b15-82e3-4d98-a2ef-dee0187f1a38, dimension=minecraft:overworld, tick=8029, generation=420], expires=8037]"
+        ],
+        [
+          "contactreacquiretrackinganddeferred",
+          "fresh aim and DEFERRED exercised in runtime"
+        ],
+        [
+          "approachrunsthenadsandnativeprojectile",
+          "real weapon approach outside old anchor, RUN -> native ADS: nearest=29.470680236816406 farthest=8.529319286806096 run=false ads=false decision=CombatDecision[intent=RETREAT, firePermitted=false, reason=no available ammunition, weaponAction=NONE, movement=MovementCommand[mode=STRAFE, destination=null, forward=-0.55, sideways=0.0, speed=0.65, locomotion=RETREAT], aim=AimCommand[mode=DIRECT, point=Vector3[x=2531.5, y=-56.495615770081315, z=31.5]], frame=Frame[owner=00000000-0000-0000-0000-00000000025e, dimension=minecraft:overworld, tick=8842, generation=431], expires=8850] playerAlive=true removed=false pos=(2531.5, -58.0, 31.5) npcTicks=600 observation=Observation[subject=335364cc-2acd-40f5-ac19-20381a37bfb5, position=Vector3[x=2531.5, y=-56.83000003099441, z=31.5], velocity=Vector3[x=0.0, y=0.0, z=0.0], tick=8843, expires=9163, source=VISION, confidence=1.0, uncertainty=0.0, visible=true]"
+        ],
+        [
+          "legitimatememorypathdetourssimplebarrier",
+          "native path makes real detour around simple barrier before memory expires: side=3.023222258905367 beyond=false pos=(3047.596210123337, -58.0, 32.35965552883987)"
+        ],
+        [
+          "hiddenpositionfrozenandexpires",
+          "visual memory expires"
+        ],
+        [
+          "hiddenattackergrantsnoaimandexpireswithoutthirdparty",
+          "Didn't succeed or fail within 300 ticks"
+        ],
+        [
+          "equipmodepropertiesandresourcesinvalidatewithoutreaddraw",
+          "mutable native properties read fresh even on same object"
+        ]
+      ]
+    },
+    {
+      "status": "FAIL",
+      "profile": "STAGE",
+      "legacy": true,
+      "executed": 18,
+      "selected": 18,
+      "seconds": 229.75,
+      "exit_code": 1,
+      "log": "forge-addon\\build\\test-runs\\20261021T225840.846737Z-STAGE-compat.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261021T225840.846737Z-STAGE-compat.json",
+      "failures": [
+        [
+          "knownopenpointwithouthiddentracking",
+          "bounded sustained real native suppression projectiles: 0"
+        ],
+        [
+          "legitimatememorypathdetourssimplebarrier",
+          "native path makes real detour around simple barrier before memory expires: side=3.3003389014949676 beyond=false pos=(440.43071463052036, -58.0, 35.48709202902895)"
+        ]
+      ]
+    },
+    {
+      "status": "FAIL",
+      "profile": "FULL",
+      "legacy": true,
+      "executed": 129,
+      "selected": 129,
+      "seconds": 1022.047,
+      "exit_code": 1,
+      "log": "forge-addon\\build\\test-runs\\20261021T231935.528372Z-FULL-compat.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261021T231935.528372Z-FULL-compat.json",
+      "failures": [
+        [
+          "retaliationcannotbypassnativereload",
+          "neutral reload starts; response resumes after native reload/ADS/cooldown: damaged=true rounds=0 ticks=180 position=(1285.5113712746363, -58.0, 7.5) player=(1295.5, -58.0, 7.5) decision=CombatDecision[intent=REPOSITION, firePermitted=false, reason=blocked route, weaponAction=NONE, movement=MovementCommand[mode=NAVIGATE, destination=Vector3[x=1285.5113712746363, y=-58.0, z=10.5], forward=0.0, sideways=0.0, speed=1.25, locomotion=RELOCATION], aim=AimCommand[mode=DIRECT, point=Vector3[x=1295.5, y=-56.83000003099441, z=7.5]], frame=Frame[owner=65ef6f86-da8e-402a-b75b-6cb668b1b56c, dimension=minecraft:overworld, tick=3782, generation=163], expires=3790] reload=com.tacz.guns.api.entity.ReloadState@305f4071"
+        ],
+        [
+          "acquisitionretainsvisiblependingperception",
+          "page continuation must not replace a fresh visible candidate still awaiting perception=8 with cadence=2"
+        ],
+        [
+          "legitimatememorypathdetourssimplebarrier",
+          "native path makes real detour around simple barrier before memory expires: side=3.303545321147837 beyond=false pos=(3196.4114834237453, -58.0, 35.49478061800862)"
+        ]
+      ]
+    },
+    {
+      "status": "FAIL",
+      "profile": "STAGE",
+      "legacy": true,
+      "executed": 43,
+      "selected": 43,
+      "seconds": 295.703,
+      "exit_code": 1,
+      "log": "forge-addon\\build\\test-runs\\20261021T233758.749261Z-STAGE-compat.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261021T233758.749261Z-STAGE-compat.json",
+      "failures": [
+        [
+          "movingprotectedbodybeforeandaftertargetanddeferral",
+          "body behind target within confirmed 128 ballistic length blocks"
+        ],
+        [
+          "combatlifecycle",
+          "removed wall opens physical sightline"
+        ],
+        [
+          "legitimatememorypathdetourssimplebarrier",
+          "native path makes real detour around simple barrier before memory expires: side=3.0221670486134364 beyond=false pos=(1065.06629021386, -58.0, 29.497490415320442)"
+        ]
+      ]
+    },
+    {
+      "status": "FAIL",
+      "profile": "FAST",
+      "legacy": true,
+      "executed": 4,
+      "selected": 4,
+      "seconds": 108.813,
+      "exit_code": 1,
+      "log": "forge-addon\\build\\test-runs\\20261021T234718.703802Z-FAST-compat.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261021T234718.703802Z-FAST-compat.json",
+      "failures": [
+        [
+          "legitimatememorypathdetourssimplebarrier",
+          "native path makes real detour around simple barrier before memory expires: side=3.3033544889734685 beyond=false pos=(112.73907997750408, -58.0, 35.33869194217099) observation=null decision=CombatDecision[intent=PATROL, firePermitted=false, reason=free local exploration, weaponAction=NONE, movement=MovementCommand[mode=NAVIGATE, destination=Vector3[x=111.5, y=-58.0, z=35.5], forward=0.0, sideways=0.0, speed=1.0, locomotion=WALK], aim=AimCommand[mode=NONE, point=null], frame=Frame[owner=00000000-0000-0000-0000-00000000025e, dimension=minecraft:overworld, tick=604, generation=18], expires=612]"
+        ]
+      ]
+    },
+    {
+      "status": "PASS",
+      "profile": "STAGE",
+      "legacy": true,
+      "executed": 17,
+      "selected": 17,
+      "seconds": 202.656,
+      "exit_code": 0,
+      "log": "forge-addon\\build\\test-runs\\20261021T235058.506525Z-STAGE-compat.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261021T235058.506525Z-STAGE-compat.json",
+      "failures": []
+    },
+    {
+      "status": "FAIL",
+      "profile": "FAST",
+      "legacy": false,
+      "executed": 1,
+      "selected": 1,
+      "seconds": 73.203,
+      "exit_code": 1,
+      "log": "forge-addon\\build\\test-runs\\20261021T230344.093275Z-FAST.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261021T230344.093275Z-FAST.json",
+      "failures": [
+        [
+          "knownopenpointwithouthiddentracking",
+          "bounded sustained real native suppression projectiles: 0 decision=CombatDecision[intent=REPOSITION, firePermitted=false, reason=blocked route, weaponAction=NONE, movement=MovementCommand[mode=NAVIGATE, destination=Vector3[x=3.5, y=-58.0, z=10.5], forward=0.0, sideways=0.0, speed=1.25, locomotion=RELOCATION], aim=AimCommand[mode=SEARCH, point=Vector3[x=11.5, y=-56.83000003099441, z=7.5]], frame=Frame[owner=d8e850ed-7ffc-43ba-84cd-3c47428cdadd, dimension=minecraft:overworld, tick=70, generation=3], expires=78] weapon=WeaponState[id=tacz:ak47, rounds=29, reserve=true, boltNeeded=false, busy=false, cooldownReady=true, supported=true, effectiveRange=345.25285037306037, mode=AUTO, profile=WeaponProfile[kind=AR, minimum=10.0, maximum=36.0, volleyRequests=4, pauseTicks=10, mobile=true], spreadDegrees=5.0, ballistics=Ballistics[speed=25.0, gravity=0.15000000596046448, friction=0.019999999552965164, lifeTicks=16], damageFalloff=30.0] firstProjectile{n=1,meanTicks=6.0,overflow=0} reacquireProjectile{n=0} unfairHints=0 gates=[NO_CONTACT:3, LOS_BLOCKED:35, REACTION:3, WEAPON_BUSY:2, COOLDOWN:23, POLICY:2] routes[failed,alternative,arrived,exhausted]=[4, 3, 0, 1] queries=4,denials=0,deferredAgeMax=0,pending=0 sectors[CLEAR,OCCUPIED,SATURATED,DEFERRED,UNSUPPORTED]=[30, 0, 0, 0, 0]"
+        ]
+      ]
+    },
+    {
+      "status": "FAIL",
+      "profile": "FAST",
+      "legacy": true,
+      "executed": 0,
+      "selected": 0,
+      "seconds": 16.579,
+      "exit_code": 1,
+      "log": "forge-addon\\build\\test-runs\\20261021T234539.436653Z-FAST-compat.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261021T234539.436653Z-FAST-compat.json",
+      "failures": []
+    },
+    {
+      "status": "FAIL",
+      "profile": "FULL",
+      "legacy": true,
+      "executed": 130,
+      "selected": 130,
+      "seconds": 1030.812,
+      "exit_code": 1,
+      "log": "forge-addon\\build\\test-runs\\20261022T020445.243448Z-FULL-compat.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261022T020445.243448Z-FULL-compat.json",
+      "failures": [
+        [
+          "reactionthenloss",
+          "LoS loss cancels fire"
+        ],
+        [
+          "controlleracquiresfifthwithcadence",
+          "armed real controller finds fifth player through staggered acquisition/perception"
+        ],
+        [
+          "combatlifecycle",
+          "removed wall opens physical sightline"
+        ]
+      ]
+    },
+    {
+      "status": "PASS",
+      "profile": "FAST",
+      "legacy": true,
+      "executed": 4,
+      "selected": 4,
+      "seconds": 116.766,
+      "exit_code": 0,
+      "log": "forge-addon\\build\\test-runs\\20261022T022247.852819Z-FAST-compat.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261022T022247.852819Z-FAST-compat.json",
+      "failures": []
+    },
+    {
+      "status": "PASS",
+      "profile": "STAGE",
+      "legacy": true,
+      "executed": 36,
+      "selected": 36,
+      "seconds": 309.203,
+      "exit_code": 0,
+      "log": "forge-addon\\build\\test-runs\\20261022T022648.203983Z-STAGE-compat.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261022T022648.203983Z-STAGE-compat.json",
+      "failures": []
+    },
+    {
+      "status": "PASS",
+      "profile": "STAGE",
+      "legacy": false,
+      "executed": 24,
+      "selected": 24,
+      "seconds": 251.156,
+      "exit_code": 0,
+      "log": "forge-addon\\build\\test-runs\\20261022T023301.831693Z-STAGE.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261022T023301.831693Z-STAGE.json",
+      "failures": []
+    },
+    {
+      "status": "FAIL",
+      "profile": "FULL",
+      "legacy": true,
+      "executed": 131,
+      "selected": 131,
+      "seconds": 1047.344,
+      "exit_code": 1,
+      "log": "forge-addon\\build\\test-runs\\20261022T024152.298948Z-FULL-compat.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261022T024152.298948Z-FULL-compat.json",
+      "failures": [
+        [
+          "externaldisplacementreturnsthroughoutsidenodes",
+          "displaced NPC really walked back inside: (1141.4058759079867, -58.0, 12.960742888916801)"
+        ],
+        [
+          "combatlifecycle",
+          "removed wall opens physical sightline: npc=(4195.5, -58.0, 7.5) target=(4206.5, -58.0, 7.5) hit=MutableBlockPos{x=4197, y=-57, z=7} state=Block{minecraft:gravel} decision=CombatDecision[intent=PATROL, firePermitted=false, reason=free local exploration, weaponAction=NONE, movement=MovementCommand[mode=NAVIGATE, destination=Vector3[x=4191.5, y=-58.0, z=-3.5], forward=0.0, sideways=0.0, speed=1.0, locomotion=WALK], aim=AimCommand[mode=NONE, point=null], frame=Frame[owner=c28a5b65-a1e0-4038-91a5-7e2d1166e156, dimension=minecraft:overworld, tick=16374, generation=633], expires=16382]"
+        ]
+      ]
+    },
+    {
+      "status": "PASS",
+      "profile": "FAST",
+      "legacy": true,
+      "executed": 7,
+      "selected": 7,
+      "seconds": 146.406,
+      "exit_code": 0,
+      "log": "forge-addon\\build\\test-runs\\20261022T030018.330915Z-FAST-compat.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261022T030018.330915Z-FAST-compat.json",
+      "failures": []
+    },
+    {
+      "status": "PASS",
+      "profile": "FAST",
+      "legacy": true,
+      "executed": 9,
+      "selected": 9,
+      "seconds": 114.344,
+      "exit_code": 0,
+      "log": "forge-addon\\build\\test-runs\\20261022T031343.066817Z-FAST-compat.log",
+      "receipt": "forge-addon\\build\\test-runs\\20261022T031343.066817Z-FAST-compat.json",
+      "failures": []
+    }
+  ],
+  "manual_not_run": [
+    "Human survival 1v1/1v4 and TTK/win rate",
+    "Distribution JAR in connected launcher/client",
+    "Natural entity ticking at chunk/simulation-distance edges with connected players",
+    "Irregular acceleration/jumps, stairs/doors/water, third-party gunpacks",
+    "Long 30/50-player multiplayer soak and repeated warm profiling"
+  ],
+  "performance_gain_claimed": false,
+  "ai_2ms_goal_reached": false,
+  "standalone": "docs/testing/combat-upgrade-standalone-2026-10-22.json",
+  "all_catalogs_green": false,
+  "full": "docs/testing/combat-upgrade-full-2026-10-22.json",
+  "defend_retest": "docs/testing/combat-upgrade-defend-2026-10-22.json",
+  "full_limitation": "Latest FULL executed131:129 passed,2 failed: displaced return and legacy lifecycle. Lifecycle raw ray hit an unexpected gravel block in intended air lane. Afterward test-only return driver waits for grounded/entity-ticking prerequisites and runs once per entity tick (same displacement/path/knockback/<2 at200 assertions): all7 DEFEND PASS. Final all9 lifecycle/native weapon tests PASS after explicitly preparing intended air corridor; raw physical ray and actual native projectile/movement/reload assertions retained. Whole FULL not repeated after these test-only changes; production AI unchanged.",
+  "final_test_sources_sha256": {
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\ActivationTests.java": "7fa6a0eeacea3aeb71ee5bab11f92905cedfb5f1117045c9474355f6792b2743",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\AlphaLocomotionTests.java": "34b735242617f2345f57a311c13e2fec0abcfba4aab3d1b034a7c2d6e2c96e9c",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\AlphaResponsivenessTests.java": "aec9f38db321c54a50e0d60060f148fc8e02073661756e6fd808251b3600aa5a",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\AttackTests.java": "49ba6337622eb3d2ae2aba120b3a7b32f5bd79b3990ba6fd0b66ec9e4d1e1a62",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\CombatUpgradeTests.java": "16df9a640f3bfd1c5ae28f7093a5689ce87c3524e8f37ded954d6b94cecf3bbb",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\CoverTests.java": "5d485c2289c3c8c1878441c4b3c5249e2b1216764e0d3052ca1729039b077176",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\DefendPatrolTests.java": "b25aa3328448230baf4bb93f1e0d7f9c09917165c1d275fddb3d71cd70338575",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\DefendTerritoryTests.java": "34230e31681faa3bcd2109f646f885c8f44a1a779888dc5650ce458f8eda1bfd",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\HearingTests.java": "b72c9d344d1a96b21f4eed2d614d36cf126afdf5f03707ebc1e7ef9992af7b53",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\IndependentNpcTests.java": "24bfb9d75f6ceaf939e2efb5d205ff4b01f891b4cadf8ac2b8d8ae8d6abef64f",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\LookControlTests.java": "e8bd76e19ba40b2c69e23a0c5bc0ca69c47db0bfe2f06eb5750ab1ebcd895515",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\ModeCommandTests.java": "3d36ff16f0c35e1c9580dec80776431e45d6ae39f35a351a04c53678ece57e5a",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\NeutralTests.java": "80d8f8a58f5f1fad068628a3349871dea07a4ebe71f98ded89469a233403a512",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\PeekRevalidationTests.java": "901f31e6c8bf1b2800915d38a6d6e3e959b7c5e6d5e4cad2a303e3745b7dc343",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\PerceptionTests.java": "db1943d9f9ce78bd7fb0b8567d8108a4cda9f08e1d9fa08554d92d78139b72f5",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\ProjectileProbe.java": "6ee53c4d3a0d13fee2d16eaae37f88dbf82951a6dbffb3d4f1ee12d3cc9b7d6d",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\QueryBudgetTests.java": "2cca93db7167733fd92e65d46da6703e7e40a94f33413b6f4e3651c7e073b4c1",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\RealTimeGameTestClock.java": "49e54fae5d7960208895ea9df8a153c42a9e20ea43326349ece9773af7513b8f",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\ScenarioIsolation.java": "1ad9541d45cb1794dcd66e5ec0f4bd903ba93f0c003f99e41c1c22784bf0568d",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\SectorTests.java": "c9442d554eaa4485af02a7dc46d62d9c12663e75ac3f48c821ef805df02489ad",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\SelectedGameTests.java": "01c7712bdc2d5298d86496a57bd6d3d67c162b756420ef6accde795a81a317ea",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\SquadTests.java": "3894ecafa9039da8e4c00d01cfac480899bb57ccbc647a40895c97e6a8bee21d",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\StandTests.java": "a4a581ffc71ba188b853af973c045011a3173f867891d019e83c5f8889e05080",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\SuppressionTests.java": "bdc9bdf2d2fcdb25b789f1efbfac486828d26fbe092f4247b6cff955869227dd",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\TargetTypeTests.java": "87e7421ed0b3d7225a4058d64f27a39108de8cdcd08d1cb2fa53cbca1b45ec06",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\TeamCommandTests.java": "c2e5b34eddd9eec51dcef9936e2b3f1214765042f31742240401793667a5d5c6",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\TeamTests.java": "b245b2ce5cab50762fdeba2013f9ad59ed9136fd718eb4c80cd83652b5582d49",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\WeaponProfileTests.java": "02f05c65a3a922f21b2b718c856a3c848f406cfc92cef519b471dba6915cb047",
+    "forge-addon\\src\\gametest\\java\\dev\\zuma\\tacticalnpc\\WeaponSnapshotTests.java": "77a553db92e68432d00bfbf77856302fde518acd669a0896215cd71d5f497420",
+    "forge-addon\\src\\gametest\\resources\\data\\tacticalnpcai\\structures\\arena.nbt": "c616f28d34d5abb889f10a7cddda106013fce95c3ee58ba45dd5d53969a4d8b3",
+    "forge-addon\\src\\gametest\\resources\\data\\tacticalnpcai\\structures\\wide_arena.nbt": "d62aa8b6257896f151be396d6f92cc03c6d98b1b7eaf9959531c6cc62a7b528f",
+    "forge-addon\\src\\compatTest\\java\\dev\\zuma\\tacticalnpc\\CombatGameTests.java": "ddaf894d5c1bd81e8edc3583ce36daf4cf406b46160be6b5bf42172a42bed716",
+    "forge-addon\\src\\compatTest\\java\\dev\\zuma\\tacticalnpc\\NeutralOptionalTests.java": "77182e5a64f3c17aadc6f4ab692633069537012089fa189fd931b67b7d8ccd7d",
+    "forge-addon\\src\\compatTest\\java\\dev\\zuma\\tacticalnpc\\OptionalTargetTests.java": "44c7736bc2d067bb7e1163ae148a33e4e210f7d8bdeaa5b3070ab2b3e96037a2",
+    "forge-addon\\src\\compatTest\\java\\dev\\zuma\\tacticalnpc\\WeaponScenarioTests.java": "27e0868b653008f9f1ce1f963a651bae9c535769239d40a0a27a554ddf854fe7"
+  },
+  "production_build": "PASS",
+  "ordinary_dedicated": "PASS",
+  "artifact_verification": "PASS",
+  "diff_check": "PASS",
+  "history_scope": "Selected retained diagnostic/final receipts; other raw run receipts remain in forge-addon/build/test-runs",
+  "full_passed": 129,
+  "full_failed": 2,
+  "full_failure_names": [
+    "externaldisplacementreturnsthroughoutsidenodes",
+    "combatlifecycle"
+  ],
+  "lifecycle_retest": "docs/testing/combat-upgrade-lifecycle-2026-10-22.json"
+}

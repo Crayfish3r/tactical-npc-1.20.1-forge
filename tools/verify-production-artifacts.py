@@ -19,7 +19,7 @@ for name, compat in [("tacticalnpcai-0.2.0.jar", False),
             data = jar.read(entry)
             assert struct.unpack(">H", data[6:8])[0] == 61, entry
             assert entry.startswith("dev/zuma/tacticalnpc/"), f"Bundled dependency: {entry}"
-            assert not any(token in entry for token in ["Tests", "ClientSmoke", "ServerProfile", "BatchProfile", "TeamCommandProfile",
+            assert not any(token in entry for token in ["Tests", "ClientSmoke", "ServerProfile", "BatchProfile", "TeamCommandProfile", "CombatUpgradeProfile",
                 "RealTimeGameTestClock", "ProjectileProbe", "ScenarioIsolation"]), f"Test fixture shipped: {entry}"
             if not compat:
                 assert b"mod/cdv/tnpc" not in data and b"mod.cdv.tnpc" not in data, f"NPCs linked: {entry}"

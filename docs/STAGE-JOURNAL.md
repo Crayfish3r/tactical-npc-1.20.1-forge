@@ -1420,3 +1420,14 @@ HEAD `3f9e810d0ce7684d78f438c91819c71e4db47539`, исходный рабочий
 Core792 PASS; актуальные scoped12/12,placement5/5,финальные targeting5/5 PASS. FULL history109/105/4,121/118/3 и свежий121/120/1 остаётся FAIL с минимальными fixture corrections/affected repeats. Production weapon/AI gates не ослаблены. Native4×4 после размещения:63 rounds,3red/1blue owners;30 lanes:119 rounds,1red/1blue,AI p95=3.859ms,не30 стреляющих/не speedup. Initial crowded0 and one-sided40 FAIL сохранены.
 
 Plain production build18s/verifier PASS (main198277bytes/94classes,compat7680/4); normal dedicated reload/save/stop/restart102.171s PASS, точное native policy/UUID/stack/team и неизменные source properties/EULA. [Полный отчёт/команды/SHA/6 ручных шагов](TEAM-COMMANDS.md),[machine evidence](testing/team-validation-2026-10-20.json). **WAITING_PLAYTEST**, не ACCEPTED; пункт2 интеллекта не начат, commit/push/merge/reset не выполнялись.
+
+
+## Усиление combat AI — 2026-10-22
+
+Явный запрос владельца: detection128, дальний native бой/lead, продолжительное давление, настоящий обход/роли и Hard/опциональный Unfair. Исходное дерево чистое, HEAD `3077098f1338c3c8fdb1f564257fd71f8ea98701`; commit/push/merge/reset не выполнялись. Стек Minecraft1.20.1/Forge47.4.20/Java17.0.19/TaCZ1.1.8-hotfix2/optional NPCs2.1.0 закреплён, SHA зависимостей совпали. Новых библиотек и Mixins нет; AGENTS5/9 исключения только в явно разрешённом Unfair.
+
+Реализация и этапы: [боевой отчёт](COMBAT-UPGRADE-2026-10-22.md), [machine evidence](testing/combat-upgrade-validation-2026-10-22.json). Core818 PASS; combined36/36, standalone24/24, финальный DEFEND7/7 PASS. История FULL115/9fail→129/3fail→130/3fail→131/2fail не переписана. В последнем остались displaced-return и lifecycle с посторонним gravel в воздушном коридоре; test-only драйвер затем синхронизирован с entity physics/готовностью чанка и весь DEFEND7/7 повторно прошёл. Lifecycle corridor затем явно подготовлен как воздух; строгий raw ray сохранён, финальный lifecycle/native9/9 PASS. Последний весь каталог остаётся FAIL; новый полный green не заявлен.
+
+Оба ordinary matched профиля9/9 PASS с идентичным fixture и неизменными production SHA. 64/96/128: реальные выстрелы31/31/31; running64:21 hits/47 rounds. Pressure:21 actual area rounds после стены;1v4:36 area rounds и3 фактических flank arrivals,25,87 блока. При30/50 все30/50 стреляли,1357/2205 native rounds против1274/1943; p95 MSPT15,40/18,37ms. Работа не уменьшалась для performance credit, общего speedup нет, AI2ms budget не достигнут. Это одна синтетическая пара, не human TTK/win rate.
+
+Plain production build25s/12 executed, verifier Java61/101+4 classes PASS. Ordinary dedicated startup/reload/save/stop/restart102,938s PASS; исходные properties/EULA неизменны, policy/UUID/native stack/team сохранились. Все JVM userdev; новый client/distribution/human playtest не выполнялся. Итог **WAITING_PLAYTEST**, не ACCEPTED. Конкретные ручные проверки перечислены в боевом отчёте.

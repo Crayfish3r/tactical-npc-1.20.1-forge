@@ -1,0 +1,380 @@
+{
+  "status": "PASS",
+  "recording": "forge-addon\\build\\upgrade-profile\\20261021T231606-before\\profile.jfr",
+  "event_counts": {
+    "jdk.ObjectAllocationSample": 9036,
+    "jdk.GCHeapSummary": 92,
+    "jdk.GarbageCollection": 46,
+    "jdk.ExecutionSample": 1602
+  },
+  "first_event": "2026-10-22T01:16:23.238354624+02:00",
+  "last_event": "2026-10-22T01:19:13.341813862+02:00",
+  "server_cpu_samples": 654,
+  "tactical_server_samples": 31,
+  "measured_phase_event_coverage": {
+    "range64": 733,
+    "range96": 274,
+    "range128": 160,
+    "running64": 260,
+    "suppression": 110,
+    "flank1v4": 219,
+    "load16": 375,
+    "load30": 575,
+    "load50": 773
+  },
+  "excluded": "startup,warmup,teardown; phase boundaries from actual CSV",
+  "server_cpu_categories": {
+    "other_server": 624,
+    "goal_or_native_safety": 15,
+    "native_maintenance": 8,
+    "profiling_fixture": 6,
+    "hearing_delivery": 1
+  },
+  "top_server_stacks": [
+    [
+      "it/unimi/dsi/fastutil/longs/Long2LongOpenHashMap.getOrDefault <- net/minecraft/server/level/ChunkMap.saveChunkIfNeeded <- net/minecraft/server/level/ChunkMap.processUnloads <- net/minecraft/server/level/ChunkMap.tick <- net/minecraft/server/level/ServerChunkCache.tick",
+      92
+    ],
+    [
+      "net/minecraft/server/level/ChunkMap.processUnloads <- net/minecraft/server/level/ChunkMap.tick <- net/minecraft/server/level/ServerChunkCache.tick <- net/minecraft/server/level/ServerLevel.tick <- net/minecraft/server/MinecraftServer.tickChildren",
+      69
+    ],
+    [
+      "java/util/concurrent/CompletableFuture.reportJoin <- java/util/concurrent/CompletableFuture.getNow <- net/minecraft/server/level/ChunkHolder.getTickingChunk <- net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick",
+      50
+    ],
+    [
+      "it/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap.get <- net/minecraft/world/level/entity/PersistentEntitySectionManager.canPositionTick <- net/minecraft/server/level/ServerLevel.isNaturalSpawningAllowed <- net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick",
+      45
+    ],
+    [
+      "net/minecraft/server/level/ServerLevel.tickChunk <- net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick <- net/minecraft/server/level/ServerLevel.tick <- net/minecraft/server/MinecraftServer.tickChildren",
+      32
+    ],
+    [
+      "net/minecraft/server/level/DistanceManager.purgeStaleTickets <- net/minecraft/server/level/ServerChunkCache.tick <- net/minecraft/server/level/ServerLevel.tick <- net/minecraft/server/MinecraftServer.tickChildren <- net/minecraft/server/dedicated/DedicatedServer.tickChildren",
+      23
+    ],
+    [
+      "net/minecraft/server/level/ChunkHolder.broadcastChanges <- net/minecraft/server/level/ServerChunkCache.lambda$tickChunks$5 <- net.minecraft.server.level.ServerChunkCache$$Lambda$7300+0x0000020e49fe6858/1705895428.accept <- java/util/ArrayList.forEach <- net/minecraft/server/level/ServerChunkCache.tickChunks",
+      19
+    ],
+    [
+      "net/minecraft/server/level/DistanceManager$FixedPlayerDistanceChunkTracker.runAllUpdates <- net/minecraft/server/level/DistanceManager.hasPlayersNearby <- net/minecraft/server/level/ChunkMap.anyPlayerCloseEnoughForSpawning <- net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick",
+      9
+    ],
+    [
+      "it/unimi/dsi/fastutil/longs/LongOpenHashSet.contains <- net/minecraft/server/level/ChunkMap$DistanceManager.isChunkToRemove <- net/minecraft/server/level/DistanceManager$ChunkTicketTracker.getLevel <- net/minecraft/server/level/ChunkTracker.getComputedLevel <- net/minecraft/world/level/lighting/DynamicGraphMinFixedPoint.checkEdge",
+      9
+    ],
+    [
+      "net/minecraft/util/SortedArraySet$ArrayIterator.remove <- net/minecraft/server/level/DistanceManager.purgeStaleTickets <- net/minecraft/server/level/ServerChunkCache.tick <- net/minecraft/server/level/ServerLevel.tick <- net/minecraft/server/MinecraftServer.tickChildren",
+      9
+    ],
+    [
+      "it/unimi/dsi/fastutil/longs/Long2ByteOpenHashMap.get <- net/minecraft/server/level/TickingTracker.getLevel <- net/minecraft/server/level/ChunkTracker.getComputedLevel <- net/minecraft/world/level/lighting/DynamicGraphMinFixedPoint.checkEdge <- net/minecraft/world/level/lighting/DynamicGraphMinFixedPoint.checkEdge",
+      8
+    ],
+    [
+      "net/minecraftforge/common/extensions/IForgeEntity.getClassification <- net/minecraft/world/level/NaturalSpawner.createState <- net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick <- net/minecraft/server/level/ServerLevel.tick",
+      8
+    ],
+    [
+      "it/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap$MapIterator.nextEntry <- it/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap$FastEntryIterator.next <- it/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap$FastEntryIterator.next <- net/minecraft/server/level/DistanceManager.purgeStaleTickets <- net/minecraft/server/level/ServerChunkCache.tick",
+      6
+    ],
+    [
+      "net/minecraft/world/level/BlockCollisions.computeNext <- com/google/common/collect/AbstractIterator.tryToComputeNext <- com/google/common/collect/AbstractIterator.hasNext <- net/minecraft/world/level/CollisionGetter.findSupportingBlock <- net/minecraft/world/entity/Entity.checkSupportingBlock",
+      6
+    ],
+    [
+      "java/util/concurrent/locks/AbstractQueuedSynchronizer.acquireShared <- java/util/concurrent/locks/ReentrantReadWriteLock$ReadLock.lock <- net/minecraft/network/syncher/SynchedEntityData.getItem <- net/minecraft/network/syncher/SynchedEntityData.get <- net/minecraft/world/entity/LivingEntity.getHealth",
+      6
+    ],
+    [
+      "com/google/common/collect/Iterators$1.hasNext <- net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick <- net/minecraft/server/level/ServerLevel.tick <- net/minecraft/server/MinecraftServer.tickChildren",
+      4
+    ],
+    [
+      "it/unimi/dsi/fastutil/longs/Long2ByteOpenHashMap.containsKey <- net/minecraft/server/level/DistanceManager.hasPlayersNearby <- net/minecraft/server/level/ChunkMap.anyPlayerCloseEnoughForSpawning <- net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick",
+      4
+    ],
+    [
+      "java/util/Collection.removeIf <- com/tacz/guns/util/CycleTaskHelper.tick <- com/tacz/guns/event/ServerTickEvent.onServerTick <- com/tacz/guns/event/__ServerTickEvent_onServerTick_ServerTickEvent.invoke <- net/minecraftforge/eventbus/ASMEventHandler.invoke",
+      4
+    ],
+    [
+      "java/util/Arrays.copyOf <- java/util/ArrayList.grow <- java/util/ArrayList.grow <- java/util/ArrayList.add <- java/util/ArrayList.add",
+      4
+    ],
+    [
+      "net/minecraft/world/entity/Entity.updateFluidHeightAndDoFluidPushing <- net/minecraft/world/entity/Entity.updateFluidHeightAndDoFluidPushing <- net/minecraft/world/entity/Entity.updateFluidHeightAndDoFluidPushing <- net/minecraft/world/entity/Entity.lambda$updateInWaterStateAndDoWaterCurrentPushing$8 <- net.minecraft.world.entity.Entity$$Lambda$7320+0x0000020e49fe9810/1192174737.getAsBoolean",
+      4
+    ]
+  ],
+  "server_cpu_categories_by_phase": {
+    "range64": {
+      "other_server": 49,
+      "goal_or_native_safety": 5
+    },
+    "range96": {
+      "other_server": 40,
+      "native_maintenance": 1
+    },
+    "range128": {
+      "other_server": 45,
+      "profiling_fixture": 1
+    },
+    "running64": {
+      "other_server": 57,
+      "profiling_fixture": 2,
+      "goal_or_native_safety": 2
+    },
+    "suppression": {
+      "other_server": 49,
+      "goal_or_native_safety": 3
+    },
+    "flank1v4": {
+      "other_server": 82,
+      "goal_or_native_safety": 1,
+      "hearing_delivery": 1,
+      "profiling_fixture": 1
+    },
+    "load16": {
+      "other_server": 65,
+      "goal_or_native_safety": 2
+    },
+    "load30": {
+      "other_server": 119,
+      "native_maintenance": 3,
+      "profiling_fixture": 2,
+      "goal_or_native_safety": 1
+    },
+    "load50": {
+      "other_server": 118,
+      "goal_or_native_safety": 1,
+      "native_maintenance": 4
+    }
+  },
+  "server_allocation_categories_estimated_bytes": {
+    "other_server": 1731521320,
+    "goal_or_native_safety": 86784424,
+    "native_maintenance": 18766064,
+    "native_shoot": 9379344,
+    "projectile_physics": 6274736,
+    "profiling_fixture": 2095832,
+    "hearing_delivery": 2095936
+  },
+  "server_allocation_categories_by_phase_estimated_bytes": {
+    "range64": {
+      "other_server": 372155712
+    },
+    "range96": {
+      "other_server": 35287568,
+      "goal_or_native_safety": 978272
+    },
+    "range128": {
+      "other_server": 58076704
+    },
+    "running64": {
+      "other_server": 49447168,
+      "native_maintenance": 2036272
+    },
+    "suppression": {
+      "other_server": 29254064,
+      "native_maintenance": 1035160
+    },
+    "flank1v4": {
+      "other_server": 113620768,
+      "goal_or_native_safety": 4167416,
+      "native_maintenance": 1047984,
+      "native_shoot": 1023488
+    },
+    "load16": {
+      "other_server": 203972864,
+      "goal_or_native_safety": 13606600,
+      "projectile_physics": 1047976,
+      "profiling_fixture": 2095832
+    },
+    "load30": {
+      "goal_or_native_safety": 20933432,
+      "other_server": 330914264,
+      "projectile_physics": 3130808,
+      "native_maintenance": 6274800,
+      "native_shoot": 4163888
+    },
+    "load50": {
+      "other_server": 538792208,
+      "goal_or_native_safety": 47098704,
+      "projectile_physics": 2095952,
+      "native_maintenance": 8371848,
+      "hearing_delivery": 2095936,
+      "native_shoot": 4191968
+    }
+  },
+  "top_server_allocation_stacks": [
+    [
+      "net/minecraft/world/level/chunk/PalettedContainer.pack <- net/minecraft/world/level/chunk/PalettedContainer.lambda$codec$5 <- net.minecraft.world.level.chunk.PalettedContainer$$Lambda$7386+0x0000020e49ffaca8/1250077123.apply <- com/mojang/serialization/Encoder$1.encode <- com/mojang/serialization/Codec$2.encode",
+      451604328
+    ],
+    [
+      "net/minecraft/world/level/chunk/DataLayer.copy <- net/minecraft/network/protocol/game/ClientboundLightUpdatePacketData.prepareSectionData <- net/minecraft/network/protocol/game/ClientboundLightUpdatePacketData.<init> <- net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.<init> <- net/minecraft/server/level/ChunkMap.playerLoadedChunk",
+      94836240
+    ],
+    [
+      "net/minecraft/server/level/ServerChunkCache.tickChunks <- net/minecraft/server/level/ServerChunkCache.tick <- net/minecraft/server/level/ServerLevel.tick <- net/minecraft/server/MinecraftServer.tickChildren <- net/minecraft/server/dedicated/DedicatedServer.tickChildren",
+      64751904
+    ],
+    [
+      "net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.<init> <- net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.<init> <- net/minecraft/server/level/ChunkMap.playerLoadedChunk <- net/minecraft/server/level/ChunkMap.updateChunkTracking <- net/minecraft/server/level/ChunkMap.updatePlayerStatus",
+      44733600
+    ],
+    [
+      "io/netty/util/internal/PlatformDependent.allocateUninitializedArray <- io/netty/buffer/UnpooledUnsafeHeapByteBuf.allocateArray <- io/netty/buffer/UnpooledByteBufAllocator$InstrumentedUnpooledUnsafeHeapByteBuf.allocateArray <- io/netty/buffer/UnpooledHeapByteBuf.<init> <- io/netty/buffer/UnpooledUnsafeHeapByteBuf.<init>",
+      42792080
+    ],
+    [
+      "java/util/stream/SpinedBuffer.<init> <- java/util/stream/StreamSpliterators$WrappingSpliterator.initPartialTraversalState <- java/util/stream/StreamSpliterators$AbstractWrappingSpliterator.doAdvance <- java/util/stream/StreamSpliterators$WrappingSpliterator.tryAdvance <- java/util/Spliterators$1Adapter.hasNext",
+      31352504
+    ],
+    [
+      "java/util/Arrays.copyOf <- java/util/ArrayList.grow <- java/util/ArrayList.grow <- java/util/ArrayList.add <- java/util/ArrayList.add",
+      26710480
+    ],
+    [
+      "java/util/stream/ReferencePipeline.wrap <- java/util/stream/AbstractPipeline.spliterator <- java/util/stream/ReferencePipeline.iterator <- net/minecraft/world/entity/Entity.lambda$getIndirectPassengers$26 <- net.minecraft.world.entity.Entity$$Lambda$7224+0x0000020e49fbf1e8/261581742.iterator",
+      25125352
+    ],
+    [
+      "java/util/Arrays.copyOfRange <- java/lang/StringLatin1.newString <- java/lang/String.substring <- java/lang/String.substring <- net/minecraft/resources/ResourceLocation.decompose",
+      25012168
+    ],
+    [
+      "it/unimi/dsi/fastutil/ints/Int2ObjectOpenHashMap$1.iterator <- it/unimi/dsi/fastutil/ints/Int2ObjectOpenHashMap$1.iterator <- net/minecraft/world/level/Level.getEntities <- net/minecraft/world/level/EntityGetter.getEntityCollisions <- net/minecraft/world/level/CommonLevelAccessor.getEntityCollisions",
+      18463448
+    ],
+    [
+      "dev/zuma/tacticalnpc/combat/VisibilitySensor.coneIntersects <- dev/zuma/tacticalnpc/combat/VisibilitySensor.lambda$occupied$1 <- dev.zuma.tacticalnpc.combat.VisibilitySensor$$Lambda$7511+0x0000020e4a0244f0/641659674.test <- net/minecraft/world/level/Level.lambda$getEntities$2 <- net.minecraft.world.level.Level$$Lambda$7417+0x0000020e4a0068a8/1765645502.accept",
+      16742608
+    ],
+    [
+      "java/lang/StringLatin1.newString <- java/lang/String.substring <- net/minecraft/resources/ResourceLocation.decompose <- net/minecraft/resources/ResourceLocation.<init> <- net/minecraft/resources/ResourceLocation.tryParse",
+      16741632
+    ],
+    [
+      "jdk/internal/misc/Unsafe.allocateUninitializedArray <- java/lang/StringConcatHelper.newArray <- java/lang/invoke/DirectMethodHandle$Holder.invokeStatic <- java.lang.invoke.LambdaForm$MH+0x0000020e49091400/689654773.invoke <- java/lang/invoke/Invokers$Holder.linkToTargetMethod",
+      16500472
+    ],
+    [
+      "java/util/HashMap.resize <- java/util/HashMap.putVal <- java/util/HashMap.put <- net/minecraft/nbt/CompoundTag.put <- net/minecraft/nbt/NbtOps$NbtRecordBuilder.append",
+      16327808
+    ],
+    [
+      "java/lang/invoke/DirectMethodHandle.allocateInstance <- java/lang/invoke/DirectMethodHandle$Holder.newInvokeSpecial <- java/lang/invoke/Invokers$Holder.linkToTargetMethod <- java/util/stream/StreamSpliterators$WrappingSpliterator.initPartialTraversalState <- java/util/stream/StreamSpliterators$AbstractWrappingSpliterator.doAdvance",
+      15695704
+    ],
+    [
+      "java/util/concurrent/CompletableFuture.biApplyStage <- java/util/concurrent/CompletableFuture.thenCombine <- net/minecraft/server/level/ChunkHolder.addSaveDependency <- net/minecraft/server/level/ChunkMap.getChunkRangeFuture <- net/minecraft/server/level/ChunkMap.scheduleChunkGeneration",
+      14709752
+    ],
+    [
+      "jdk/internal/misc/Unsafe.allocateUninitializedArray <- java/lang/StringConcatHelper.newArray <- java/lang/invoke/DirectMethodHandle$Holder.invokeStatic <- java.lang.invoke.LambdaForm$MH+0x0000020e4900e400/396283472.invoke <- java/lang/invoke/Invokers$Holder.linkToTargetMethod",
+      14002976
+    ],
+    [
+      "jdk/internal/misc/Unsafe.allocateUninitializedArray <- java/lang/StringConcatHelper.newArray <- java/lang/StringConcatHelper.newArrayWithSuffix <- java/lang/invoke/DirectMethodHandle$Holder.invokeStatic <- java.lang.invoke.LambdaForm$MH+0x0000020e49088000/1766145591.invoke",
+      13731216
+    ],
+    [
+      "java/lang/StringLatin1.newString <- java/lang/String.substring <- java/lang/String.substring <- net/minecraft/resources/ResourceLocation.decompose <- net/minecraft/resources/ResourceLocation.<init>",
+      13611776
+    ],
+    [
+      "java/util/stream/ReferencePipeline.flatMap <- net/minecraft/world/entity/Entity.getIndirectPassengersStream <- net/minecraft/world/entity/Entity.lambda$getIndirectPassengers$26 <- net.minecraft.world.entity.Entity$$Lambda$7224+0x0000020e49fbf1e8/261581742.iterator <- net/minecraft/server/level/ChunkMap$TrackedEntity.getEffectiveRange",
+      13587400
+    ]
+  ],
+  "server_allocation_estimated_bytes": [
+    [
+      "[I",
+      457825352
+    ],
+    [
+      "[B",
+      288120472
+    ],
+    [
+      "[Ljava/lang/Object;",
+      116732248
+    ],
+    [
+      "net/minecraft/server/level/ServerChunkCache$ChunkAndHolder",
+      64751904
+    ],
+    [
+      "java/lang/String",
+      60654952
+    ],
+    [
+      "net/minecraft/world/phys/Vec3",
+      34484256
+    ],
+    [
+      "java/util/stream/ReferencePipeline$Head",
+      30364432
+    ],
+    [
+      "[Ljava/util/HashMap$Node;",
+      29667080
+    ],
+    [
+      "java/util/stream/StreamSpliterators$WrappingSpliterator",
+      25125352
+    ],
+    [
+      "net/minecraft/resources/ResourceLocation",
+      24960136
+    ],
+    [
+      "[Ljava/lang/String;",
+      24026800
+    ],
+    [
+      "java/util/Optional",
+      23249248
+    ],
+    [
+      "[D",
+      21970512
+    ],
+    [
+      "java/util/HashMap$Node",
+      19681048
+    ],
+    [
+      "it/unimi/dsi/fastutil/ints/Int2ObjectOpenHashMap$ValueIterator",
+      19511416
+    ],
+    [
+      "java/util/ArrayList$Itr",
+      17796544
+    ],
+    [
+      "[J",
+      16691704
+    ],
+    [
+      "java/util/concurrent/CompletableFuture$BiApply",
+      14709752
+    ],
+    [
+      "net/minecraft/world/level/ChunkPos",
+      14645232
+    ],
+    [
+      "java.util.stream.MatchOps$$Lambda$335+0x0000020e491787a0/1200048933",
+      14566936
+    ]
+  ],
+  "note": "Sampling estimates; categories are mutually exclusive by priority; fixture separated. Goal scope is not total server cost."
+}

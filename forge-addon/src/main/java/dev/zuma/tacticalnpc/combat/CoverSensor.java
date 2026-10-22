@@ -138,6 +138,7 @@ public final class CoverSensor {
         return true;
     }
     private Boolean clear(Vec3 start,Vec3 end) {
+        if(!VisibilitySensor.loadedSegment((ServerLevel)runtime.entity().level(),start,end))return null;
         var npc=runtime.entity();if(!AiWorkBudget.of((ServerLevel)npc.level()).ray(npc.getUUID())) return null;
         return npc.level().clip(new ClipContext(start,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,npc)).getType()==HitResult.Type.MISS;
     }

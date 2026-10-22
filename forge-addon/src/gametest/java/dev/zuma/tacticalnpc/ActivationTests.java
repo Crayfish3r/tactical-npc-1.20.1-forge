@@ -16,7 +16,7 @@ public final class ActivationTests {
     public static void dormantMaintenanceAndHonestWake(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=NpcEntities.NPC.get().create(h.getLevel());var at=h.absoluteVec(new Vec3(3.5,2,20.5));n.moveTo(at.x,at.y,at.z,-90,0);n.setYHeadRot(-90);n.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
         n.setItemSlot(EquipmentSlot.MAINHAND,GunSupport.create(new ResourceLocation("tacz","ak47")));n.addTag(RuntimeRegistry.TAG);h.getLevel().addFreshEntity(n);
-        var p=new net.minecraftforge.common.util.FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"dormant-test"));p.setGameMode(GameType.SURVIVAL);p.setInvulnerable(true);var far=h.absoluteVec(new Vec3(96.5,2,20.5));p.moveTo(far.x,far.y,far.z);h.getLevel().addNewPlayer(p);
+        var p=new net.minecraftforge.common.util.FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"dormant-test"));p.setGameMode(GameType.SURVIVAL);p.setInvulnerable(true);var far=h.absoluteVec(new Vec3(164.5,2,20.5));p.moveTo(far.x,far.y,far.z);h.getLevel().addNewPlayer(p);
         h.runAtTickTime(145,()->{
             h.assertTrue(n.controller().observation()==null && n.controller().shots()==0,"activation grants no remote player knowledge");
             h.assertTrue(n.controller().reloads()==1 && IGun.getIGunOrNull(n.getMainHandItem()).getCurrentAmmoCount(n.getMainHandItem())>0,"dormant runtime completes native maintenance");

@@ -1,5 +1,49 @@
 # Compatibility audit: independent NPC / optional NPCs 2.1.0
 
+## Combat upgrade audit, 2026-10-22
+
+Pinned artifacts rehashed unchanged: TaCZ 1.1.8-hotfix2 SHA256
+`2CBB89F44333D2EB4E825D86D789FF119B272FF75184390B55BAFD4F0E7F10C2`;
+NPCs 2.1.0 SHA256 `2593AA66CD56C08538A91ED3D274C054B043F0C6A4C0FF51A37DE310D60734EE`.
+Minecraft 1.20.1 / Forge 47.4.20 / Java 17 are unchanged. No dependency or Mixin added.
+
+Additional `javap -c -p` evidence from these binaries is retained locally in
+`forge-addon/build/upgrade-{bullet,script,gun}-bytecode.txt`:
+
+- `BulletData.getLifeSecond/getGravity/getFriction/getBulletAmount` exist. Bullet construction
+  converts life seconds to integer ticks with `*20`. `EntityKineticBullet.tick` moves by the old
+  velocity, multiplies velocity by `(1-friction)`, then subtracts gravity. Water changes drag/gravity;
+  the new dry-air predictor is an estimate, not a replacement for native projectile physics.
+- `ModernKineticGunScriptAPI.shootOnce` reads live cached `GunProperties.AMMO_SPEED`, applies
+  `AmmoConfig.GLOBAL_BULLET_SPEED_MODIFIER`, divides by 20, then passes speed to native shooting.
+  The adapter uses those units, live attachment speed, indexed gravity/friction/life. Supported
+  maintenance-only scripts cannot supply an unaudited custom ballistic modifier.
+- The native `lambda$shootOnce$2` posts one cancellable server `GunFireEvent` per cartridge before
+  creating its `bullet_amount` pellet loop. A monotonically increasing authorization token, confirmed
+  only by an actual uncanceled projectile join, counts one cartridge for all its pellets. A later
+  canceled event consumes no tactical pressure quota. Distinct BURST cartridges keep separate tokens,
+  including when delivered in the same game tick. Every native event retains fresh safety checks.
+- `GunProperties.EFFECTIVE_RANGE` still means damage falloff onset. It no longer clamps firing to
+  the 14–64 block behavioural preference. The immutable weapon snapshot now exposes preference,
+  falloff, and a bounded kinetic reach separately. Actual damage, spread, ammo and reload stay native.
+- Acquisition still pages the existing level player list / lifecycle NPC registry. LOS now preflights
+  all crossed loaded chunks with a bounded chunk-grid DDA, including thin corner crossings, before
+  `Level.clip`; cover rays use the same guard. It creates no chunk ticket and never calls `getChunk`
+  to search. Native path creation remains budgeted and uses loaded navigation regions.
+- Suppression exempts its intended eligible hostile UUID from the conservative living-entity sector,
+  just as DIRECT exempts its target. This lookup does not read hidden coordinates/velocity. All other
+  living entities, fresh block rays, actual barrel direction and final allied pre-damage guard remain.
+
+User explicitly authorized sustained configurable pressure in place of the historical six-round /
+40-tick skill guidance, and Unfair exceptions only to AGENTS constraints 5/9. `UNFAIR_HINT` is a
+separate transient memory, quantized region with zero velocity, never VISION or a visual squad report.
+Hard restores legitimate knowledge and the saved ammo policy. Profile changes invalidate the old
+controller frame and cancel an in-progress native reload before applying the changed reserve policy.
+Pinned Forge47.4.20 `ConfigFileTypeHandler.reader` builds a synchronous autosaving FileConfig.
+Config changes are visible on disk (standalone fixture memoryTicks160 instead of default320);
+Hard/Unfair commands therefore persist to the world serverconfig.
+Current measurements and limitations: [combat upgrade report](COMBAT-UPGRADE-2026-10-22.md).
+
 Audited 2026-10-10 from official binaries, not legacy tacz_npc sources.
 
 Текущий срез 0.2.0: собственный `tacticalnpcai:npc` работает через TaCZ без NPCs. NPCs 2.1.0 вынесен в отдельный `npcs-compat` JAR (`dev.zuma.tacticalnpc.npcs`); в общем коде нет импортов NPCs. Разделы MVP ниже сохраняют исторический аудит 0.1.0. Фактические срезы и логи: [IMPLEMENTATION-STATUS](IMPLEMENTATION-STATUS.md).

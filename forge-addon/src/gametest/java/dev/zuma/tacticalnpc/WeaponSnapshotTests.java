@@ -51,7 +51,11 @@ public final class WeaponSnapshotTests {
             h.assertTrue(!c.snapshot().supported() && c.measurements()[1]>lookups,"mode invalidation preserves unsupported mode rejection");
             gun.setFireMode(replacement,com.tacz.guns.api.item.gun.FireMode.SEMI);
             var cache=operator.getCacheProperty();cache.setCache(com.tacz.guns.api.GunProperties.EFFECTIVE_RANGE,7f);
-            h.assertTrue(c.snapshot().effectiveRange()==7,"mutable native properties read fresh even on same object");
+            h.assertTrue(c.snapshot().damageFalloff()==7 && c.snapshot().effectiveRange()>7,"mutable damage falloff read fresh without clamping kinetic reach");
+            double oldSpeed=c.snapshot().ballistics().speed();
+            Float cachedSpeed=cache.getCache(com.tacz.guns.api.GunProperties.AMMO_SPEED);
+            cache.setCache(com.tacz.guns.api.GunProperties.AMMO_SPEED,cachedSpeed/2);
+            h.assertTrue(Math.abs(c.snapshot().ballistics().speed()-oldSpeed/2)<1e-6,"live attachment speed read fresh in verified units");
             GunSupport.verifyResources(h.getLevel().getServer().getResourceManager());
             h.assertTrue(!c.snapshot().supported() && c.measurements()[2]==2,"resource generation invalidates native readiness without read draw");
             c.maintain(tick+2);h.assertTrue(c.snapshot().supported() && c.measurements()[2]==3,"resource maintenance rebuilds native draw");

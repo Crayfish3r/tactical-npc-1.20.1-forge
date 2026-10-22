@@ -59,18 +59,17 @@ public final class AttackTests {
         h.runAtTickTime(500,()->{h.assertTrue(closed[0]!=null && pause[0] && replaced[0] && n.position().distanceTo(origin)>2,"unreachable exploration replaced after finite recovery/backoff");budget(h,500);finish(n);h.succeed();});
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="attack-03-native",timeoutTicks=650)
-    public static void approachRunsThenAdsAndNativeProjectile(GameTestHelper h) {
-        begin(h);var n=npc(h,9.5,31.5,true);var origin=n.position();var p=player(h,47.5,31.5);boolean[] run={false},adsAfterRun={false},advance={false};double[] nearest={100},farthest={0};
+    public static void approachFiresBeyondPreferenceWithNativeAds(GameTestHelper h) {
+        begin(h);var n=npc(h,9.5,31.5,true);var origin=n.position();var p=player(h,47.5,31.5);boolean[] approach={false},ads={false};double[] nearest={100},farthest={0};
         int bulletsBefore=ProjectileProbe.count(n.getUUID());
         h.onEachTick(()->{
-            var d=decision(n);if(d==null)return;advance[0]|=d.intent()==TacticalIntent.ADVANCE;
-            run[0]|=n.isSprinting() && d.movement().sprint();
-            adsAfterRun[0]|=run[0] && !n.isSprinting() && n.runtime().operator().getSynAimingProgress()>.9;
+            var d=decision(n);if(d==null)return;approach[0]|=d.intent()==TacticalIntent.ENGAGE && d.movement().mode()==MovementCommand.Mode.NAVIGATE && d.firePermitted();
+            ads[0]|=!n.isSprinting() && n.runtime().operator().getSynAimingProgress()>.9;
             nearest[0]=Math.min(nearest[0],n.distanceTo(p));
             farthest[0]=Math.max(farthest[0],n.position().distanceTo(origin));
         });
         h.runAtTickTime(600,()->{
-            h.assertTrue(advance[0] && run[0] && adsAfterRun[0] && nearest[0]<=n.controller().weaponState().effectiveRange() && farthest[0]>4,"real weapon approach outside old anchor, RUN -> native ADS: nearest="+nearest[0]+" farthest="+farthest[0]+" run="+run[0]+" ads="+adsAfterRun[0]+" decision="+decision(n)+" playerAlive="+p.isAlive()+" removed="+p.isRemoved()+" pos="+p.position()+" npcTicks="+n.tickCount+" observation="+n.controller().observation());
+            h.assertTrue(approach[0] && ads[0] && nearest[0]<=n.controller().weaponState().effectiveRange() && farthest[0]>4,"real firing approach beyond preferred range with native ADS: nearest="+nearest[0]+" farthest="+farthest[0]+" approach="+approach[0]+" ads="+ads[0]+" decision="+decision(n)+" playerAlive="+p.isAlive()+" removed="+p.isRemoved()+" pos="+p.position()+" npcTicks="+n.tickCount+" observation="+n.controller().observation());
             h.assertTrue(n.controller().shots()>0 && ProjectileProbe.count(n.getUUID())>bulletsBefore,"new native TaCZ projectile after this approach");
             var gun=com.tacz.guns.api.item.IGun.getIGunOrNull(n.getMainHandItem());h.assertTrue(n.ammoPolicy()==TacticalNpcEntity.AmmoPolicy.FINITE && gun.getDummyAmmoAmount(n.getMainHandItem())==0 && gun.getCurrentAmmoCount(n.getMainHandItem())<25,"finite native ammunition is consumed, never replenished by movement");
             budget(h,600);p.discard();finish(n);h.succeed();
@@ -112,11 +111,14 @@ public final class AttackTests {
             if(frozen[0]==null || h.getTick()<=31 || n.controller()==null)return;var o=n.controller().observation();if(o==null)return;
             h.assertTrue(!o.visible() && o.position().equals(frozen[0]),"detour uses frozen observation only");
             side[0]=Math.max(side[0],Math.abs(n.getZ()-h.absoluteVec(new Vec3(11.5,2,31.5)).z));beyond[0]|=n.getX()>h.absoluteVec(new Vec3(17,2,31.5)).x;
+
         });
-        h.runAtTickTime(300,()->{h.assertTrue(beyond[0] && side[0]>2,"native path makes real detour around simple barrier before memory expires: side="+side[0]+" beyond="+beyond[0]+" pos="+n.position());budget(h,300);p.discard();finish(n);h.succeed();});
+        h.runAtTickTime(300,()->{h.assertTrue(beyond[0] && side[0]>2,"native path makes real detour around simple barrier before memory expires: side="+side[0]+" beyond="+beyond[0]+" pos="+n.position()+" observation="+n.controller().observation()+" decision="+decision(n));budget(h,300);p.discard();finish(n);h.succeed();});
     }
     private static void begin(GameTestHelper h){
         releaseChunks();ScenarioIsolation.begin(h);watched=null;requests=0;last=-1;minGap=Long.MAX_VALUE;maximum=0;
+        // These fixtures isolate navigation. Sustained-pressure holds have their own native tests/profile.
+        dev.zuma.tacticalnpc.config.ServerConfig.SUPPRESSION.set(false);
         // A loaded structure is not necessarily entity-ticking throughout its 64x64 area.
         // Force only this fixture, preserving prior tickets; production never uses this helper.
         fixtureLevel=h.getLevel();var first=new net.minecraft.world.level.ChunkPos(h.absolutePos(new BlockPos(0,1,0)));var end=new net.minecraft.world.level.ChunkPos(h.absolutePos(new BlockPos(63,1,63)));

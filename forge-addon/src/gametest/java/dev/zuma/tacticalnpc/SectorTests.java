@@ -37,19 +37,25 @@ public final class SectorTests {
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="sector-02-protection",timeoutTicks=90)
     public static void movingProtectedBodyBeforeAndAfterTargetAndDeferral(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,false);var c=new TaczGunController(n.runtime());var sensor=new VisibilitySensor();var body=stand(h,n.position().add(6,0,0));
-        h.runAtTickTime(10,()->{
+        boolean[] exercised={false};
+        h.onEachTick(()->{
+            if(exercised[0] || h.getTick()<10)return;
+            var behind=net.minecraft.core.BlockPos.containing(n.position().add(20,0,0));
+            // Force-load completion includes entity tracking; a merely generated chunk is insufficient.
+            if(!h.getLevel().isPositionEntityTicking(behind) || !h.getLevel().isPositionEntityTicking(n.blockPosition()))return;
+            exercised[0]=true;
             c.maintain(h.getLevel().getGameTime());var end=n.getEyePosition().add(12,0,0);var weapon=c.snapshot();
             h.assertTrue(sensor.occupied(n,null,end,weapon) && sensor.lastSector()==VisibilitySensor.Sector.OCCUPIED,"protected front body blocks");
             body.moveTo(n.getX()+20,n.getY(),n.getZ());
-            h.assertTrue(sensor.occupied(n,null,end,weapon),"body behind target within confirmed 128 ballistic length blocks");
+            h.assertTrue(sensor.occupied(n,null,end,weapon),"body behind target within confirmed 128 ballistic length blocks: sector="+sensor.lastSector()+" tracked="+(h.getLevel().getEntity(body.getUUID())==body)+" ticking="+h.getLevel().isPositionEntityTicking(body.blockPosition())+" box="+body.getBoundingBox());
             body.moveTo(n.getX()+3,n.getY(),n.getZ()+30);
             h.assertFalse(sensor.occupied(n,null,end,weapon),"fresh movement away clears without stale prior geometry");
             body.moveTo(n.getX()+4,n.getY(),n.getZ());
             h.assertTrue(sensor.occupied(n,null,end,weapon),"new same-tick crossing is rechecked");
             var b=AiWorkBudget.of(h.getLevel());while(b.query(n.getUUID(),true)){}
             h.assertTrue(sensor.occupied(n,null,end,weapon) && sensor.lastSector()==VisibilitySensor.Sector.DEFERRED,"query denial is distinct from occupied/clear");
+            h.runAfterDelay(1,()->{body.moveTo(n.getX()+3,n.getY(),n.getZ()+30);h.assertFalse(sensor.occupied(n,null,n.getEyePosition().add(12,0,0),c.snapshot()),"next call resumes ordering but validates every section fresh");body.discard();n.discard();h.succeed();});
         });
-        h.runAtTickTime(11,()->{body.moveTo(n.getX()+3,n.getY(),n.getZ()+30);h.assertFalse(sensor.occupied(n,null,n.getEyePosition().add(12,0,0),c.snapshot()),"next call resumes ordering but validates every section fresh");body.discard();n.discard();h.succeed();});
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="sector-03-native",timeoutTicks=200)
     public static void sideCrowdAllowsFiniteNativeRounds(GameTestHelper h) {

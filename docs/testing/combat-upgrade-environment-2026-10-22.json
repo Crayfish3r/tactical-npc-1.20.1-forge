@@ -1,0 +1,9 @@
+{
+  "cpu_identifier": "Intel64 Family 6 Model 165 Stepping 2, GenuineIntel",
+  "logical_processors": 8,
+  "java": "openjdk version \"17.0.19\" 2026-04-21 LTS\nOpenJDK Runtime Environment Microsoft-13877129 (build 17.0.19+10-LTS)\nOpenJDK 64-Bit Server VM Microsoft-13877129 (build 17.0.19+10-LTS, mixed mode, sharing)",
+  "baseline_commit": "3077098f1338c3c8fdb1f564257fd71f8ea98701",
+  "profile_heap": "-Xms1G -Xmx4G",
+  "physical_memory": "CIM unavailable in sandbox; no system RAM claim",
+  "seed": 8675309
+}

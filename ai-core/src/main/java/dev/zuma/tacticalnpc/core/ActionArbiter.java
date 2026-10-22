@@ -28,7 +28,7 @@ public final class ActionArbiter {
         if (decision.weaponAction() == WeaponAction.BOLT) return WeaponAction.BOLT;
         boolean direct=decision.aim().mode()==AimCommand.Mode.DIRECT && s.targetValid() && s.visible() && s.reactionComplete();
         boolean area=decision.aim().mode()==AimCommand.Mode.SUPPRESS_AREA && suppression.valid(tick) &&
-                decision.aim().point().equals(suppression.observation().position());
+                decision.aim().point().equals(suppression.point());
         return decision.firePermitted() && (direct || area) && s.aimAligned() && s.clear() &&
                 !s.allyCrossing() && s.cooldownReady() ? WeaponAction.SHOOT : WeaponAction.NONE;
     }

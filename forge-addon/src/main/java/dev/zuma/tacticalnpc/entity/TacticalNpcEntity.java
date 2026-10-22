@@ -161,7 +161,10 @@ public final class TacticalNpcEntity extends PathfinderMob {
         if(gun!=null && policy==AmmoPolicy.FINITE) { gun.setDummyAmmoAmount(getMainHandItem(),initialReserve); gun.setMaxDummyAmmoAmount(getMainHandItem(),initialReserve); }
     }
     // This overrides the method supplied to LivingEntity by TaCZ, without implementing/copying its operator.
-    public boolean needCheckAmmo() { return ammoPolicy==AmmoPolicy.FINITE; }
+    public boolean needCheckAmmo() {
+        // Client construction/rendering must not read a server config before Forge synchronization.
+        return ammoPolicy==AmmoPolicy.FINITE && (level().isClientSide || !dev.zuma.tacticalnpc.config.ServerConfig.unfair());
+    }
     @Override protected void registerGoals() { goalSelector.addGoal(0,new FloatGoal(this)); }
     @Override protected net.minecraft.world.entity.ai.control.BodyRotationControl createBodyControl() {
         return new dev.zuma.tacticalnpc.combat.TacticalBodyControl(this,super.createBodyControl());

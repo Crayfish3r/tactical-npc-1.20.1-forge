@@ -92,7 +92,7 @@ public final class DefendTerritoryTests {
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-04-return",timeoutTicks=220)
     public static void externalDisplacementReturnsThroughOutsideNodes(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,10.5,10.5);var movement=new MovementExecutor(n.runtime());final Vec3[] anchor={null};
-        h.runAtTickTime(5,()->{
+        Runnable displace=()->{
             n.setOrder(OrderState.Kind.DEFEND_AREA,4);anchor[0]=n.position();n.setPos(n.getX()+6.988,n.getY(),n.getZ()+.311);
             var cell=n.blockPosition();
             var arrived=new net.minecraft.world.level.pathfinder.Path(List.of(
@@ -103,15 +103,26 @@ public final class DefendTerritoryTests {
             h.assertTrue(new CoverSensor(n.runtime()).withinOrderPath(arrived),"already-arrived exterior waypoint must not block the next inward segment");
             var standing=new CoverSensor(n.runtime()).safeStanding(n.position());
             h.assertTrue(standing!=null && Math.abs(standing.y-n.getY())<.01,"displaced fixture feet have checked support");
-            n.setOnGround(true); // Explicit precondition of the direct native createPath probe.
+            h.assertTrue(n.onGround(),"real grounded physics precedes the direct native createPath probe");
             var path=n.getNavigation().createPath(BlockPos.containing(anchor[0]),0);
             h.assertTrue(path!=null && path.canReach(),"native return path exists: self="+n.position()+" anchor="+anchor[0]+" path="+path+" ground="+n.onGround()+" ticks="+n.tickCount);
             String nodes="";for(int i=0;i<path.getNodeCount();i++)nodes+=path.getEntityPosAtNode(n,i)+" ";
             h.assertTrue(new CoverSensor(n.runtime()).withinOrderPath(path),"initial outside nodes are legal on an inward return: self="+n.position()+" nodes="+nodes);
             n.push(.6,.2,0);movement.guardTerritory();h.assertTrue(n.getDeltaMovement().x>0,"boundary guard preserves external knockback");
+        };
+        int[] lastEntityTick={-1};
+        h.onEachTick(()->{
+            // Production invokes this executor from the entity's own tick, never while its
+            // destination chunk is still upgrading or its physics is paused by chunk status.
+            if(anchor[0]==null){
+                var displaced=n.position().add(6.988,0,.311);
+                if(n.tickCount<5 || !n.onGround() || !h.getLevel().isPositionEntityTicking(BlockPos.containing(displaced)))return;
+                displace.run();
+            }
+            if(lastEntityTick[0]==n.tickCount)return;lastEntityTick[0]=n.tickCount;
+            movement.apply(MovementCommand.navigate(vector(anchor[0]),MovementCommand.Locomotion.RETREAT),h.getLevel().getGameTime());movement.guardTerritory();
         });
-        h.onEachTick(()->{if(anchor[0]!=null){movement.apply(MovementCommand.navigate(vector(anchor[0]),MovementCommand.Locomotion.RETREAT),h.getLevel().getGameTime());movement.guardTerritory();}});
-        h.runAtTickTime(200,()->{h.assertTrue(n.position().subtract(anchor[0]).horizontalDistance()<2,"displaced NPC really walked back inside: "+n.position());n.discard();h.succeed();});
+        h.runAtTickTime(200,()->{h.assertTrue(anchor[0]!=null,"entity-ticking return fixture became ready");h.assertTrue(n.position().subtract(anchor[0]).horizontalDistance()<2,"displaced NPC really walked back inside: self="+n.position()+" anchor="+anchor[0]+" entityTicks="+n.tickCount+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition())+" recovery="+movement.recoveryStatus()+" navDone="+n.getNavigation().isDone()+" path="+n.getNavigation().getPath()+" movement="+movementDiagnostic(movement));n.discard();h.succeed();});
     }
 
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-05-long-return",timeoutTicks=250)
@@ -171,6 +182,10 @@ public final class DefendTerritoryTests {
         var n=NpcEntities.NPC.get().create(h.getLevel());var p=h.absoluteVec(new Vec3(x,2,z));n.moveTo(p.x,p.y,p.z);
         // Fixture feet are exactly on the floor; chunk activation may delay the first physics tick.
         n.setOnGround(true);h.getLevel().addFreshEntity(n);return n;
+    }
+    private static String movementDiagnostic(MovementExecutor movement){
+        try{var d=MovementExecutor.class.getDeclaredField("destination");var a=MovementExecutor.class.getDeclaredField("alternative");d.setAccessible(true);a.setAccessible(true);return "destination="+d.get(movement)+" alternative="+a.get(movement);}
+        catch(ReflectiveOperationException e){return e.toString();}
     }
     private static Vector3 vector(Vec3 v){return new Vector3(v.x,v.y,v.z);}
 }

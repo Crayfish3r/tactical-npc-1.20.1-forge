@@ -42,6 +42,7 @@ minecraft {
             args '--nogui'; workingDirectory project.file(project.hasProperty('profile')?(project.findProperty('profileDir') ?: 'run/profile'):(project.findProperty('dedicatedDir') ?: 'run/standalone'))
             if(project.hasProperty('profile')) {
                 property 'tactical.profile.batch',project.hasProperty('batchProfile').toString()
+                property 'tactical.profile.upgrade',project.hasProperty('upgradeProfile').toString()
                 property 'tactical.profile.team',project.hasProperty('teamProfile').toString()
                 property 'tactical.profile.team.count',(project.findProperty('teamCount') ?: '15').toString()
                 property 'tactical.profile.team.crowded',project.hasProperty('teamCrowded').toString()

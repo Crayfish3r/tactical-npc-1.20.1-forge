@@ -36,7 +36,7 @@ public final class WeaponProfileTests {
         h.runAtTickTime(150,()->{
             var state=n.controller().weaponState();
             h.assertTrue(state.supported() && state.profile().kind()==kind,"verified native gun type: "+state);
-            h.assertTrue(state.effectiveRange()<=state.profile().maximum(),"native falloff can only shorten profile distance");
+            h.assertTrue(state.effectiveRange()>state.profile().maximum() && state.damageFalloff()>0 && state.ballistics().valid(),"native ballistic reach is independent of preference and damage falloff");
             h.assertTrue(n.controller().shots()>0 && ProjectileProbe.count(n.getUUID())>=pellets,"native requests and projectiles: "+id+" shots="+n.controller().shots()+" bullets="+ProjectileProbe.count(n.getUUID())+" decision="+n.controller().decision());
             h.assertTrue(n.controller().shots()<=150/state.profile().pauseTicks()+ammo,"profile pauses never cancel native cooldown");
             if(kind==WeaponProfile.Kind.SNIPER) h.assertTrue(n.controller().shots()<=3,"manual bolt rifle respects finite loaded rounds before reload");

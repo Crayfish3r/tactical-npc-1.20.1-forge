@@ -1,5 +1,7 @@
 # Профили проверок Tactical NPC
 
+Новый боевой срез2026-10-22: [combat upgrade](COMBAT-UPGRADE-2026-10-22.md). Для его before/after используйте `run-combat-upgrade.py before|after` и `compare-combat-upgrade.py`; source baseline сохранён отдельно от batch14. Нижеследующий аудит и исторические пакеты остаются своими checkpoint.
+
 Аудит 2026-10-19: HEAD `eb1f04eefb2141adaefd91c90fb82b56a0d9c030`, начальное дерево чистое.
 Minecraft 1.20.1 / Forge 47.4.20 / Java 17 / TaCZ 1.1.8-hotfix2 / optional NPCs 2.1.0.
 Production-логика не менялась. Этапы 07–14 этим аудитом не начинаются и не принимаются.

@@ -41,7 +41,7 @@ public final class AlphaResponsivenessTests {
             } else if(stage[0]==4) {
                 var o=goal.observation();var d=goal.decision();
                 if(o!=null && o.visible() && d.aim().mode()==AimCommand.Mode.DIRECT && d.frame().tick()<h.getLevel().getGameTime()) {
-                    h.assertTrue(d.aim().point().equals(o.position()),"DIRECT aim tracks fresh visual sample between tactic plans");tracked[0]=true;
+                    h.assertTrue(d.aim().point().minus(o.position()).length()<2 && o.tick()==h.getLevel().getGameTime(),"DIRECT aim stays anchored to fresh visual sample with bounded ballistic lead between tactic plans");tracked[0]=true;
                 }
                 p.setPos(at.x,at.y,at.z+Math.sin(tick*.2)*.5);
                 if(tracked[0] && !deferred[0]) {

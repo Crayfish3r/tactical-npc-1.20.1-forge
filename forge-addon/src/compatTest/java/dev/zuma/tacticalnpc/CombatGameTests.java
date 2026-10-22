@@ -32,6 +32,8 @@ public final class CombatGameTests {
         npc.setYHeadRot(-90);
         npc.setYBodyRot(-90);
         npc.setPersistenceRequired();
+        var movementSpeed=npc.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
+        double normalSpeed=movementSpeed.getBaseValue();movementSpeed.setBaseValue(0);
         var stack = GunItemBuilder.create().setId(new ResourceLocation("tacz", "ak47"))
                 .setFireMode(FireMode.SEMI).setAmmoCount(1).setAmmoInBarrel(true).build();
         npc.setItemSlot(EquipmentSlot.MAINHAND, stack);
@@ -56,7 +58,8 @@ public final class CombatGameTests {
                     new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "tactical-test"));
             player.setGameMode(GameType.SURVIVAL);
             player.setInvulnerable(true);
-            Vec3 pos = h.absoluteVec(new Vec3(11.5, 2, 7.5));
+            // Keep this lifecycle fixture outside AR retreat distance; emergency movement has separate tests.
+            Vec3 pos = h.absoluteVec(new Vec3(14.5, 2, 7.5));
             player.moveTo(pos.x, pos.y, pos.z, 90, 0);
             h.getLevel().addNewPlayer(player);
             // Closed plane separates NPC and player. No hidden target acquisition allowed.
@@ -65,16 +68,20 @@ public final class CombatGameTests {
                 h.assertTrue(goal.targetId() == null && goal.shots() == 0, "wall blocks detection and fire");
                 h.assertFalse(new VisibilitySensor().clear(npc, new VisibilitySensor().aimPoint(player)), "physical ray hits wall");
                 npc.setYRot(-90);npc.setYHeadRot(-90);npc.getLookControl().setLookAt(player,10,10);
+                lastAngles[0]=npc.getYHeadRot();lastAngles[1]=npc.getXRot();
+                // Some FULL placements contain unexpected gravel in the intended air lane.
+                // Establish the open-room precondition; the raw ray assertion below stays strict.
+                for(int x=3;x<=15;x++)for(int y=2;y<=7;y++)for(int z=0;z<16;z++)h.setBlock(new BlockPos(x,y,z),Blocks.AIR);
                 wall(h, false);
             });
             h.runAtTickTime(45, () -> {
                 h.assertTrue(new VisibilitySensor().valid(npc, player, 40), "test player eligible: alive=" + player.isAlive() + " creative=" + player.isCreative() + " spectator=" + player.isSpectator() + " distance=" + npc.distanceTo(player));
                 var hit = npc.level().clip(new net.minecraft.world.level.ClipContext(npc.getEyePosition(), new VisibilitySensor().aimPoint(player), net.minecraft.world.level.ClipContext.Block.COLLIDER, net.minecraft.world.level.ClipContext.Fluid.NONE, npc));
-                h.assertTrue(hit.getType()==net.minecraft.world.phys.HitResult.Type.MISS, "removed wall opens physical sightline");
+                h.assertTrue(hit.getType()==net.minecraft.world.phys.HitResult.Type.MISS, "removed wall opens physical sightline: npc="+npc.position()+" target="+player.position()+" hit="+hit.getBlockPos()+" state="+h.getLevel().getBlockState(hit.getBlockPos())+" decision="+goal.decision());
             });
-            h.runAtTickTime(60,()->h.assertTrue(player.getUUID().equals(goal.targetId()),"production perception acquires the eligible player within the scan/reaction fixture"));
+            h.runAtTickTime(60,()->{h.assertTrue(player.getUUID().equals(goal.targetId()),"production perception acquires the eligible player within the scan/reaction fixture");movementSpeed.setBaseValue(normalSpeed);});
             h.runAtTickTime(180, () -> {
-                h.assertTrue(goal.shots() >= 2, "real TaCZ shooting succeeded");
+                h.assertTrue(ProjectileProbe.count(npc.getUUID()) >= 2, "real TaCZ projectiles joined");
                 h.assertTrue(goal.reloads() >= 1, "empty magazine requested real reload");
                 h.assertTrue(npc.position().subtract(origin).horizontalDistance() > 0.25, "strafe moves the real entity horizontally");
                 h.assertFalse(goal.failed(), "controller remained healthy");
@@ -88,16 +95,17 @@ public final class CombatGameTests {
                 // Strafe may orbit across the fixed wall plane; restore the fixture's two sides.
                 npc.moveTo(origin.x,origin.y,origin.z,npc.getYRot(),npc.getXRot());
                 npc.setDeltaMovement(Vec3.ZERO);
-                long count = goal.shots();
+                movementSpeed.setBaseValue(0);
+                int count = ProjectileProbe.count(npc.getUUID());
                 wall(h, true);
                 h.assertFalse(new VisibilitySensor().clear(npc,new VisibilitySensor().aimPoint(player)),"closed fixture wall actually separates moving NPC and player");
                 h.runAtTickTime(200, () -> {
-                    h.assertTrue(goal.shots() == count && goal.targetId() == null, "lost visibility stops shots immediately");
+                    h.assertTrue(ProjectileProbe.count(npc.getUUID()) == count && goal.targetId() == null, "lost visibility stops actual native rounds");
                     wall(h, false);
                     player.setHealth(0);
                 });
                 h.runAtTickTime(220, () -> {
-                    h.assertTrue(goal.targetId() == null && goal.shots() == count, "dead player cannot be attacked");
+                    h.assertTrue(goal.targetId() == null && ProjectileProbe.count(npc.getUUID()) == count, "dead player cannot receive actual native rounds");
                     npc.removeTag(Npc210Adapter.TAG);
                 });
                 h.runAtTickTime(230, () -> {

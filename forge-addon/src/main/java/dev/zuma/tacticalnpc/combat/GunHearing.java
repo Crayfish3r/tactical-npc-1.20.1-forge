@@ -26,7 +26,7 @@ public final class GunHearing {
             if(s.last.getOrDefault(source.getUUID(),Long.MIN_VALUE)==tick){s.coalesced++;return 0;}
             s.last.put(source.getUUID(),tick);trim(s.last,1024);
             if(!AiWorkBudget.of(level).query(source.getUUID(),false)){s.denials++;return 0;}
-            s.queries++;double range=ServerConfig.HEARING_RANGE.get();var listeners=new ArrayList<PathfinderMob>(16);int[] checked={0};boolean[] saturated={false};
+            s.queries++;double range=ServerConfig.hearingRange();var listeners=new ArrayList<PathfinderMob>(16);int[] checked={0};boolean[] saturated={false};
             AiWorkBudget.of(level).worldQuery();
             level.getEntities(EntityTypeTest.forClass(PathfinderMob.class),source.getBoundingBox().inflate(range),n->{
                 s.considered++;

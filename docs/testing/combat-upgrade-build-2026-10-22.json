@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "command": [
+    "gradlew.bat",
+    "compileJava",
+    "compileCompatJava",
+    "build",
+    "--offline",
+    "--rerun-tasks",
+    "--console=plain"
+  ],
+  "working_directory": "forge-addon",
+  "exit_code": 0,
+  "gradle_seconds": 25,
+  "executed_tasks": 12,
+  "compile_warnings": 7,
+  "log": "forge-addon\\build\\combat-upgrade-production-build.log",
+  "log_sha256": "16b3ccc35de850a40f16b2fa861ea5b6a8ad2325a71cf048ea8089d1fa58a9d7",
+  "scope": "plain build; no combatTests/profile flags; Gradle test=NO-SOURCE is not test coverage"
+}

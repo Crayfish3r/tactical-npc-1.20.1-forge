@@ -70,15 +70,19 @@ public final class TaczGunController implements GunController {
         var state=observe(); var gun=IGun.getIGunOrNull(npc.getMainHandItem());
         var data=metadata(npc.getMainHandItem(),gun);
         WeaponProfile profile=data==null?WeaponProfile.of(WeaponProfile.Kind.CONSERVATIVE):data.profile();
-        double range=profile.maximum(),spread=Double.NaN;
+        var bullet=data==null || data.index()==null?null:data.index().getBulletData();
+        Float nativeSpeed=operator.getCacheProperty()==null?null:operator.getCacheProperty().getCache(GunProperties.AMMO_SPEED);
+        var ballistics=bullet==null || nativeSpeed==null?dev.zuma.tacticalnpc.core.Ballistics.UNKNOWN:
+                new dev.zuma.tacticalnpc.core.Ballistics(nativeSpeed*com.tacz.guns.config.common.AmmoConfig.GLOBAL_BULLET_SPEED_MODIFIER.get()/20.0,bullet.getGravity(),bullet.getFriction(),Math.max(1,(int)(bullet.getLifeSecond()*20)));
+        double range=ballistics.maximumRange(),damageFalloff=profile.maximum(),spread=Double.NaN;
         if(operator.getCacheProperty()!=null) {
             Float falloff=operator.getCacheProperty().getCache(GunProperties.EFFECTIVE_RANGE);
-            if(falloff!=null && Float.isFinite(falloff) && falloff>0) range=Math.min(range,falloff);
+            if(falloff!=null && Float.isFinite(falloff) && falloff>0) damageFalloff=falloff;
             java.util.Map<com.tacz.guns.resource.pojo.data.gun.InaccuracyType,Float> spreads=operator.getCacheProperty().getCache(GunProperties.INACCURACY);
             if(spreads!=null && !spreads.isEmpty()) {spread=0;for(Float value:spreads.values())spread=Math.max(spread,value);}
         }
         return new WeaponState(gun==null?"none":gun.getGunId(npc.getMainHandItem()).toString(),state.rounds(),state.reserve(),state.bolt(),state.busy(),state.ready(),state.supported(),range,
-                gun==null?"NONE":gun.getFireMode(npc.getMainHandItem()).name(),profile,spread);
+                gun==null?"NONE":gun.getFireMode(npc.getMainHandItem()).name(),profile,spread,ballistics,damageFalloff);
     }
     @Override public void aim(boolean aiming) { runtime.requireServer(); operator.aim(aiming); }
 
@@ -112,6 +116,10 @@ public final class TaczGunController implements GunController {
                 busy, operator.getSynShootCoolDown() == 0 && operator.getSynSprintTime()==0 && !npc.isSprinting() && npc.level().getGameTime()>=nextVolley);
     }
 
+    private boolean suppressing(){
+        var goal=dev.zuma.tacticalnpc.runtime.RuntimeRegistry.active(npc);
+        return goal!=null && goal.decision()!=null && goal.decision().aim().mode()==dev.zuma.tacticalnpc.core.AimCommand.Mode.SUPPRESS_AREA;
+    }
     public void apply(WeaponAction action, long tick) {
         runtime.requireServer();
         if (action == WeaponAction.NONE || tick == lastActionTick) return;
@@ -134,7 +142,7 @@ public final class TaczGunController implements GunController {
             if (result == ShootResult.SUCCESS) {
                 shots++;debug("shot SUCCESS");
                 var profile=metadata.profile();
-                if(++volleyRequests>=profile.volleyRequests()) {volleyRequests=0;nextVolley=tick+profile.pauseTicks();}
+                if(!suppressing() && ++volleyRequests>=profile.volleyRequests()) {volleyRequests=0;nextVolley=tick+profile.pauseTicks();}
             }
             else if (result == ShootResult.NEED_BOLT) operator.bolt();
             else if (result == ShootResult.NOT_DRAW) drawnStack=ItemStack.EMPTY;

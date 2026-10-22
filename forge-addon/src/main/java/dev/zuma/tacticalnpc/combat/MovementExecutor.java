@@ -27,6 +27,12 @@ public final class MovementExecutor {
     public void patrolLegChanged(){contactRestored();}
     public void apply(MovementCommand command,long tick) {
         runtime.requireServer();var npc=runtime.entity();var level=(ServerLevel)npc.level();
+        // An intentionally immobile entity is not a failed path. Keep weapon/aim authority alive.
+        if(npc.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)<=0){
+            npc.getNavigation().stop();npc.getMoveControl().strafe(0,0);npc.setSprinting(false);
+            recovery.clear();alternative=null;failedPoint=null;destination=null;mode=MovementCommand.Mode.HOLD;
+            return;
+        }
         if(command.locomotion()==MovementCommand.Locomotion.RETREAT && gait!=command.locomotion()) {
             recovery.clear();alternative=null;destination=null;
             // The replacement path may be budget-deferred; never keep walking the old peek meanwhile.
@@ -119,16 +125,25 @@ public final class MovementExecutor {
     /** Keep defend return and free attack legs local to FOLLOW_RANGE and loaded terrain. */
     private Vec3 standingSegment(Vec3 requested) {
         var npc=runtime.entity();var boundary=terrain.territory();
-        if(boundary==null && runtime.orderState().kind()!=OrderState.Kind.ASSAULT)return terrain.safeStanding(requested);
+        if(boundary==null && runtime.orderState().kind()!=OrderState.Kind.ASSAULT)return standingEndpoint(requested);
         Vec3 delta=requested.subtract(npc.position());double distance=delta.horizontalDistance();
         double limit=Math.max(1,Math.min(16,npc.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE)/2));
-        if(distance<=limit)return terrain.safeStanding(requested);
+        if(distance<=limit)return standingEndpoint(requested);
         for(double leg=limit;leg>=1;leg/=2) {
             Vec3 guess=npc.position().add(delta.x*leg/distance,0,delta.z*leg/distance);
             Vec3 point=terrain.safeStanding(guess);
             if(point!=null && (boundary==null || boundary.permitsStep(vector(npc.position()),vector(point))))return point;
         }
         return null;
+    }
+    private Vec3 standingEndpoint(Vec3 requested){
+        var point=terrain.safeStanding(requested);var npc=runtime.entity();
+        // Observations are body aim points, not feet. On flat terrain a floating player's
+        // known torso can be >1 block above any standing node. Try the current floor only
+        // after the requested elevation fails, and only within one actor-height plus a step.
+        if(point==null && requested.y>=npc.getY() && requested.y-npc.getY()<=npc.getBbHeight()+1)
+            point=terrain.safeStanding(new Vec3(requested.x,npc.getY(),requested.z));
+        return point;
     }
     private static Vector3 vector(Vec3 v) {return new Vector3(v.x,v.y,v.z);}
     private static Vec3 vec(Vector3 v) {return new Vec3(v.x(),v.y(),v.z());}

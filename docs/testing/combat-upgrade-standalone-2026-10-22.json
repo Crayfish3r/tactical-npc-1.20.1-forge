@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "profile": "STAGE",
+  "legacy": false,
+  "executed": 24,
+  "selected": 24,
+  "seconds": 251.156,
+  "exit_code": 0,
+  "command": [
+    "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+    "runGameTestServer",
+    "compileCompatJava",
+    "-PcombatTests",
+    "-PtestProfile=STAGE",
+    "--console=plain",
+    "-PtestSelection=CombatUpgradeTests,IndependentNpcTests,SuppressionTests,AlphaResponsivenessTests,AttackTests#legitimateMemoryPathDetoursSimpleBarrier,PerceptionTests#controllerAcquiresFifthWithCadence,PerceptionTests#acquisitionRetainsVisiblePendingPerception",
+    "--offline",
+    "-PgameTestDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261022T023301.831693Z-runtime"
+  ],
+  "log": "forge-addon\\build\\test-runs\\20261022T023301.831693Z-STAGE.log",
+  "runtime": "forge-addon\\build\\test-runs\\20261022T023301.831693Z-runtime",
+  "tasks": [
+    ":extractTaczLua UP-TO-DATE",
+    ":compileJava UP-TO-DATE",
+    ":processResources UP-TO-DATE",
+    ":classes UP-TO-DATE",
+    ":downloadMcpConfig",
+    ":extractSrg UP-TO-DATE",
+    ":createSrgToMcp UP-TO-DATE",
+    ":downloadMCMeta UP-TO-DATE",
+    ":downloadAssets UP-TO-DATE",
+    ":extractNatives UP-TO-DATE",
+    ":makeSrcDirs",
+    ":prepareRuns",
+    ":prepareRunGameTestServer",
+    ":prepareRunGameTestServerCompile UP-TO-DATE",
+    ":runGameTestServer",
+    ":compileCompatJava UP-TO-DATE"
+  ]
+}

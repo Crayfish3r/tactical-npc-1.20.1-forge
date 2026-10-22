@@ -53,3 +53,28 @@ cd tactical-npc-1.20.1-forge/forge-addon
 Архитектура: perception → immutable snapshot → decision → action arbitration → Forge/TaCZ adapter. Ядро `ai-core/` не импортирует игровые API; сущностями управляет server thread. `src/compat/` изолирует оригинальные goals, фракции и AutoGunOperator. Подробности подтверждённых API: [аудит](docs/INTEGRATION-AUDIT.md), контракты испытаний: [TEST_PLAN](docs/TEST_PLAN.md).
 
 Новый код — MIT. Применимые лицензии зависимостей и распространение модпака рассматриваются отдельно; чужие JAR не вложены в артефакты.
+
+## Боевые профили — 2026-10-22
+
+`/tacticalnpc hard`: detection/hearing128, activation не меньше sight/hearing, память320тиков /
+160блоков, реакция3тика, поворот17°/тик и коррелированная ошибка.35° плюс native TaCZ spread.
+В старом мире значения могут отличаться: примените эту команду после обновления либо измените
+`world/serverconfig/tacticalnpcai-server.toml`. Forge47.4.20 сохраняет изменения команды
+в serverconfig этого мира через autosave; там же задаются ручные настройки. Hard сохраняет ammo policy каждого NPC.
+
+Опциональный `/tacticalnpc unfair`: hearing192, derived contact memory208, реакция1тик, squad report delay2тика,
+бесконечный резерв с обычной TaCZ перезарядкой и отдельная подсказка скрытой области каждые60тиков.
+Возврат в Hard очищает подсказки и восстанавливает сохранённую ammo policy.
+Оба режима сохраняют препятствия, native оружейную механику и защиту союзников.
+
+Давление: `suppressionDurationTicks=160`, `suppressionRoundBudget=48`,
+`suppressionBurstRounds=8`, `suppressionBurstPauseTicks=12`. Проверяются доступные сектора
+вокруг известного контакта; hidden report не пополняет бюджет. Native team объединяет
+прикрывающего, подавляющих и обходящего. Упреждение использует подтверждённую визуальную
+скорость и проверенную dry-air баллистику; damage falloff не запрещает дальний выстрел.
+
+Поиск не загружает чанки принудительно. Сервер должен уже тикать чанк NPC: для встреч на128
+проверьте simulation distance и границы чанков подключённым клиентом. Автотесты dedicated
+используют явные fixture tickets, отсутствующие в production.
+
+[Реализация, before/after, артефакты и отдельный человеческий плейтест](docs/COMBAT-UPGRADE-2026-10-22.md).

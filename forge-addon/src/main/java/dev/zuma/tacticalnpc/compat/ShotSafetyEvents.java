@@ -22,7 +22,10 @@ public final class ShotSafetyEvents {
     public void fire(GunFireEvent event) {
         if (event.getLogicalSide() != LogicalSide.SERVER) return;
         TacticalCombatGoal goal = RuntimeRegistry.active(event.getShooter());
-        if (goal != null && !goal.allowNativeFire()) event.setCanceled(true);
+        if (goal != null) {
+            if(!goal.allowNativeFire())event.setCanceled(true);
+            else goal.authorizeNativeRound();
+        }
     }
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void hurt(EntityHurtByGunEvent.Pre event) {

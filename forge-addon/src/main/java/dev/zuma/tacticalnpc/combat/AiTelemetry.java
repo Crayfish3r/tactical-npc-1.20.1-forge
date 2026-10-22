@@ -9,6 +9,7 @@ public final class AiTelemetry {
     public enum Gate { NO_CONTACT, LOS_BLOCKED, LOS_DEFERRED, REACTION, TURN, WEAPON_BUSY, COOLDOWN, ALLY, POLICY, NATIVE_DECLINED }
     public enum Route { FAILED, ALTERNATIVE, ARRIVED, EXHAUSTED }
     private static final class Counters {
+        long unfairHints;
         final long[] gates=new long[Gate.values().length],routes=new long[Route.values().length];
         final long[][] latency=new long[2][129];
         final long[] sectors=new long[VisibilitySensor.Sector.values().length];
@@ -26,13 +27,14 @@ public final class AiTelemetry {
     public static void sector(ServerLevel level,VisibilitySensor.Sector result){LEVELS.computeIfAbsent(level,k->new LevelData()).counters.sectors[result.ordinal()]++;}
     public static void route(ServerLevel level,Route route) {LEVELS.computeIfAbsent(level,k->new LevelData()).counters.routes[route.ordinal()]++;}
     public static void contactShot(ServerLevel level,boolean reacquire,long ticks) {LEVELS.computeIfAbsent(level,k->new LevelData()).counters.latency[reacquire?1:0][(int)Math.min(128,Math.max(0,ticks))]++;}
+    public static void unfairHint(ServerLevel level){LEVELS.computeIfAbsent(level,k->new LevelData()).counters.unfairHints++;}
     private static String latency(long[] histogram) {
         long n=0,sum=0;for(int i=0;i<histogram.length;i++){n+=histogram[i];sum+=i*histogram[i];}
         return n==0?"n=0":"n="+n+",meanTicks="+(double)sum/n+",overflow="+histogram[128];
     }
     public static String diagnostics(ServerLevel level) {
         var c=LEVELS.computeIfAbsent(level,k->new LevelData()).counters;
-        return "firstProjectile{"+latency(c.latency[0])+"} reacquireProjectile{"+latency(c.latency[1])+"} gates="+java.util.stream.IntStream.range(0,c.gates.length).filter(i->c.gates[i]>0).mapToObj(i->Gate.values()[i]+":"+c.gates[i]).toList()+" routes[failed,alternative,arrived,exhausted]="+java.util.Arrays.toString(c.routes)+" "+AiWorkBudget.of(level).queryDiagnostics()+" sectors[CLEAR,OCCUPIED,SATURATED,DEFERRED,UNSUPPORTED]="+java.util.Arrays.toString(c.sectors);
+        return "firstProjectile{"+latency(c.latency[0])+"} reacquireProjectile{"+latency(c.latency[1])+"} unfairHints="+c.unfairHints+" gates="+java.util.stream.IntStream.range(0,c.gates.length).filter(i->c.gates[i]>0).mapToObj(i->Gate.values()[i]+":"+c.gates[i]).toList()+" routes[failed,alternative,arrived,exhausted]="+java.util.Arrays.toString(c.routes)+" "+AiWorkBudget.of(level).queryDiagnostics()+" sectors[CLEAR,OCCUPIED,SATURATED,DEFERRED,UNSUPPORTED]="+java.util.Arrays.toString(c.sectors);
     }
     @SubscribeEvent public void tick(TickEvent.ServerTickEvent event) {
         if(event.phase==TickEvent.Phase.START){serverStart=System.nanoTime();return;}

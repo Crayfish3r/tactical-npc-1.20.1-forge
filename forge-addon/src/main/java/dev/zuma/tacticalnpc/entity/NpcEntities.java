@@ -19,7 +19,7 @@ public final class NpcEntities {
             if(!event.getLevel().isClientSide && event.getEntity() instanceof TacticalNpcEntity npc) npc.release();
         });
         bus.addListener((EntityAttributeCreationEvent event)->event.put(NPC.get(),net.minecraft.world.entity.Mob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH,20).add(Attributes.MOVEMENT_SPEED,.25).add(Attributes.FOLLOW_RANGE,64).build()));
+                .add(Attributes.MAX_HEALTH,20).add(Attributes.MOVEMENT_SPEED,.25).add(Attributes.FOLLOW_RANGE,128).build()));
         RuntimeRegistry.registerIndependent(e->e instanceof TacticalNpcEntity npc?npc.runtime():null,
                 level->{var npc=NPC.get().create(level); if(npc==null) throw new IllegalStateException("Entity creation failed"); return npc.runtime();});
     }

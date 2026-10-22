@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "checks": 818,
+  "suites": [
+    72,
+    94,
+    38,
+    235,
+    353,
+    26
+  ],
+  "command": [
+    "C:/Program Files/Git/bin/bash.exe",
+    "ai-core/run-tests.sh"
+  ],
+  "log": "forge-addon/build/combat-upgrade-core.log",
+  "output": "PASS: 72 policy checks\nPASS: 94 alpha temporal regression checks (R1/R2/R4/R5, contact, tracking, recovery, locomotion)\nPASS: 38 defend territory checks\nPASS: 235 defend patrol checks\nPASS: 353 attack route checks\nPASS: 26 combat upgrade checks\n",
+  "exit_code": 0
+}

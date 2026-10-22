@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "world": "team-update-normal-20261022T030448",
+  "seconds": 102.938,
+  "output": "forge-addon\\build\\team-dedicated-check\\20261022T030448",
+  "scope": "plain dedicated startup, real reload, new/legacy command aliases, native scoreboard team, PATROL/STAND/DEFEND128, UUID/policy/finite/native stack save/restart, clean stop; no human combat"
+}

@@ -51,10 +51,28 @@ public final class VisibilitySensor {
     }
     public Los los(PathfinderMob npc,Vec3 point,boolean active) {
         if(!(npc.level() instanceof net.minecraft.server.level.ServerLevel level)) return Los.DEFERRED;
+        // ClipContext may ask for chunks. Preflight its entire bounded segment without tickets/I/O.
+        if(!loadedSegment(level,npc.getEyePosition(),point))return Los.DEFERRED;
         var budget=AiWorkBudget.of(level);
         if(!(active?budget.activeRay(npc.getUUID()):budget.ray(npc.getUUID()))) return Los.DEFERRED;
         return npc.level().clip(new ClipContext(npc.getEyePosition(), point,
                 ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, npc)).getType() == HitResult.Type.MISS?Los.CLEAR:Los.BLOCKED;
+    }
+    /** Chunk-grid DDA, including corner neighbours: fixed-distance samples can miss a thin corner. */
+    public static boolean loadedSegment(ServerLevel level,Vec3 start,Vec3 end){
+        double distance=start.distanceTo(end);if(!Double.isFinite(distance) || distance>512)return false;
+        int x=net.minecraft.util.Mth.floor(start.x/16),z=net.minecraft.util.Mth.floor(start.z/16);
+        int ex=net.minecraft.util.Mth.floor(end.x/16),ez=net.minecraft.util.Mth.floor(end.z/16);
+        double dx=end.x-start.x,dz=end.z-start.z;int sx=Double.compare(dx,0),sz=Double.compare(dz,0);
+        double tx=sx==0?Double.POSITIVE_INFINITY:((sx>0?(x+1)*16.0:x*16.0)-start.x)/dx;
+        double tz=sz==0?Double.POSITIVE_INFINITY:((sz>0?(z+1)*16.0:z*16.0)-start.z)/dz;
+        double stepx=sx==0?Double.POSITIVE_INFINITY:16/Math.abs(dx),stepz=sz==0?Double.POSITIVE_INFINITY:16/Math.abs(dz);
+        for(int i=0;i<130;i++){
+            if(!level.hasChunk(x,z))return false;if(x==ex && z==ez)return true;
+            if(Math.abs(tx-tz)<1e-10 && (!level.hasChunk(x+sx,z) || !level.hasChunk(x,z+sz)))return false;
+            if(tx<=tz){x+=sx;tx+=stepx;}else{z+=sz;tz+=stepz;}
+        }
+        return false;
     }
 
     public boolean acquisitionDeferred() { return acquisitionDeferred; }
@@ -144,11 +162,14 @@ public final class VisibilitySensor {
         // Check beyond the target too. A probabilistic native spread has no absolute cone guarantee;
         // the server damage-event guard is the final protection for allied living entities.
         Vec3 direction = end.subtract(start).normalize();
-        end = start.add(direction.scale(128));
+        // Cover the requested firing depth plus continuation, not the bullet's entire lifetime.
+        // The native damage guard protects allies further downrange even after the owner unloads.
+        double safetyRange=Math.max(128,Math.min(512,end.distanceTo(start)+8));
+        end = start.add(direction.scale(safetyRange));
         double slope = Math.tan(Math.toRadians(Math.min(75, spread * 3 + 1)));
         var level=(ServerLevel)npc.level();var budget=AiWorkBudget.of(level);int first=sectorCursor;
         for(int section=0;section<4;section++) {
-            int index=(first+section)%4;double low=index*32,high=low+32;
+            int index=(first+section)%4;double low=index*safetyRange/4,high=low+safetyRange/4;
             if(!budget.query(npc.getUUID(),true)){sectorCursor=index;return sector(npc,Sector.DEFERRED);}
             List<LivingEntity> nearby=new ArrayList<>(32);int[] scanned={0};boolean[] saturated={false};
             AABB region=new AABB(start.add(direction.scale(low)),start.add(direction.scale(high))).inflate(.6+slope*high);

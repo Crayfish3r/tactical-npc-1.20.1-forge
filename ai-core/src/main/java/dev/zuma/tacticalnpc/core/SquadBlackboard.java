@@ -22,7 +22,9 @@ public final class SquadBlackboard {
         if(squad==null || !groups.containsKey(squad) && groups.size()>=128) return;
         var g=groups.computeIfAbsent(squad,k->new Group());
         if(!g.members.containsKey(owner) && g.members.size()>=64) return;
+        boolean joined=!g.members.containsKey(owner);
         var m=g.members.computeIfAbsent(owner,k->new Member());m.position=position;m.heartbeat=tick;
+        if(joined)g.rolesUntil=0;
         if(tick>=g.rolesUntil) {
             var ids=g.members.keySet().stream().sorted().toList();
             for(int i=0;i<ids.size();i++)g.members.get(ids.get(i)).role=i==0?Role.ANCHOR:i==1?Role.FLANKER:Role.SUPPRESSOR;
@@ -30,17 +32,23 @@ public final class SquadBlackboard {
         }
     }
     public void report(UUID squad,UUID owner,Observation observed,long tick) {
+        report(squad,owner,observed,tick,10);
+    }
+    public void report(UUID squad,UUID owner,Observation observed,long tick,int delay) {
         var g=groups.get(squad);var m=g==null?null:g.members.get(owner);
-        if(m==null || observed==null || !observed.visible() || observed.source()!=Observation.Source.VISION || tick-m.lastReport<10) return;
-        deliver(m,tick);m.pending=new Report(observed,m.position,tick+10);m.lastReport=tick;
+        if(m==null || observed==null || !observed.visible() || observed.source()!=Observation.Source.VISION || tick-m.lastReport<delay) return;
+        deliver(m,tick);m.pending=new Report(observed,m.position,tick+Math.max(1,delay));m.lastReport=tick;
     }
     public Observation receive(UUID squad,UUID owner,Vector3 position,long tick) {
+        return receive(squad,owner,position,tick,48);
+    }
+    public Observation receive(UUID squad,UUID owner,Vector3 position,long tick,double radius) {
         cleanup(tick);var g=groups.get(squad);if(g==null) return null;
         Report best=null;
         for(var e:g.members.entrySet()) {
             if(e.getKey().equals(owner)) continue;
             deliver(e.getValue(),tick);var r=e.getValue().delivered;
-            if(r==null || tick-r.observation.tick()>80 || tick>r.observation.expires() || position.minus(r.sender).lengthSquared()>48*48)continue;
+            if(r==null || tick-r.observation.tick()>80 || tick>r.observation.expires() || position.minus(r.sender).lengthSquared()>radius*radius)continue;
             if(best==null || best.observation.tick()<r.observation.tick()) best=r;
         }
         if(best==null)return null;var o=best.observation;

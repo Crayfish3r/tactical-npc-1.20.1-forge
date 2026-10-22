@@ -3,30 +3,49 @@ package dev.zuma.tacticalnpc.config;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public final class ServerConfig {
+    public enum Difficulty { HARD, UNFAIR }
+    public static final ForgeConfigSpec.EnumValue<Difficulty> DIFFICULTY;
+    public static final ForgeConfigSpec.IntValue SUPPRESSION_DURATION,SUPPRESSION_ROUNDS,SUPPRESSION_BURST,SUPPRESSION_PAUSE,HINT_INTERVAL;
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.BooleanValue ENABLED, DEBUG, SUPPRESSION, TELEMETRY;
     public static final ForgeConfigSpec.DoubleValue RANGE, TURN, ERROR, STRAFE, FOV, MEMORY_RANGE, HEARING_RANGE, ACTIVATION_RANGE;
     public static final ForgeConfigSpec.IntValue REACTION, PERCEPTION, REACQUIRE, ACQUISITION, MEMORY;
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
+        DIFFICULTY=b.comment("HARD uses legitimate observations. UNFAIR explicitly enables periodic separate hidden-position hints, faster reaction/radio and infinite reserve with native reload.").defineEnum("difficultyProfile",Difficulty.HARD);
+        SUPPRESSION_DURATION=b.defineInRange("suppressionDurationTicks",160,20,400);
+        SUPPRESSION_ROUNDS=b.defineInRange("suppressionRoundBudget",48,1,240);
+        SUPPRESSION_BURST=b.defineInRange("suppressionBurstRounds",8,1,30);
+        SUPPRESSION_PAUSE=b.defineInRange("suppressionBurstPauseTicks",12,2,80);
+        HINT_INTERVAL=b.defineInRange("unfairHintIntervalTicks",60,20,200);
         ENABLED = b.comment("Only NPCs with entity tag tactical_ai are affected.").define("enabled", true);
         DEBUG = b.comment("Log target, state, successful shots and reload requests.").define("debug", false);
         TELEMETRY=b.comment("Aggregate in-memory AI samples; log every 200 ticks, not every NPC tick.").define("telemetry",false);
-        SUPPRESSION=b.comment("Limited fire at a fresh known open point. No deliberate wall penetration.").define("suppression",true);
-        RANGE = b.defineInRange("detectionRange", 40.0, 4.0, 64.0);
-        ACTIVATION_RANGE=b.comment("Dormant AI updates every ten ticks outside this radius; never smaller than sight/hearing. Does not grant a target observation.").defineInRange("activationRange",64.0,16.0,128.0);
+        SUPPRESSION=b.comment("Sustained bounded native bursts at checked sectors around known contact. No deliberate wall penetration.").define("suppression",true);
+        RANGE = b.defineInRange("detectionRange", 128.0, 4.0, 128.0);
+        ACTIVATION_RANGE=b.comment("Dormant AI updates every ten ticks outside this radius; never smaller than sight/hearing. Does not grant a target observation.").defineInRange("activationRange",128.0,16.0,192.0);
         FOV = b.defineInRange("horizontalFov", 140.0, 30.0, 180.0);
         PERCEPTION = b.comment("Hard starting profile: perception 1-2, reaction 2-3, reacquire 1-2, acquisition 2-4, turn 16-18. Existing world overrides remain authoritative; latency requires measurement.").defineInRange("perceptionTicks", 1, 1, 40);
         REACQUIRE = b.defineInRange("reacquireTicks", 1, 1, 20);
         ACQUISITION = b.comment("Active scan interval with UUID phase staggering.").defineInRange("activeAcquisitionTicks", 3, 2, 10);
-        MEMORY = b.comment("Search memory; longer than the separate 40-tick suppression permit.").defineInRange("memoryTicks", 160, 20, 600);
-        MEMORY_RANGE = b.defineInRange("memoryRange", 64.0, 8.0, 128.0);
-        HEARING_RANGE = b.defineInRange("hearingRange", 40.0, 4.0, 64.0);
+        MEMORY = b.comment("Search memory; suppression additionally requires confidence, uncertainty, duration and ammo budget.").defineInRange("memoryTicks", 320, 20, 600);
+        MEMORY_RANGE = b.defineInRange("memoryRange", 160.0, 8.0, 256.0);
+        HEARING_RANGE = b.defineInRange("hearingRange", 128.0, 4.0, 192.0);
         TURN = b.comment("Maximum aim rotation in degrees per tick.").defineInRange("turnRate", 17.0, 1.0, 18.0);
-        ERROR = b.comment("Correlated aim error amplitude in degrees, plus native TaCZ spread.").defineInRange("aimError", 1.0, 0.1, 5.0);
+        ERROR = b.comment("Correlated aim error amplitude in degrees, plus native TaCZ spread.").defineInRange("aimError", 0.35, 0.1, 5.0);
         REACTION = b.comment("First-contact reaction; same visual UUID within 60 ticks uses reacquireTicks. Geometry is always fresh.").defineInRange("reactionTicks", 3, 2, 20);
         STRAFE = b.defineInRange("strafeSpeed", 0.55, 0.0, 1.0);
         SPEC = b.build();
+    }
+    public static boolean unfair(){return DIFFICULTY.get()==Difficulty.UNFAIR;}
+    public static double hearingRange(){return unfair()?Math.max(192,HEARING_RANGE.get()):HEARING_RANGE.get();}
+    public static double memoryRange(){return Math.max(Math.max(RANGE.get(),hearingRange())+16,MEMORY_RANGE.get());}
+    public static int reaction(){return unfair()?1:REACTION.get();}
+    public static int perception(){return unfair()?1:PERCEPTION.get();}
+    public static int reacquire(){return unfair()?1:REACQUIRE.get();}
+    public static void applyProfile(Difficulty profile){
+        DIFFICULTY.set(profile);RANGE.set(128.0);ACTIVATION_RANGE.set(128.0);MEMORY_RANGE.set(160.0);HEARING_RANGE.set(128.0);
+        PERCEPTION.set(1);REACTION.set(3);REACQUIRE.set(1);ACQUISITION.set(3);TURN.set(17.0);ERROR.set(.35);MEMORY.set(320);
     }
     private ServerConfig() {}
 }

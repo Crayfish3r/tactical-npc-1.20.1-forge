@@ -11,6 +11,9 @@ public final class ScenarioIsolation {
         if(!(h.getLevel().getServer() instanceof GameTestServer)) throw new IllegalStateException("Isolated harness requires GameTestServer");
         h.getLevel().getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false,h.getLevel().getServer());
         dev.zuma.tacticalnpc.config.ServerConfig.DEBUG.set(false);
+        dev.zuma.tacticalnpc.config.ServerConfig.DIFFICULTY.set(dev.zuma.tacticalnpc.config.ServerConfig.Difficulty.HARD);
+        // Historical temporal fixtures explicitly use a short memory; upgrade fixtures apply Hard/320.
+        dev.zuma.tacticalnpc.config.ServerConfig.MEMORY.set(160);
         // Native projectiles/items also belong to the previous fixture; an in-flight enemy
         // round may legally outlive its owner and must not damage the next fixture's NPC.
         java.util.List<net.minecraft.world.entity.Entity> leftovers=new java.util.ArrayList<>();

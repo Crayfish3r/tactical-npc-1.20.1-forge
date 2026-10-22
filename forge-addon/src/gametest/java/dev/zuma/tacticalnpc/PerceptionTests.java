@@ -90,9 +90,11 @@ public final class PerceptionTests {
     public static void controllerAcquiresFifthWithCadence(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=acquisitionNpc(h,true);
         var players=acquisitionPlayers(h,4,true);var open=players.get(4);
+        // The bounded cursor guarantee assumes fixed FOV; idle sweep has separate coverage.
+        h.onEachTick(()->{n.setYRot(-90);n.setYBodyRot(-90);n.setYHeadRot(-90);});
         dev.zuma.tacticalnpc.core.Vector3[] known={null};int[] projectiles={0};
         h.runAtTickTime(25,()->{
-            h.assertTrue(n.controller()!=null && open.getUUID().equals(n.controller().targetId()),"armed real controller finds fifth player through staggered acquisition/perception");
+            h.assertTrue(n.controller()!=null && open.getUUID().equals(n.controller().targetId()),"armed real controller finds fifth player through staggered acquisition/perception: target="+(n.controller()==null?null:n.controller().targetId())+" contact="+(n.controller()==null?null:n.controller().contactId())+" observation="+(n.controller()==null?null:n.controller().observation())+" entityTicks="+n.tickCount+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition()));
             h.assertTrue(n.controller().observation()!=null && n.controller().observation().visible() && open.getUUID().equals(n.controller().observation().subject()),"only real visible target becomes an observation");
             known[0]=n.controller().observation().position();projectiles[0]=ProjectileProbe.count(n.getUUID());
             for(int y=2;y<7;y++)for(int z=0;z<16;z++)h.setBlock(new BlockPos(7,y,z),Blocks.STONE);
@@ -116,7 +118,7 @@ public final class PerceptionTests {
         // Isolate acquisition/readiness from the existing idle sweep and weapon aim.
         h.onEachTick(()->{n.setYRot(-90);n.setYBodyRot(-90);n.setYHeadRot(-90);});
         h.runAtTickTime(45,()->{
-            h.assertTrue(n.controller()!=null && open.getUUID().equals(n.controller().targetId()),"page continuation must not replace a fresh visible candidate still awaiting perception=8 with cadence=2");
+            h.assertTrue(n.controller()!=null && open.getUUID().equals(n.controller().targetId()),"page continuation must not replace a fresh visible candidate still awaiting perception=8 with cadence=2: target="+(n.controller()==null?null:n.controller().targetId())+" contact="+(n.controller()==null?null:n.controller().contactId())+" observation="+(n.controller()==null?null:n.controller().observation())+" entityTicks="+n.tickCount+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition())+" players="+h.getLevel().players().size()+" "+dev.zuma.tacticalnpc.combat.AiTelemetry.diagnostics(h.getLevel()));
             h.assertTrue(open.getUUID().equals(n.controller().contactId()),"same identity reaches ContactReadiness without changing perception delay");
             acquisitionFinish(h,n,players);
         });

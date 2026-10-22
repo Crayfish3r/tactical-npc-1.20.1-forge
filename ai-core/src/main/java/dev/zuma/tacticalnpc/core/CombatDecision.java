@@ -16,9 +16,16 @@ public record CombatDecision(TacticalIntent intent, boolean firePermitted, Strin
         MovementCommand move = MovementCommand.hold();
         if ((intent == TacticalIntent.TAKE_COVER || intent == TacticalIntent.RETREAT) && s.coverAvailable())
             move = MovementCommand.navigate(s.terrain().coverPositions().get(0),intent==TacticalIntent.RETREAT?MovementCommand.Locomotion.RETREAT:MovementCommand.Locomotion.RELOCATION);
-        else if (intent == TacticalIntent.ENGAGE && s.targetVisible() && s.weapon().profile().mobile())
+        else if (intent == TacticalIntent.ENGAGE && s.targetVisible() && s.weapon().profile().mobile() && s.targetDistanceBlocks()>s.weapon().profile().maximum()*1.25) {
+            Vector3 delta=s.observation().position().minus(s.self().position());
+            move=MovementCommand.navigate(s.self().position().plus(new Vector3(delta.x(),0,delta.z()).times(Math.min(8,delta.length())/delta.length())),MovementCommand.Locomotion.WALK);
+        } else if (intent == TacticalIntent.ENGAGE && s.targetVisible() && s.weapon().profile().mobile())
             move = new MovementCommand(MovementCommand.Mode.STRAFE,null,0,s.tactical().strafeDirection(),.55);
-        else if(intent==TacticalIntent.RETREAT && s.targetKnown()) move=new MovementCommand(MovementCommand.Mode.STRAFE,null,-.55,0,.65,MovementCommand.Locomotion.RETREAT);
+        else if(intent==TacticalIntent.RETREAT && s.targetKnown()) {
+            Vector3 away=s.self().position().minus(s.observation().position());away=new Vector3(away.x(),0,away.z());
+            if(away.lengthSquared()<.01)away=new Vector3(1,0,0);
+            move=MovementCommand.navigate(s.self().position().plus(away.times(4/away.length())),MovementCommand.Locomotion.RETREAT);
+        }
         else if (intent == TacticalIntent.ADVANCE && s.targetKnown()) {
             Vector3 away=s.self().position().minus(s.observation().position());away=new Vector3(away.x(),0,away.z());
             if(away.lengthSquared()<.01) away=new Vector3(1,0,0);
