@@ -1,0 +1,9 @@
+Java17 / Git Bash: bash ai-core/run-tests.sh
+PASS: 72 policy
+PASS: 94 temporal
+PASS: 38 defend territory
+PASS: 235 defend patrol
+PASS: 353 attack route
+PASS: 26 combat upgrade
+PASS: 118 action route
+Total: 936 checks

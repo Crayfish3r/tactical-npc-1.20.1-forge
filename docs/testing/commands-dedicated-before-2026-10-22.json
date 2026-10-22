@@ -1,0 +1,6 @@
+{
+  "policy": "{schema: 6, neutral: 0b, anchorZ: -5.5d, anchorY: -60.0d, initialReserve: 37, anchorX: -5.5d, name: \"Steve\", loadout: \"tacz:glock_17\", standPhase: \"NONE\", serviceId: [I; -1945795371, -1319746983, -1167211998, -1774215850], leash: 128.0d, ammoPolicy: \"FINITE\", order: \"DEFEND_AREA\"}",
+  "uuid": "[I; -1282515307, -480096335, -1821116797, 1645585021]",
+  "hand_items": "[{id: \"tacz:modern_kinetic_gun\", Count: 1b, tag: {DummyAmmo: 20, HasBulletInBarrel: 1b, GunId: \"tacz:glock_17\", MaxDummyAmmo: 37, GunFireMode: \"SEMI\", GunCurrentAmmoCount: 16}}, {}]",
+  "native_team": "team-update"
+}

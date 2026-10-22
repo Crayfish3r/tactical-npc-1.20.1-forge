@@ -1,4 +1,17 @@
 // Test-only registration selection. All test sources stay in the compiler inputs.
+// Keep a running server's lazy-loaded test classes/resources separate from plain
+// builds or IDE compilation of the same checkout.
+def isolatedOutput = providers.gradleProperty('gameTestOutputDir').orNull
+if (isolatedOutput != null) {
+    sourceSets.each { set ->
+        def classes = file("${isolatedOutput}/classes/${set.name}")
+        def resources = file("${isolatedOutput}/resources/${set.name}")
+        tasks.named(set.compileJavaTaskName, JavaCompile).configure { destinationDirectory.set(classes) }
+        set.output.classesDirs.setFrom(project.files(classes).builtBy(tasks.named(set.compileJavaTaskName)))
+        set.output.resourcesDir = resources
+        tasks.named(set.processResourcesTaskName, ProcessResources).configure { destinationDir = resources }
+    }
+}
 def testProfile = providers.gradleProperty('testProfile').getOrElse('FULL')
 def selection = providers.gradleProperty('testSelection').getOrElse('')
 if (!(testProfile in ['FAST', 'STAGE', 'FULL'])) throw new GradleException('Unknown testProfile')

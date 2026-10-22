@@ -1,5 +1,7 @@
 # Журнал этапов
 
+> Команды в этом датированном отчёте относятся к прежнему интерфейсу. Актуальные команды, постоянный Hard и таблица миграции: [COMMANDS](COMMANDS.md).
+
 ## 00 — baseline, 2026-10-16
 
 Статус: **ACCEPTED** — владелец явно принял 00 в запросе этапа 01.
@@ -1431,3 +1433,31 @@ Plain production build18s/verifier PASS (main198277bytes/94classes,compat7680/4)
 Оба ordinary matched профиля9/9 PASS с идентичным fixture и неизменными production SHA. 64/96/128: реальные выстрелы31/31/31; running64:21 hits/47 rounds. Pressure:21 actual area rounds после стены;1v4:36 area rounds и3 фактических flank arrivals,25,87 блока. При30/50 все30/50 стреляли,1357/2205 native rounds против1274/1943; p95 MSPT15,40/18,37ms. Работа не уменьшалась для performance credit, общего speedup нет, AI2ms budget не достигнут. Это одна синтетическая пара, не human TTK/win rate.
 
 Plain production build25s/12 executed, verifier Java61/101+4 classes PASS. Ordinary dedicated startup/reload/save/stop/restart102,938s PASS; исходные properties/EULA неизменны, policy/UUID/native stack/team сохранились. Все JVM userdev; новый client/distribution/human playtest не выполнялся. Итог **WAITING_PLAYTEST**, не ACCEPTED. Конкретные ручные проверки перечислены в боевом отчёте.
+
+
+## Маршруты с действиями — 2026-10-22
+
+Сначала инструкции/7skills согласованы отдельным локальным commit `b57bd49d70cd07bbe9cbce2a23faccc1b37ac398`;
+gameplay baseline — опубликованный feature `f990246dea8e876cbacb3be2fd36540c7c0a20b7`.
+Основная навигация уже в локальном commit `716200d`; заключительные test-only fixes/evidence
+остаются рабочим diff. Закреплённый стек прежний, новых библиотек/Mixins нет.
+Pure-core transitions/UUID leases; single movement owner; loaded bounded planning;
+native wooden doors/LadderBlock physics; actual grounded completion, safe cancellation,
+FIFO/TTL cleanup и limited recovery реализованы. TaCZ/friendly gates и UNFAIR_HINT сохранены.
+
+Core936, affected STAGE31/31 и DefendPatrol7/7; FULL standalone132/132 PASS.
+После прерывания combined оставались80 PASS,2 FAIL,62 не завершены. По последнему запросу
+владельца повторены только два проблемных теста и выполнены оставшиеся62; все144 ID имеют
+PASS evidence. Это aggregate coverage, не новый единый FULL green. Предыдущие FAIL/0-executed,
+Windows errno1455 и missing test class receipts сохранены. Runner изолирует classes/resources
+от обычных сборок; combatSmoke retreat origin перенесён внутрь пола без ослабления assertions.
+
+Оба matched ordinary dedicated load profiles5/5 PASS; все заявленные NPC alive/entity-ticking.
+При50 все50 прибыли,25 стреляли,421 native rounds/421 impacts с фиксированных после прибытия
+позиций. Вклад veto/ролей не изолирован. MSPT p95 8,386→12,612ms; AI p95 4,485ms, target2ms
+не достигнут. Baseline не проходил маршрут: это новая работа, не оптимизация. CSV/JFR/source SHA
+сохранены; dedicated reload/save/restart и plain production build/verifier PASS, properties/EULA
+не менялись. Инструкции, команды, длительности, причины, SHA и ручной сценарий:
+[отчёт](ACTION-ROUTES-2026-10-22.md), [evidence](testing/action-routes-validation-2026-10-22.json).
+Human1v1/1v4, distribution launcher, встречные потоки/claim mods, natural chunk edges и soak
+NOT RUN. **WAITING_PLAYTEST**, не ACCEPTED. Push/PR/merge не выполнялись.

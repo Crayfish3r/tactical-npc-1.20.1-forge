@@ -34,6 +34,7 @@ public final class TacticalNpcEntity extends PathfinderMob {
     private net.minecraft.world.scores.Team observedTeam;
     private int initialReserve=120;
     private UUID serviceId=UUID.randomUUID();
+    private String npcName="";
     private double leash=24;
     private Vector3 anchor;
     private boolean initialized;
@@ -69,6 +70,22 @@ public final class TacticalNpcEntity extends PathfinderMob {
     public NpcRuntimeAdapter runtime() { return runtime; }
     public TacticalCombatGoal controller() { return controller; }
     public UUID serviceId() { return serviceId; }
+    public String npcName() { return npcName; }
+    public void assignNpcName(String name) {
+        runtime.requireServer();
+        if(!dev.zuma.tacticalnpc.command.NpcNames.valid(name))throw new IllegalArgumentException("NPC name must start with a Latin letter");
+        npcName=name;setCustomName(net.minecraft.network.chat.Component.literal(name));setCustomNameVisible(true);
+    }
+    @Override public void onAddedToWorld() {
+        super.onAddedToWorld();
+        if(!level().isClientSide)dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).join(this);
+    }
+    @Override public void onRemovedFromWorld() {
+        // Forge also calls this on temporary tracking loss, before actual entity unload.
+        // remove()/dimension removal clear the index; a still-loaded instance keeps its weak handle.
+        if(!level().isClientSide && isRemoved())dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).leave(this);
+        super.onRemovedFromWorld();
+    }
     public AmmoPolicy ammoPolicy() { return ammoPolicy; }
     /** Compatibility getter; there is no independent faction membership. */
     public String faction() { var name=dev.zuma.tacticalnpc.runtime.NpcTeams.name(this);return name==null?"":name; }
@@ -101,6 +118,7 @@ public final class TacticalNpcEntity extends PathfinderMob {
         runtime.requireServer();
         if(standPhase!=StandPhase.COMBAT)return;
         standPhase=StandPhase.NONE;standDamageSource=null;standDamageUntil=0;order=OrderState.Kind.DEFEND_AREA.name();leash=32;
+        dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).update(this);
         if(controller!=null)controller.stop();
     }
     public boolean neutral() { return neutral; }
@@ -141,6 +159,7 @@ public final class TacticalNpcEntity extends PathfinderMob {
         neutral=false;clearRetaliation();
         standPhase=kind==OrderState.Kind.HOLD_POSITION?StandPhase.WAIT:StandPhase.NONE;standDamageSource=null;standDamageUntil=0;
         order=kind.name();leash=radius;anchor=new Vector3(getX(),getY(),getZ());
+        dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).update(this);
         if(standPhase==StandPhase.WAIT)leash=6;
         if(controller!=null) controller.stopForOrderChange();
         getNavigation().stop();
@@ -163,7 +182,7 @@ public final class TacticalNpcEntity extends PathfinderMob {
     // This overrides the method supplied to LivingEntity by TaCZ, without implementing/copying its operator.
     public boolean needCheckAmmo() {
         // Client construction/rendering must not read a server config before Forge synchronization.
-        return ammoPolicy==AmmoPolicy.FINITE && (level().isClientSide || !dev.zuma.tacticalnpc.config.ServerConfig.unfair());
+        return ammoPolicy==AmmoPolicy.FINITE;
     }
     @Override protected void registerGoals() { goalSelector.addGoal(0,new FloatGoal(this)); }
     @Override protected net.minecraft.world.entity.ai.control.BodyRotationControl createBodyControl() {
@@ -188,11 +207,12 @@ public final class TacticalNpcEntity extends PathfinderMob {
         if(controller!=null) { goalSelector.removeGoal(controller); controller.stop(); controller=null; }
         RuntimeRegistry.release(this);
     }
-    @Override public void remove(Entity.RemovalReason reason) { if(!level().isClientSide) release(); super.remove(reason); }
-    @Override protected void removeAfterChangingDimensions() { if(!level().isClientSide) release(); super.removeAfterChangingDimensions(); }
+    @Override public void remove(Entity.RemovalReason reason) { if(!level().isClientSide) {dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).leave(this);release();} super.remove(reason); }
+    @Override protected void removeAfterChangingDimensions() { if(!level().isClientSide) {dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).leave(this);release();} super.removeAfterChangingDimensions(); }
     @Override public void addAdditionalSaveData(CompoundTag root) {
         super.addAdditionalSaveData(root);
-        CompoundTag tag=new CompoundTag(); tag.putInt("schema",5); tag.putUUID("serviceId",serviceId);
+        CompoundTag tag=new CompoundTag(); tag.putInt("schema",6); tag.putUUID("serviceId",serviceId);
+        tag.putString("name",npcName);
         tag.putString("standPhase",standPhase.name());
         tag.putBoolean("neutral",neutral);
         tag.putString("loadout",loadout); tag.putString("order",order);
@@ -208,11 +228,12 @@ public final class TacticalNpcEntity extends PathfinderMob {
     @Override public void readAdditionalSaveData(CompoundTag root) {
         super.readAdditionalSaveData(root);
         CompoundTag tag=root.getCompound("tacticalnpc");
+        npcName=tag.getString("name"); // Decode only; the server admission callback allocates/migrates names.
         if(tag.isEmpty()) return;
         reactiveAttacker=null;reactiveUntil=0;neutral=false;
         pendingLegacyTeam=false;
         standDamageSource=null;standDamageUntil=0;standPhase=StandPhase.NONE;
-        if(tag.getInt("schema")<1 || tag.getInt("schema")>5) {
+        if(tag.getInt("schema")<1 || tag.getInt("schema")>6) {
             removeTag(RuntimeRegistry.TAG); ammoPolicy=AmmoPolicy.FINITE; initialReserve=0;
             dev.zuma.tacticalnpc.TacticalNpcAiMod.LOGGER.warn("NPC {} unsupported NBT schema {}; tactical control disabled",getUUID(),tag.getInt("schema"));
             return;

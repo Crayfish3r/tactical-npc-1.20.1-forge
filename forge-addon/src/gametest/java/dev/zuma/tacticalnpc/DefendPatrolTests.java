@@ -144,7 +144,7 @@ public final class DefendPatrolTests {
         });
         h.runAtTickTime(182,()->{
             loaded[0]=(TacticalNpcEntity)EntityType.loadEntityRecursive(saved,h.getLevel(),e->e);
-            h.assertTrue(loaded[0]!=null && order[0].equals(loaded[0].runtime().orderState()) && saved.getCompound("tacticalnpc").getInt("schema")==5,"schema 5 retains persisted order/anchor/radius");
+            h.assertTrue(loaded[0]!=null && order[0].equals(loaded[0].runtime().orderState()) && saved.getCompound("tacticalnpc").getInt("schema")==6,"schema 6 retains persisted order/anchor/radius");
             loaded[0].setOnGround(true);h.assertTrue(h.getLevel().addFreshEntity(loaded[0]),"saved entity re-added with original UUID");
         });
         h.onEachTick(()->{

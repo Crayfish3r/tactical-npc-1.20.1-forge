@@ -53,7 +53,6 @@ public final class TacticalCombatGoal extends Goal {
     private boolean failed;
     private int previousRounds=-1;
     private boolean previousBusy;
-    private ServerConfig.Difficulty appliedProfile=ServerConfig.DIFFICULTY.get();
     private long nextActivation;
     private int blockedFireTicks;
     private long nextOpportunityScan,nextTargetChange;
@@ -178,7 +177,6 @@ public final class TacticalCombatGoal extends Goal {
     }
     private void combatTick() {
         runtime.requireServer();
-        if(appliedProfile!=ServerConfig.DIFFICULTY.get()){runtime.operator().cancelReload();stop();appliedProfile=ServerConfig.DIFFICULTY.get();}
         runtime.beforeTick();guns.maintain(npc.level().getGameTime());
         long tick=npc.level().getGameTime(); double range=ServerConfig.RANGE.get();
         var neutral=neutralOwner();
@@ -385,6 +383,7 @@ public final class TacticalCombatGoal extends Goal {
         stop(false);
     }
     public void stopForOrderChange(){stop(true);}
+    public void migrateHard(){runtime.requireServer();runtime.operator().cancelReload();stop();}
     private void stop(boolean orderChange) {
         orderPlanner.resetPatrol();
         generation=GENERATIONS.incrementAndGet(); targetId=null; candidateId=null; contact.clear();freshVisible=false;memory.clear();covers.reset(); decision=null;

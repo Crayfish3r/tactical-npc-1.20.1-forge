@@ -1,5 +1,7 @@
 # Tactical NPC AI 0.2.0 — alpha-1 responsiveness slice, 2026-10-11
 
+> Команды в этом датированном отчёте относятся к прежнему интерфейсу. Актуальные команды, постоянный Hard и таблица миграции: [COMMANDS](COMMANDS.md).
+
 Проверки и сведения обновлены 2026-10-12; логи 2026-10-11 сохраняют исходные имена и даты.
 
 Это первый поведенческий alpha-срез, не объявление готовности всей alpha. Minecraft 1.20.1 / Forge 47.4.20 / Microsoft OpenJDK 17.0.19+10 / TaCZ 1.1.8-hotfix2 / optional NPCs 2.1.0. ForgeGradle 6.0.54, Gradle 8.8. Версии и integration architecture сохранены; оба dependency SHA-256 перепроверены и совпадают с INTEGRATION-AUDIT.

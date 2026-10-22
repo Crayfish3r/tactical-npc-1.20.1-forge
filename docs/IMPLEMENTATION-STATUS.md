@@ -2,8 +2,14 @@
 
 Новый срез навигации: [ACTION-ROUTES-2026-10-22](ACTION-ROUTES-2026-10-22.md).
 WALK/OPEN_DOOR/CLIMB_UP/CLIMB_DOWN, native physics/interactions, FIFO narrow leases,
-отдельные статусы ожидания и bounded recovery. Финальные результаты этого среза
-публикуются в его отчёте; прежние боевые receipts ниже остаются историческими.
+отдельные статусы ожидания и bounded recovery. Core936, FULL standalone132/132 PASS;
+combined144/144 покрыты с одиночными повторами после прерывания по запросу владельца,
+нового единого FULL green нет. Dedicated reload/save/restart и plain build/verifier PASS.
+Load50/50 прибытий,25/50 shooters,421 native rounds; MSPT p95 8,386→12,612ms,
+это стоимость новой работы, не performance win; AI2ms при30/50 не достигнут.
+**WAITING_PLAYTEST**. Инструкции согласованы отдельно commit `b57bd49`; навигация
+уже в commit `716200d`; заключительные test-only fixes/evidence остаются рабочим diff.
+Прежние боевые receipts ниже относятся к своим срезам.
 
 Текущий боевой срез: [COMBAT-UPGRADE-2026-10-22](COMBAT-UPGRADE-2026-10-22.md), от чистого `3077098f1338c3c8fdb1f564257fd71f8ea98701`. Detection/hearing128, согласованная память, отдельные preference/falloff/reach, подтверждённое ballistic lead, длительное native pressure, трёхчастный flank route/роли/utility, Hard и явно разрешённый Unfair реализованы без новых зависимостей/Mixins. AGENTS5/9 исключения только для Unfair.
 

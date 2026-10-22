@@ -1,0 +1,60 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.8/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :extractTaczLua
+
+> Task :compileJava
+C:\MCDev\[TACZ] Military NPC\forge-addon\src\main\java\dev\zuma\tacticalnpc\client\NpcClient.java:18: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+        private static final ResourceLocation TEXTURE=new ResourceLocation("minecraft:textures/entity/zombie/zombie.png");
+                                                      ^
+C:\MCDev\[TACZ] Military NPC\forge-addon\src\main\java\dev\zuma\tacticalnpc\compat\GunSupport.java:30: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+            if(!new ResourceLocation("tacz:xmag_reload_logic").equals(data.getScript()) || !auditedReloadScript)
+                ^
+C:\MCDev\[TACZ] Military NPC\forge-addon\src\main\java\dev\zuma\tacticalnpc\compat\GunSupport.java:47: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+            var resource=manager.getResource(new ResourceLocation("tacz:scripts/xmag_reload_logic.lua"));
+                                             ^
+C:\MCDev\[TACZ] Military NPC\forge-addon\src\main\java\dev\zuma\tacticalnpc\debug\DebugCommands.java:150: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+            npc.setItemSlot(EquipmentSlot.MAINHAND,gun(new ResourceLocation("tacz:ak47")));runtime.onEquip(npc.getMainHandItem());npc.addTag(RuntimeRegistry.TAG);
+                                                       ^
+C:\MCDev\[TACZ] Military NPC\forge-addon\src\main\java\dev\zuma\tacticalnpc\debug\DebugCommands.java:233: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+            npc.setItemSlot(EquipmentSlot.MAINHAND,gun(new ResourceLocation("tacz:ak47")));runtime.onEquip(npc.getMainHandItem());npc.addTag(RuntimeRegistry.TAG);
+                                                       ^
+C:\MCDev\[TACZ] Military NPC\forge-addon\src\main\java\dev\zuma\tacticalnpc\TacticalNpcAiMod.java:19: warning: [removal] get() in ModLoadingContext has been deprecated and marked for removal
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
+                         ^
+C:\MCDev\[TACZ] Military NPC\forge-addon\src\main\java\dev\zuma\tacticalnpc\TacticalNpcAiMod.java:20: warning: [removal] get() in FMLJavaModLoadingContext has been deprecated and marked for removal
+        NpcEntities.register(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus());
+                                                                                       ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+7 warnings
+
+> Task :processResources
+> Task :classes
+> Task :compileCompatJava
+> Task :jar
+> Task :processCompatResources
+> Task :compatClasses
+> Task :compatJar
+> Task :downloadMcpConfig
+> Task :extractSrg
+> Task :createMcpToSrg
+> Task :reobfCompatJar
+> Task :reobfJar
+> Task :jarJar SKIPPED
+> Task :reobfJarJar SKIPPED
+> Task :assemble
+> Task :compileTestJava NO-SOURCE
+> Task :processTestResources NO-SOURCE
+> Task :testClasses UP-TO-DATE
+> Task :test NO-SOURCE
+> Task :check UP-TO-DATE
+> Task :build
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.8/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 24s
+12 actionable tasks: 12 executed

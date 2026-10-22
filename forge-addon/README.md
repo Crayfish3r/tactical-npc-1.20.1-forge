@@ -18,3 +18,5 @@ WALK/OPEN_DOOR/CLIMB_UP/CLIMB_DOWN: серверные взаимодейств�
 [ACTION-ROUTES](../docs/ACTION-ROUTES-2026-10-22.md).
 
 `-Pprofile runServer` — отдельный синтетический benchmark world в run/profile; `-PprofileQuick` оставляет combat 30/50. Для исходного контроллера добавьте `-PprofileLegacy -PlegacyCompatibility`: test-only task устанавливает минимальные factions/loadouts в **run/profile/config**, чтобы исходные goals сами выбирали survival dummy. Эти fixtures не распространяются в production JAR и не изменяют configs игрового мира. Методика и ограничения: [PROFILE-REPORT](../docs/PROFILE-REPORT-2026-10-11.md). После обычной сборки `tools/verify-production-artifacts.py` проверяет Java 17, отсутствие тестов/вложенных зависимостей и NPCs-ссылок в основном JAR.
+
+Пользовательские команды объединены под `/npc`: [справочник и миграция](../docs/COMMANDS.md). Постоянные имена, явные цели и Hard включаются без optional NPCs.

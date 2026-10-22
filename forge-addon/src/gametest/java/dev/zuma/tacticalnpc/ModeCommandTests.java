@@ -26,124 +26,110 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 @PrefixGameTestTemplate(false)
 public final class ModeCommandTests {
-    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="mode-01-aliases",timeoutTicks=60)
-    public static void aliasesShareStatePersistenceAndInvalidation(GameTestHelper h) {
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="mode-unified-state",timeoutTicks=55)
+    public static void aliasesShareStatePersistenceAndInvalidation(GameTestHelper h){
         ScenarioIsolation.begin(h);var n=npc(h,3.5,7.5);
         var stack=GunSupport.create(new ResourceLocation("tacz:ak47"));var gun=IGun.getIGunOrNull(stack);
-        gun.setCurrentAmmoCount(stack,5);gun.setBulletInBarrel(stack,true);
-        n.setItemSlot(EquipmentSlot.MAINHAND,stack);n.runtime().onEquip(stack);
+        gun.setCurrentAmmoCount(stack,5);gun.setBulletInBarrel(stack,true);n.setItemSlot(EquipmentSlot.MAINHAND,stack);n.runtime().onEquip(stack);
         n.setAmmoPolicy(TacticalNpcEntity.AmmoPolicy.FINITE,17);n.addTag(RuntimeRegistry.TAG);
         h.runAtTickTime(10,()->{
-            var source=console(h);String id=n.getUUID().toString();var controller=n.controller();
-            h.assertTrue(controller!=null && controller.decision()!=null,"existing single controller active");
+            var source=console(h);String name=n.npcName();var controller=n.controller();
+            dev.zuma.tacticalnpc.config.ServerConfig.STRAFE.set(.22);
+            h.assertTrue(controller!=null && controller.decision()!=null,"single controller active");
             var dest=h.absoluteVec(new Vec3(11.5,2,7.5));
-            h.assertTrue(n.getNavigation().moveTo(dest.x,dest.y,dest.z,1) && !n.getNavigation().isDone(),"real old navigation exists");
+            h.assertTrue(n.getNavigation().moveTo(dest.x,dest.y,dest.z,1),"real navigation exists");
             long generation=controller.generation(),cooldown=n.runtime().operator().getSynShootCoolDown();
             int rounds=gun.getCurrentAmmoCount(stack),reserve=gun.getDummyAmmoAmount(stack);boolean chamber=gun.hasBulletInBarrel(stack);
-            run(h,source,"tacticalnpc order "+id+" ASSAULT 19");var assault=n.runtime().orderState();
-            run(h,source,"npc mode attack "+id);h.assertTrue(assault.equals(n.runtime().orderState()),"attack is the same ASSAULT/order/anchor/radius");
-            h.assertTrue(controller.generation()>generation && controller.decision()==null && n.getNavigation().isDone(),"old decisions and actual path invalidated");
-            run(h,source,"tacticalnpc order "+id+" DEFEND_AREA 12");var defend=n.runtime().orderState();
-            run(h,source,"npc mode defend 12 "+id);h.assertTrue(defend.equals(n.runtime().orderState()),"defend shares legacy DEFEND_AREA state");
-            run(h,source,"tacticalnpc order "+id+" HOLD_POSITION 27");var stand=n.runtime().orderState();
-            run(h,source,"npc mode stand "+id);h.assertTrue(stand.equals(n.runtime().orderState()) && stand.radius()==6,"stand and HOLD_POSITION share fixed combat radius 6");
-            h.assertTrue(gun.getCurrentAmmoCount(stack)==rounds && gun.getDummyAmmoAmount(stack)==reserve && gun.hasBulletInBarrel(stack)==chamber && n.runtime().operator().getSynShootCoolDown()==cooldown,"mode/order commands preserve native magazine/reserve/chamber/cooldown");
-            h.assertTrue(n.controller()==controller,"aliases do not install a second controller");
-            run(h,source,"tacticalnpc order "+id+" PATROL 9");h.assertTrue(n.runtime().orderState().kind()==OrderState.Kind.PATROL,"PATROL remains independent");
-            run(h,source,"npc mode defend 14 "+id);var expected=n.runtime().orderState();
-            var saved=new CompoundTag();n.save(saved);
-            h.assertTrue(saved.getCompound("tacticalnpc").getInt("schema")==5 && !saved.getCompound("tacticalnpc").contains("mode"),"schema 5 persists stand phase without duplicating the order/mode source of truth");
-            var restored=(TacticalNpcEntity)EntityType.loadEntityRecursive(saved,h.getLevel(),e->e);
-            h.assertTrue(restored!=null && expected.equals(restored.runtime().orderState()) && n.serviceId().equals(restored.serviceId()),"new command mode persists via actual entity save/load");
-            n.discard();restored.discard();h.succeed();
+            run(h,source,"npc mode "+name.toLowerCase(java.util.Locale.ROOT)+" assault");
+            h.assertTrue(n.order().equals("ASSAULT") && controller.generation()>generation && controller.decision()==null && n.getNavigation().isDone(),"name command invalidates actual path and decisions");
+            run(h,source,"npc mode "+name+" stand");h.assertTrue(n.standPhase()==TacticalNpcEntity.StandPhase.WAIT && n.runtime().orderState().radius()==6,"fixed STAND phase");
+            run(h,source,"npc mode "+name+" patrol 9");h.assertTrue(n.runtime().orderState().kind()==OrderState.Kind.PATROL,"PATROL remains distinct");
+            run(h,source,"npc mode "+name+" defend 128");var expected=n.runtime().orderState();
+            h.assertTrue(expected.anchor().equals(new dev.zuma.tacticalnpc.core.Vector3(n.getX(),n.getY(),n.getZ())),"anchor is recipient position");
+            h.assertTrue(dev.zuma.tacticalnpc.config.ServerConfig.STRAFE.get()==.22,"NPC management never resets serverconfig");
+            h.assertTrue(n.controller()==controller && gun.getCurrentAmmoCount(stack)==rounds && gun.getDummyAmmoAmount(stack)==reserve && gun.hasBulletInBarrel(stack)==chamber && n.runtime().operator().getSynShootCoolDown()==cooldown,"orders preserve native ammo/cooldown and controller ownership");
+            var saved=new CompoundTag();n.save(saved);var restored=(TacticalNpcEntity)EntityType.loadEntityRecursive(saved,h.getLevel(),e->e);
+            h.assertTrue(saved.getCompound("tacticalnpc").getInt("schema")==6 && restored!=null && expected.equals(restored.runtime().orderState()) && name.equals(restored.npcName()) && n.serviceId().equals(restored.serviceId()),"schema6 persists name, service identity and existing state");
+            restored.discard();h.assertTrue(run(h,source,"npc info "+name)==1,"unadmitted NBT clone cannot evict original loaded index");
+            n.discard();h.succeed();
         });
     }
-
-    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="mode-02-targets",timeoutTicks=60)
-    public static void validateWholeBatchBeforeMutationAndRequireConsoleTargets(GameTestHelper h) {
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="mode-unified-atomic",timeoutTicks=50)
+    public static void validateWholeBatchBeforeMutationAndRequireConsoleTargets(GameTestHelper h){
         ScenarioIsolation.begin(h);var a=npc(h,3.5,7.5);var b=npc(h,10.5,10.5);
         var at=h.absoluteVec(new Vec3(8.5,2,7.5));var other=new ArmorStand(h.getLevel(),at.x,at.y,at.z);h.getLevel().addFreshEntity(other);
         a.addTag("mode-batch");b.addTag("mode-batch");other.addTag("mode-batch");
         h.runAtTickTime(10,()->{
             var source=console(h);var oldA=a.runtime().orderState();var oldB=b.runtime().orderState();
-            reject(h,source,"npc mode attack @e[tag=mode-batch]");
-            h.assertTrue(oldA.equals(a.runtime().orderState()) && oldB.equals(b.runtime().orderState()),"mixed unsupported batch changes no valid recipients");
-            reject(h,source,"npc mode defend 3 "+a.getUUID());reject(h,source,"npc mode defend 129 "+a.getUUID());
-            reject(h,source,"npc mode defend NaN "+a.getUUID());reject(h,source,"npc mode attack "+UUID.randomUUID());
-            h.assertTrue(oldA.equals(a.runtime().orderState()),"invalid radius/targets do not mutate state");
-            for(String text:new String[]{"npc mode attack","npc mode defend 16","npc mode stand"})
-                h.assertTrue(reject(h,source,text).contains("targets"),"console without targets has explicit actionable error");
-            h.assertTrue(run(h,source,"npc mode defend 16 @e[type=tacticalnpcai:npc,tag=mode-batch]")==2,"console selector affects both supported NPCs");
-            h.assertTrue(a.runtime().orderState().kind()==OrderState.Kind.DEFEND_AREA && b.runtime().orderState().radius()==16,"batch uses existing order state on each entity");
-            if(net.minecraftforge.fml.ModList.get().isLoaded("tacznpcs")) {
-                var legacy=RuntimeRegistry.createLegacy(h.getLevel()).entity();legacy.moveTo(at.x,at.y,at.z);h.getLevel().addFreshEntity(legacy);
-                legacy.addTag("mode-batch");var before=a.runtime().orderState();
-                reject(h,source,"npc mode stand "+legacy.getUUID());
-                reject(h,source,"npc mode stand @e[tag=mode-batch,type=!minecraft:armor_stand]");
-                h.assertTrue(before.equals(a.runtime().orderState()),"optional legacy is rejected before mutating independent recipients");legacy.discard();
+            for(String cmd:new String[]{"npc mode @e[tag=mode-batch] assault","npc ammo @e[tag=mode-batch] finite 99","npc equip @e[tag=mode-batch] tacz:glock_17","npc info @e[tag=mode-batch]"})reject(h,source,cmd);
+            for(String tail:new String[]{"defend 3","defend 129","defend NaN","patrol 65","assault 10","stand 10"})reject(h,source,"npc mode "+a.npcName()+" "+tail);
+            for(String value:new String[]{"0","129","-1","NaN","Infinity","32","UnknownName"})reject(h,source,"npc mode "+value+" assault");
+            for(String cmd:new String[]{"npc mode assault","npc mode stand","npc info","npc team red"})reject(h,source,cmd);
+            h.assertTrue(oldA.equals(a.runtime().orderState()) && oldB.equals(b.runtime().orderState()) && a.ammoPolicy()==TacticalNpcEntity.AmmoPolicy.INFINITE && a.getMainHandItem().isEmpty(),"all invalid batches/arguments leave recipients unchanged");
+            h.assertTrue(run(h,source,"npc mode @e[type=tacticalnpcai:npc,tag=mode-batch] defend 16")==2,"explicit console selector works");
+            h.assertTrue(!a.runtime().orderState().anchor().equals(b.runtime().orderState().anchor()),"each NPC has its own anchor");
+            if(net.minecraftforge.fml.ModList.get().isLoaded("tacznpcs")){
+                var legacy=RuntimeRegistry.createLegacy(h.getLevel()).entity();legacy.moveTo(at.x,at.y,at.z);h.getLevel().addFreshEntity(legacy);legacy.addTag("mode-batch");
+                reject(h,source,"npc mode @e[tag=mode-batch,type=!minecraft:armor_stand] stand");legacy.discard();
             }
             a.discard();b.discard();other.discard();h.succeed();
         });
     }
-
-    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="mode-03-permission",timeoutTicks=50)
-    public static void permissionSuggestionsAndOldCommandSurface(GameTestHelper h) {
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="mode-unified-permissions",timeoutTicks=50)
+    public static void permissionSuggestionsAndOldCommandSurface(GameTestHelper h){
         ScenarioIsolation.begin(h);var n=npc(h,3.5,7.5);
         h.runAtTickTime(10,()->{
-            var source=console(h).withPermission(2);var dispatcher=h.getLevel().getServer().getCommands().getDispatcher();
-            reject(h,source.withPermission(1),"npc mode attack "+n.getUUID());
-            reject(h,source.withPermission(1),"tacticalnpc order "+n.getUUID()+" ASSAULT 24");
-            h.assertTrue(n.order().equals("HOLD_POSITION"),"permission 1 cannot mutate either interface");
-            run(h,source,"npc mode attack "+n.getUUID());h.assertTrue(n.order().equals("ASSAULT"),"permission 2 is sufficient");
-            var modes=dispatcher.getCompletionSuggestions(dispatcher.parse("npc mode ",source)).join().getList().stream().map(s->s.getText()).toList();
-            h.assertTrue(modes.containsAll(java.util.List.of("attack","defend","stand")),"mode suggestions expose all three literals");
-            var root=dispatcher.getRoot().getChild("tacticalnpc");
-            for(String name:new String[]{"spawn","spawnlegacy","order","equip","ammo","faction","squad","hard","diagnostics"})
-                h.assertTrue(root.getChild(name)!=null,"old command remains registered: "+name);
-            var orders=dispatcher.getCompletionSuggestions(dispatcher.parse("tacticalnpc order "+n.getUUID()+" ",source)).join().getList().stream().map(s->s.getText()).toList();
-            h.assertTrue(orders.containsAll(java.util.List.of("ASSAULT","DEFEND_AREA","HOLD_POSITION","PATROL")),"old order suggestions including PATROL remain");
+            var source=console(h).withPermission(2);var d=h.getLevel().getServer().getCommands().getDispatcher();
+            for(String text:new String[]{"npc help","npc spawn","npc list","npc info "+n.npcName(),"npc mode "+n.npcName()+" assault","npc team "+n.npcName()+" red","npc equip "+n.npcName()+" tacz:ak47","npc ammo "+n.npcName()+" finite 1","npc debug diagnostics"})reject(h,source.withPermission(1),text);
+            h.assertTrue(n.order().equals("HOLD_POSITION"),"permission1 changes nothing");
+            h.assertTrue(d.getRoot().getChild("tacticalnpc")==null && (d.getRoot().getChild("spawn")==null || d.getRoot().getChild("spawn").getChild("npc")==null),"removed root/alias registrations absent");
+            for(String text:new String[]{"npc order","npc faction","npc squad","npc hard","npc unfair","tacticalnpc hard","tacticalnpc unfair","spawn npc"})reject(h,source,text);
+            h.assertTrue(suggestions(d,source,"npc ").containsAll(java.util.List.of("help","spawn","list","info","mode","team","equip","ammo","debug")),"sections complete");
+            h.assertTrue(suggestions(d,source,"npc mode "+n.npcName()+" ").containsAll(java.util.List.of("assault","defend","patrol","stand")),"four modes complete");
+            h.assertTrue(suggestions(d,source,"npc info "+n.npcName().substring(0,1)).contains(n.npcName()),"names complete");
+            h.assertTrue(suggestions(d,source,"npc equip "+n.npcName()+" tacz:").contains("tacz:ak47"),"loaded weapon IDs complete");
+            h.assertTrue(suggestions(d,source,"npc mode @e[ty").contains("type="),"vanilla selector options complete");
+            h.assertTrue(net.minecraft.commands.synchronization.ArgumentTypeInfos.isClassRecognized(dev.zuma.tacticalnpc.command.NpcTargetArgument.class),"target argument has client command-tree serialization");
+            var buffer=new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
+            try{
+                @SuppressWarnings("unchecked") var sharedTree=(com.mojang.brigadier.tree.RootCommandNode<net.minecraft.commands.SharedSuggestionProvider>)(com.mojang.brigadier.tree.RootCommandNode<?>)d.getRoot();
+                new net.minecraft.network.protocol.game.ClientboundCommandsPacket(sharedTree).write(buffer);
+                var tree=new net.minecraft.network.protocol.game.ClientboundCommandsPacket(buffer).getRoot(net.minecraft.commands.CommandBuildContext.simple(h.getLevel().getServer().registryAccess(),net.minecraft.world.flag.FeatureFlags.DEFAULT_FLAGS));
+                var target=(com.mojang.brigadier.tree.ArgumentCommandNode<net.minecraft.commands.SharedSuggestionProvider,?>)tree.getChild("npc").getChild("mode").getChild("targets");
+                int[] requests={0};
+                var client=(net.minecraft.commands.SharedSuggestionProvider)java.lang.reflect.Proxy.newProxyInstance(net.minecraft.commands.SharedSuggestionProvider.class.getClassLoader(),new Class<?>[]{net.minecraft.commands.SharedSuggestionProvider.class},(proxy,method,args)->{
+                    if(method.getName().equals("customSuggestion")){requests[0]++;return com.mojang.brigadier.suggestion.Suggestions.empty();}
+                    throw new UnsupportedOperationException(method.getName());
+                });
+                h.assertTrue(target.getCustomSuggestions()!=null,"serialized client target has a suggestion provider");
+                var clientDispatcher=new com.mojang.brigadier.CommandDispatcher<net.minecraft.commands.SharedSuggestionProvider>(tree);
+                var clientContext=new com.mojang.brigadier.context.CommandContextBuilder<>(clientDispatcher,client,tree,0).build("npc mode ");
+                try{target.getCustomSuggestions().getSuggestions(clientContext,new com.mojang.brigadier.suggestion.SuggestionsBuilder("npc mode ",9)).join();}
+                catch(CommandSyntaxException ex){h.fail(ex.toString());}
+                h.assertTrue(requests[0]==1,"actual serialized client tree requests server NPC name completions");
+            }finally{buffer.release();}
+            run(h,source,"npc mode "+n.npcName()+" assault");run(h,source,"npc help");run(h,source,"npc list 1");reject(h,source,"npc list 1000000");
             n.discard();h.succeed();
         });
     }
-
-    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="mode-04-aim",timeoutTicks=50)
-    public static void aimSelectsHitInsteadOfNearestAndRespectsWall(GameTestHelper h) {
-        ScenarioIsolation.begin(h);var near=npc(h,5.5,10.5);var hit=npc(h,11.5,7.5);var player=player(h);
+    private static java.util.List<String> suggestions(com.mojang.brigadier.CommandDispatcher<CommandSourceStack> d,CommandSourceStack source,String text){return d.getCompletionSuggestions(d.parse(text,source)).join().getList().stream().map(s->s.getText()).toList();}
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="mode-unified-radius",timeoutTicks=50)
+    public static void radiusUsesSphericalPositionsAcrossTeamsWithoutAim(GameTestHelper h){
+        ScenarioIsolation.begin(h);var a=npc(h,6.5,7.5);var b=npc(h,7.5,7.5);var corner=npc(h,6.5,10.5);var edge=npc(h,7.6,7.5);var p=player(h);
+        dev.zuma.tacticalnpc.runtime.NpcTeams.assign(a,"red");dev.zuma.tacticalnpc.runtime.NpcTeams.assign(b,"blue");
         h.runAtTickTime(10,()->{
-            var source=player.createCommandSourceStack().withPermission(2).withSuppressedOutput();
-            run(h,source,"npc mode attack");
-            h.assertTrue(hit.order().equals("ASSAULT") && near.order().equals("HOLD_POSITION"),"aim selects farther intersected NPC, not closer off-axis NPC");
-            for(int y=2;y<7;y++)h.setBlock(new BlockPos(7,y,7),Blocks.STONE);
-            reject(h,source,"npc mode stand");h.assertTrue(hit.order().equals("ASSAULT"),"wall blocks command selection");
-            for(int y=2;y<7;y++)h.setBlock(new BlockPos(7,y,7),Blocks.AIR);
-            player.setYRot(90);player.setYHeadRot(90);player.setXRot(0);reject(h,source,"npc mode defend 16");
-            h.assertTrue(near.order().equals("HOLD_POSITION") && hit.order().equals("ASSAULT"),"empty aim has no nearest fallback");
-            near.discard();hit.discard();player.discard();h.succeed();
+            p.moveTo(a.getX()-3,a.getY(),a.getZ(),90,0); // Face away; use exact current feet height.
+            for(int y=2;y<7;y++)h.setBlock(new BlockPos(5,y,7),Blocks.STONE);
+            var source=p.createCommandSourceStack().withPermission(2).withSuppressedOutput();
+            h.assertTrue(run(h,source,"npc mode 4 defend 12")==2,"radius includes all teams and inclusive boundary, excludes AABB corner and overlapping edge");
+            h.assertTrue(a.order().equals("DEFEND_AREA") && b.order().equals("DEFEND_AREA") && corner.order().equals("HOLD_POSITION") && edge.order().equals("HOLD_POSITION"),"distance is to NPC feet position, not body intersection");
+            h.assertTrue(run(h,source,"npc team 4 green")==2 && p.getTeam()==null,"radius never includes player");
+            h.assertTrue(run(h,source,"npc ammo 4 finite 17")==2 && run(h,source,"npc equip 4 tacz:glock_17")==2 && run(h,source,"npc info 4")==2,"all operations share radius resolver");
+            for(String value:new String[]{"0","128.1","129","-2","NaN"})reject(h,source,"npc mode "+value+" assault");
+            run(h,source,"npc mode "+corner.npcName()+" patrol 64");h.assertTrue(corner.order().equals("PATROL"),"name ignores wall, facing and selection distance");
+            a.discard();b.discard();corner.discard();edge.discard();p.discard();h.succeed();
         });
     }
-
-    @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="mode-05-range",timeoutTicks=50)
-    public static void aimRangeAndUnsupportedFrontEntity(GameTestHelper h) {
-        ScenarioIsolation.begin(h);var n=npc(h,38.5,7.5);var player=player(h);
-        h.runAtTickTime(10,()->{
-            var origin=h.absoluteVec(new Vec3(3.5,2,7.5));
-            player.moveTo(origin.x,origin.y,origin.z,-90,0);player.setYHeadRot(-90);player.setYBodyRot(-90);player.setXRot(0);
-            var source=player.createCommandSourceStack().withPermission(2).withSuppressedOutput();
-            reject(h,source,"npc mode attack");h.assertTrue(n.order().equals("HOLD_POSITION"),"35-block target is outside aim range");
-            var at=h.absoluteVec(new Vec3(34.5,2,7.5));n.moveTo(at.x,at.y,at.z);
-            var eye=player.getEyePosition();var end=eye.add(player.getViewVector(1).scale(32));
-            var block=h.getLevel().clip(new net.minecraft.world.level.ClipContext(eye,end,net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,player));
-            h.assertTrue(n.getBoundingBox().clip(eye,end).isPresent(),"31-block fixture intersects aim: eye="+eye+" end="+end+" body="+n.getBoundingBox());
-            h.assertTrue(block.getType()==net.minecraft.world.phys.HitResult.Type.MISS,"31-block fixture has real block LOS: "+block.getBlockPos()+" type="+h.getLevel().getBlockState(block.getBlockPos()));
-            h.assertTrue(h.getLevel().getEntities(player,new net.minecraft.world.phys.AABB(eye,end).inflate(1)).contains(n),"31-block fixture is in native spatial index; npcTicks="+n.tickCount+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition()));
-            run(h,source,"npc mode defend 4");h.assertTrue(n.order().equals("DEFEND_AREA") && n.runtime().orderState().radius()==4,"31-block target and minimum defend radius accepted");
-            run(h,source,"npc mode defend 64");h.assertTrue(n.runtime().orderState().radius()==64,"64-block defend radius remains accepted");
-            var front=h.absoluteVec(new Vec3(6.5,2,7.5));var stand=new ArmorStand(h.getLevel(),front.x,front.y,front.z);h.getLevel().addFreshEntity(stand);
-            reject(h,source,"npc mode attack");h.assertTrue(n.order().equals("DEFEND_AREA"),"unsupported entity under crosshair does not select NPC behind it");
-            stand.discard();n.discard();player.discard();h.succeed();
-        });
-    }
-
     private static TacticalNpcEntity npc(GameTestHelper h,double x,double z) {
         var n=NpcEntities.NPC.get().create(h.getLevel());var at=h.absoluteVec(new Vec3(x,2,z));
         n.moveTo(at.x,at.y,at.z);n.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);h.getLevel().addFreshEntity(n);return n;

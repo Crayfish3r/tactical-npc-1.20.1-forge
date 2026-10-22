@@ -41,7 +41,7 @@ public final class WeaponSnapshotTests {
             long drawClock=operator.getDataHolder().drawTimestamp;
             try {
                 var source=h.getLevel().getServer().createCommandSourceStack().withLevel(h.getLevel()).withPermission(2).withSuppressedOutput();
-                h.assertTrue(h.getLevel().getServer().getCommands().getDispatcher().execute("tacticalnpc equip "+n.getUUID()+" tacz:glock_17",source)==1,"actual equip command succeeds");
+                h.assertTrue(h.getLevel().getServer().getCommands().getDispatcher().execute("npc equip "+n.npcName()+" tacz:glock_17",source)==1,"actual equip command succeeds");
             } catch(com.mojang.brigadier.exceptions.CommandSyntaxException ex){throw new IllegalStateException(ex);}
             var replacement=n.getMainHandItem();
             h.assertTrue(operator.getDataHolder().drawTimestamp==drawClock,"equip command leaves the single draw to tick maintenance");

@@ -38,15 +38,19 @@ public final class IndependentNpcTests {
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="own-02-combat",timeoutTicks=320)
     public static void combatSmoke(GameTestHelper h) {
         dev.zuma.tacticalnpc.config.ServerConfig.DEBUG.set(true);
-        var npc=spawn(h,"ak47",0,false); var p=player(h); wall(h,true);
+        var npc=spawn(h,"ak47",0,false); var p=player(h);
+        // Leave the four-block retreat inside this fixture's materialized floor.
+        // An x=3.5 origin sent it to x=-.5, into unrelated generated terrain.
+        var origin=h.absoluteVec(new Vec3(6.5,2,7.5));npc.moveTo(origin.x,origin.y,origin.z,-90,0);npc.setYHeadRot(-90);
+        var target=h.absoluteVec(new Vec3(14.5,2,7.5));p.moveTo(target.x,target.y,target.z);wall(h,true);
         h.runAtTickTime(25,()->h.assertTrue(npc.runtime().operator().getDataHolder().reloadStateType.isReloading() && npc.controller().shots()==0,"reload behind wall without firing"));
         h.runAtTickTime(105,()->{h.assertTrue(npc.controller().reloads()==1,"one accepted reload"); npc.setYRot(-90);npc.setYHeadRot(-90);npc.getLookControl().setLookAt(p,10,10);wall(h,false);});
         h.runAtTickTime(106,()->h.assertTrue(npc.controller().shots()==0,"perception/reaction protects first tick of newly visible player"));
         h.runAtTickTime(190,()->{
-            h.assertTrue(npc.position().subtract(h.absoluteVec(new Vec3(3.5,2,7.5))).horizontalDistance()>.25,"independent strafe really moves horizontally: pos="+npc.position()+" ticks="+npc.tickCount+" ground="+npc.onGround()+" decision="+npc.controller().decision()+" movement="+npc.controller().movementDiagnostics());
+            h.assertTrue(npc.position().subtract(origin).horizontalDistance()>.25,"independent strafe really moves horizontally: pos="+npc.position()+" origin="+origin+" ticks="+npc.tickCount+" ground="+npc.onGround()+" decision="+npc.controller().decision()+" movement="+npc.controller().movementDiagnostics());
             h.assertTrue(npc.controller().shots()>=2 && ProjectileProbe.count(npc.getUUID())>=2,"real TaCZ projectiles on own entity: requests="+npc.controller().shots()+" bullets="+ProjectileProbe.count(npc.getUUID())+" at="+npc.position()+" decision="+npc.controller().decision()+" observation="+npc.controller().observation());
             long shots=npc.controller().shots(); int bullets=ProjectileProbe.count(npc.getUUID()); long generation=npc.controller().generation();
-            Vec3 reset=h.absoluteVec(new Vec3(3.5,2,7.5));npc.moveTo(reset.x,reset.y,reset.z,npc.getYRot(),npc.getXRot());npc.setDeltaMovement(Vec3.ZERO);
+            npc.moveTo(origin.x,origin.y,origin.z,npc.getYRot(),npc.getXRot());npc.setDeltaMovement(Vec3.ZERO);
             wall(h,true);
             h.assertTrue(h.getLevel().clip(new net.minecraft.world.level.ClipContext(npc.getEyePosition(),new dev.zuma.tacticalnpc.combat.VisibilitySensor().aimPoint(p),net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,npc)).getType()!=net.minecraft.world.phys.HitResult.Type.MISS,"wall fixture physically separates both actors");
             h.runAtTickTime(205,()->{

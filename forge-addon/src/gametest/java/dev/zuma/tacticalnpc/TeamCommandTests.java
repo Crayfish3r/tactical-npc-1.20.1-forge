@@ -18,8 +18,8 @@ public final class TeamCommandTests {
     public static void twoCommandsCreateArmedOpposingTeamsWithSafePlacement(GameTestHelper h){
         ScenarioIsolation.begin(h);h.runAtTickTime(5,()->{
             var source=source(h,22.5,32.5);
-            h.assertTrue(run(h,source,"spawn npc team \"Красная команда\" count 4")==4,"one command creates four red NPCs");
-            h.assertTrue(run(h,source(h,42.5,32.5),"tacticalnpc spawn team blue count 4")==4,"old alias shares new group spawn");
+            h.assertTrue(run(h,source,"npc spawn team \"РљСЂР°СЃРЅР°СЏ РєРѕРјР°РЅРґР°\" count 4")==4,"one command creates four red NPCs");
+            h.assertTrue(run(h,source(h,42.5,32.5),"npc spawn team blue count 4")==4,"new root creates second group");
             var all=npcs(h);h.assertTrue(all.size()==8,"exactly two groups of four");
             for(var n:all){
                 h.assertTrue(!n.neutral() && n.order().equals("ASSAULT") && n.getTags().contains(RuntimeRegistry.TAG),"spawn is active attack without another command");
@@ -35,37 +35,29 @@ public final class TeamCommandTests {
     public static void permissionCountAndInvalidNamesDoNotCreateAnything(GameTestHelper h){
         ScenarioIsolation.begin(h);h.runAtTickTime(5,()->{
             var source=source(h,32.5,32.5);
-            reject(h,source.withPermission(1),"spawn npc team red count 4");reject(h,source,"spawn npc count 0");reject(h,source,"spawn npc count 17");
-            h.assertTrue(run(h,source,"spawn npc team \"   \"")==0,"blank name rejected before creation");
-            h.assertTrue(run(h,source,"spawn npc team "+"x".repeat(65))==0,"long name rejected before creation");
+            reject(h,source.withPermission(1),"npc spawn team red count 4");reject(h,source,"npc spawn count 0");reject(h,source,"npc spawn count 17");
+            h.assertTrue(run(h,source,"npc spawn team \"   \"")==0,"blank name rejected before creation");
+            h.assertTrue(run(h,source,"npc spawn team "+"x".repeat(65))==0,"long name rejected before creation");
             reject(h,source,"npc team red");reject(h,source,"npc info");
             h.assertTrue(npcs(h).isEmpty() && h.getLevel().getScoreboard().getPlayerTeam("red")==null,"invalid commands leave entities and teams untouched");h.succeed();
         });
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="team-command-03-selection",timeoutTicks=50)
-    public static void aimedNpcExplicitPlayerAndAtomicMixedSelector(GameTestHelper h){
+    public static void namedNpcExplicitPlayerAndAtomicMixedSelector(GameTestHelper h){
         ScenarioIsolation.begin(h);var n=NpcEntities.NPC.get().create(h.getLevel());var at=h.absoluteVec(new Vec3(32.5,2,32.5));n.moveTo(at.x,at.y,at.z);n.setNoAi(true);h.getLevel().addFreshEntity(n);
-        var p=net.minecraftforge.common.util.FakePlayerFactory.get(h.getLevel(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"team-cmd-player"));p.setGameMode(GameType.CREATIVE);p.moveTo(at.x,at.y,at.z-4,0,0);h.getLevel().addNewPlayer(p);
-        var otherPlayer=new net.minecraftforge.common.util.FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"team-aim-player"));otherPlayer.setGameMode(GameType.CREATIVE);otherPlayer.moveTo(at.x+2,at.y,at.z);h.getLevel().addNewPlayer(otherPlayer);
+        var p=new net.minecraftforge.common.util.FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"team-cmd-player"));p.setGameMode(GameType.CREATIVE);p.moveTo(at.x,at.y,at.z-4,0,0);h.getLevel().addNewPlayer(p);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.moveTo(at.x+8,at.y,at.z);mob.setNoAi(true);h.getLevel().addFreshEntity(mob);n.addTag("team-mixed");mob.addTag("team-mixed");
         h.runAtTickTime(8,()->{
-            System.out.println("TEAM_AIM_FIXTURE npcY="+n.getY()+" playerYBefore="+p.getY());
-            // Explicit live position and head/body yaw avoid relying on FakePlayer's initial pose.
-            p.moveTo(n.getX()-4,n.getY(),n.getZ(),-90,0);p.setYHeadRot(-90);p.setYBodyRot(-90);p.setXRot(0);
             var source=p.createCommandSourceStack().withPermission(2).withSuppressedOutput();
-            h.assertTrue(run(h,source,"npc team red")==1 && n.faction().equals("red"),"no targets selects aimed NPC");
-            h.assertTrue(run(h,source,"npc team red @s")==1 && n.runtime().allied(p),"explicit player joins same native team");
-            reject(h,source.withPermission(1),"npc team blue @s");
-            reject(h,source,"npc team blue @e[tag=team-mixed]");h.assertTrue(n.faction().equals("red"),"mixed selector does not partially change NPC");
+            h.assertTrue(run(h,source,"npc team "+n.npcName()+" red")==1 && n.faction().equals("red"),"explicit NPC name");
+            h.assertTrue(run(h,source,"npc team @s red")==1 && n.runtime().allied(p),"explicit player joins same native team");
+            reject(h,source.withPermission(1),"npc team @s blue");
+            reject(h,source,"npc team @e[tag=team-mixed] blue");h.assertTrue(n.faction().equals("red"),"mixed selector is atomic");
             long draw=n.runtime().operator().getDataHolder().drawTimestamp;
-            h.assertTrue(run(h,source,"npc info")==1 && draw==n.runtime().operator().getDataHolder().drawTimestamp,"info reads selected NPC without native draw");
-            h.assertTrue(run(h,source,"npc team clear")==1 && n.getTeam()==null && n.runtime().squadId()==null,"clear leaves independent NPC");
-            p.moveTo(n.getX()+4,n.getY(),n.getZ(),90,0);p.setYHeadRot(90);p.setYBodyRot(90);
-            reject(h,p.createCommandSourceStack().withPermission(2).withSuppressedOutput(),"npc team blue");
-            h.assertTrue(otherPlayer.getTeam()==null && n.getTeam()==null,"player in crosshair requires explicit targets; NPC behind is not a fallback");
-            p.setYRot(-90);p.setYHeadRot(-90);p.setYBodyRot(-90);
-            reject(h,p.createCommandSourceStack().withPermission(2).withSuppressedOutput(),"npc team blue");
-            NpcTeams.assign(p,null);n.discard();p.discard();otherPlayer.discard();mob.discard();h.succeed();
+            h.assertTrue(run(h,source,"npc info "+n.npcName())==1 && draw==n.runtime().operator().getDataHolder().drawTimestamp,"info never draws");
+            h.assertTrue(run(h,source,"npc team "+n.npcName()+" clear")==1 && n.getTeam()==null && n.runtime().squadId()==null,"clear removes membership");
+            reject(h,source,"npc team blue");reject(h,source,"npc info");
+            NpcTeams.assign(p,null);n.discard();p.discard();mob.discard();h.succeed();
         });
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="team-command-04-partial",timeoutTicks=45)
@@ -73,7 +65,7 @@ public final class TeamCommandTests {
         ScenarioIsolation.begin(h);for(int x=16;x<=48;x++)for(int z=16;z<=48;z++)h.setBlock(new BlockPos(x,1,z),Blocks.MAGMA_BLOCK);
         h.setBlock(new BlockPos(28,1,32),Blocks.STONE);
         h.runAtTickTime(5,()->{
-            h.assertTrue(run(h,source(h,32.5,32.5),"spawn npc team partial count 4")==1,"only one safe position creates one NPC");
+            h.assertTrue(run(h,source(h,32.5,32.5),"npc spawn team partial count 4")==1,"only one safe position creates one NPC");
             var all=npcs(h);h.assertTrue(all.size()==1,"no extra or overlapping bodies");
             h.assertTrue(!h.getLevel().getBlockState(all.get(0).blockPosition().below()).is(Blocks.MAGMA_BLOCK),"hazard never accepted");
             all.forEach(Entity::discard);h.succeed();

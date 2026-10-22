@@ -1,0 +1,14 @@
+{
+  "pattern": "tacticalnpc (spawn|ammo|equip|order|faction|squad|hard|unfair|diagnostics)|spawn npc|npc mode (attack|defend|stand)",
+  "scope": [
+    "forge-addon/src",
+    "tools",
+    "README.md",
+    "MVP-TESTING.md"
+  ],
+  "matches": [
+    "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\ModeCommandTests.java:67:            for(String cmd:new String[]{\"npc mode assault\",\"npc mode stand\",\"npc info\",\"npc team red\"})reject(h,source,cmd);",
+    "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\ModeCommandTests.java:86:            for(String text:new String[]{\"npc order\",\"npc faction\",\"npc squad\",\"npc hard\",\"npc unfair\",\"tacticalnpc hard\",\"tacticalnpc unfair\",\"spawn npc\"})reject(h,source,text);"
+  ],
+  "classification": "Remaining live-source matches are rejection assertions; dated reports/receipts retain historical commands with current-reference banners."
+}

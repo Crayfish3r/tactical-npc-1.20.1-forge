@@ -19,17 +19,17 @@ public final class DefendTerritoryTests {
         ScenarioIsolation.begin(h);var n=npc(h,10.5,10.5);
         h.runAtTickTime(5,()->{
             var source=h.getLevel().getServer().createCommandSourceStack().withLevel(h.getLevel()).withSuppressedOutput();
-            var dispatcher=h.getLevel().getServer().getCommands().getDispatcher();String id=n.getUUID().toString();
+            var dispatcher=h.getLevel().getServer().getCommands().getDispatcher();String id=n.npcName();
             try {
                 for(int radius:new int[]{4,64,128}) {
-                    dispatcher.execute("npc mode defend "+radius+" "+id,source);var expected=n.runtime().orderState();
-                    dispatcher.execute("tacticalnpc order "+id+" DEFEND_AREA "+radius,source);
-                    h.assertTrue(expected.equals(n.runtime().orderState()),"both command interfaces accept "+radius);
+                    dispatcher.execute("npc mode "+id+" defend "+radius,source);var expected=n.runtime().orderState();
+                    dispatcher.execute("npc mode "+id+" defend "+radius,source);
+                    h.assertTrue(expected.equals(n.runtime().orderState()),"repeated command accept "+radius);
                 }
                 var saved=new CompoundTag();n.save(saved);
                 var restored=(TacticalNpcEntity)EntityType.loadEntityRecursive(saved,h.getLevel(),e->e);
                 h.assertTrue(restored!=null && restored.runtime().orderState().equals(n.runtime().orderState()) && saved.getCompound("tacticalnpc").getDouble("leash")==128,"NBT preserves defend 128 and anchor");restored.discard();
-                for(String radius:new String[]{"3","129","NaN"})for(String command:new String[]{"npc mode defend "+radius+" "+id,"tacticalnpc order "+id+" DEFEND_AREA "+radius}) {
+                for(String radius:new String[]{"3","129","NaN"})for(String command:new String[]{"npc mode "+id+" defend "+radius,"npc mode "+id+" defend "+radius}) {
                     try {dispatcher.execute(command,source);h.fail("accepted invalid radius: "+command);}catch(com.mojang.brigadier.exceptions.CommandSyntaxException expected) {}
                 }
                 for(double radius:new double[]{3,129,Double.NaN}) {
@@ -37,9 +37,9 @@ public final class DefendTerritoryTests {
                 }
                 h.assertTrue(n.runtime().orderState().radius()==128,"rejections leave order intact");
                 for(var kind:List.of(OrderState.Kind.ASSAULT,OrderState.Kind.HOLD_POSITION,OrderState.Kind.PATROL)) {
-                    try {dispatcher.execute("tacticalnpc order "+id+" "+kind+" 128",source);h.fail("expanded legacy radius "+kind);}catch(com.mojang.brigadier.exceptions.CommandSyntaxException expected) {}
+                    try {dispatcher.execute("npc mode "+id+" "+(kind==OrderState.Kind.ASSAULT?"assault":kind==OrderState.Kind.HOLD_POSITION?"stand":"patrol")+" 128",source);h.fail("expanded legacy radius "+kind);}catch(com.mojang.brigadier.exceptions.CommandSyntaxException expected) {}
                 }
-                dispatcher.execute("npc mode attack "+id,source);h.assertTrue(n.runtime().orderState().radius()==64,"switch from defend 128 keeps legacy maximum 64");
+                dispatcher.execute("npc mode "+id+" assault",source);h.assertTrue(n.runtime().orderState().radius()==64,"switch from defend 128 keeps legacy maximum 64");
             }catch(com.mojang.brigadier.exceptions.CommandSyntaxException ex){h.fail(ex.getMessage());}
             n.discard();h.succeed();
         });

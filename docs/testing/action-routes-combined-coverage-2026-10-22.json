@@ -1,0 +1,903 @@
+{
+  "status": "PASS_SCOPED_COVERAGE",
+  "selected": 144,
+  "passed": 144,
+  "failed_ids": [],
+  "missing_ids": [],
+  "latest_full_verdict": "INTERRUPTED",
+  "single_full_green": false,
+  "initial": {
+    "status": "INTERRUPTED",
+    "selected": 144,
+    "completed": 82,
+    "passed": 80,
+    "failed": 2,
+    "uncompleted": 62,
+    "log": "forge-addon\\build\\test-runs\\20261022T105821.004245Z-FULL-compat.log",
+    "passed_ids": [
+      "QueryBudgetTests#fixedTickOrderCannotStarveLateOwnersAndUnloadClears",
+      "NeutralTests#returningNeutralCancelsUncreatedNativeBurstRounds",
+      "AttackTests#idleAttackReallyExploresBeyondOldAnchor",
+      "NeutralTests#lostVisualContactKeepsFrozenMemoryThenReturnsNeutral",
+      "TargetTypeTests#occludedNpcResolutionNeverRefreshesHiddenCoordinates",
+      "SectorTests#movingProtectedBodyBeforeAndAfterTargetAndDeferral",
+      "SectorTests#sideCrowdAllowsFiniteNativeRounds",
+      "TargetTypeTests#hiddenNpcWakesLodWithoutGrantingObservation",
+      "ModeCommandTests#aimRangeAndUnsupportedFrontEntity",
+      "NeutralTests#schemaMigrationPreservesConfiguredNpcsAndNeutralInventory",
+      "CombatUpgradeTests#unfairHintsSeparateAndHardClears",
+      "TargetTypeTests#npcDimensionTransferCannotResolveAcrossLevels",
+      "WeaponProfileTests#rifleNativeFire",
+      "ActionRouteTests#ladderDestroyedDuringClimb",
+      "DefendTerritoryTests#strafeAndRetreatCannotLeaveEdge",
+      "DefendTerritoryTests#commandSetterAndNbtRadiusContract",
+      "ActionRouteTests#orderCancellationClearsDoorThroat",
+      "IndependentNpcTests#nativeLifecycleWithoutNpcs",
+      "HearingTests#actualNpcNativeProjectileDeliversSound",
+      "WeaponProfileTests#independentFourAgainstOne",
+      "WeaponScenarioTests#boltWithoutTarget",
+      "TeamTests#nativeTeamChangesInvalidateFramesReportsAndClaims",
+      "CombatUpgradeTests#genuineNativeShotIsAudibleAt128",
+      "ActionRouteTests#unloadReleasesLadderLease",
+      "SuppressionTests#knownOpenPointWithoutHiddenTracking",
+      "CombatUpgradeTests#detection96",
+      "SectorTests#thirtyTwoSideObjectsNoLongerSaturateAndMeasure",
+      "StandTests#allPhasesAndOldHoldMigrateWithoutLiveContact",
+      "WeaponProfileTests#shotgunNativePellets",
+      "TeamCommandTests#twoCommandsCreateArmedOpposingTeamsWithSafePlacement",
+      "WeaponScenarioTests#reloadBehindWall",
+      "TargetTypeTests#defaultFactionAndScoreboardAlliesNeverAcquire",
+      "StandTests#deliveredReportIsProcessedBeforeEndingCombatPhase",
+      "DefendTerritoryTests#externalDisplacementReturnsThroughOutsideNodes",
+      "WeaponScenarioTests#nativeModesAndBurst",
+      "ActionRouteTests#woodenDoorFromEast",
+      "TeamCommandTests#aimedNpcExplicitPlayerAndAtomicMixedSelector",
+      "ActionRouteTests#ladderUpAndStableExit",
+      "ActionRouteTests#woodenDoorFromWest",
+      "NeutralTests#retaliationCannotBypassNativeReload",
+      "DefendTerritoryTests#radius128UsesLocalReturnSegments",
+      "CombatUpgradeTests#detection64",
+      "HearingTests#boundedLocalDeliveryCoalescesAndRotatesRecipients",
+      "ActionRouteTests#landingBlockedDuringClimb",
+      "IndependentNpcTests#dimensionTransfer",
+      "CombatUpgradeTests#unfairInfiniteReserveUsesNativeReloadAndHardRestoresFinite",
+      "NeutralTests#actualArrowCollisionUsesOwner",
+      "TargetTypeTests#npcPageBeyondSixteenAndDeferredKeepProgress",
+      "WeaponProfileTests#defendReturnAndOrderPersistence",
+      "ModeCommandTests#aliasesShareStatePersistenceAndInvalidation",
+      "LookControlTests#navigationCannotSnapAim",
+      "DefendTerritoryTests#visibleExternalTargetIsShotWithoutPursuit",
+      "WeaponScenarioTests#reactionThenLoss",
+      "PeekRevalidationTests#deferredDoesNotExportStalePeekAndCoverLossInvalidates",
+      "ActionRouteTests#fourNpcDoorAndLadderQueue",
+      "PerceptionTests#acquisitionContinuesBeyondSixteen",
+      "PerceptionTests#acquisitionRetainsVisiblePendingPerception",
+      "ActionRouteTests#knownTargetDoorLadderAndNativeCombat",
+      "PerceptionTests#acquisitionFiltersFovBeforeLos",
+      "AttackTests#hiddenRouteFrozenUntilExpiryThenFreeSearch",
+      "TeamTests#teamlessNpcAndPlayersHaveExplicitAllianceRules",
+      "NeutralTests#cancelledZeroUnknownSelfAndMobNeverAuthorizeRetaliation",
+      "TargetTypeTests#ordinaryMobsAnimalsArmorStandsAndSelfAreExcluded",
+      "TeamTests#playerJoiningTeamCancelsRemainingNativeBurstThenEnemyCanBeReacquired",
+      "TeamCommandTests#limitedSafeSpaceReportsPartialCountWithoutUnsafeSpawns",
+      "ModeCommandTests#aimSelectsHitInsteadOfNearestAndRespectsWall",
+      "QueryBudgetTests#deniedBeforeAcquireActivationAndSafetyThenResumes",
+      "WeaponProfileTests#pistolNativeFire",
+      "AlphaLocomotionTests#straightLaneNpcGaits",
+      "PerceptionTests#controllerAcquiresFifthWithCadence",
+      "CombatUpgradeTests#unfairRefreshesHiddenHintWithoutReplacingVisualMemory",
+      "CombatUpgradeTests#unloadedLosDoesNotLoadChunks",
+      "StandTests#waitHoldsDespiteSoundAndRejectedShot",
+      "WeaponProfileTests#sniperNativeBoltFire",
+      "WeaponProfileTests#smgNativeFire",
+      "WeaponScenarioTests#legacyNavigationCannotSnapAim",
+      "IndependentNpcTests#alliedDamageEventGuard",
+      "CombatUpgradeTests#detection128",
+      "NeutralTests#realMeleeReactsWithoutDelayThenDeathReturnsNeutral",
+      "ActionRouteTests#closedAgainBeforeNextNpc"
+    ],
+    "failed_ids": [
+      "IndependentNpcTests#combatSmoke",
+      "DefendPatrolTests#idleRadius128ExploresBeyondLegacyCap"
+    ],
+    "remaining_ids": [
+      "ActionRouteTests#forgeInteractionVetoAndIronDoor",
+      "ActionRouteTests#ladderDownAndStableExit",
+      "ActionRouteTests#orderCancellationFinishesCurrentLadderExit",
+      "ActivationTests#dormantMaintenanceAndHonestWake",
+      "AlphaResponsivenessTests#contactReacquireTrackingAndDeferred",
+      "AlphaResponsivenessTests#emergencyStopsPeekWhilePathDeferred",
+      "AlphaResponsivenessTests#failedDestinationRecoversLocally",
+      "AttackTests#approachFiresBeyondPreferenceWithNativeAds",
+      "AttackTests#legitimateMemoryPathDetoursSimpleBarrier",
+      "AttackTests#unreachableExplorationBacksOffWithoutPathSpam",
+      "CombatGameTests#combatLifecycle",
+      "CombatUpgradeTests#unfairNativeHearingAt192RetainsMemory",
+      "CombatUpgradeTests#unsafeVisibleContactDoesNotMonopolizeFirstPage",
+      "CoverTests#hazardsAndBudgets",
+      "CoverTests#moveReloadAndPeek",
+      "DefendPatrolTests#blockedWaypointBacksOffAndSelectsAnother",
+      "DefendPatrolTests#combatAndLiveMemoryInterruptThenPatrolResumes",
+      "DefendPatrolTests#idleRadius32ReallyMovesAndPauses",
+      "DefendPatrolTests#idleRadius4ReallyMovesAndPauses",
+      "DefendPatrolTests#independentPatrolOrderKeepsOldCardinalRoute",
+      "DefendPatrolTests#persistedDefendRebuildsPatrolAfterEntityLoad",
+      "DefendTerritoryTests#heightAndSlopeAreIndependentFromHorizontalCircle",
+      "DefendTerritoryTests#interiorEndpointRejectsExteriorDetourAndRecovery",
+      "HearingTests#hiddenInvisibleSourcesGrantOnlyExpiringRegionAndNeutralIgnores",
+      "IndependentNpcTests#finiteReloadConsumesReserve",
+      "IndependentNpcTests#finiteReserveAndBolt",
+      "IndependentNpcTests#nbtUnloadReload",
+      "ModeCommandTests#permissionSuggestionsAndOldCommandSurface",
+      "ModeCommandTests#validateWholeBatchBeforeMutationAndRequireConsoleTargets",
+      "NeutralOptionalTests#verifiedLegacyDamageAuthorizesPersonalResponse",
+      "NeutralTests#actualAlliedDamageIsPersonalAndNewAttackerReplacesIt",
+      "NeutralTests#actualTaczProjectileDamageAuthenticatesNpcShooter",
+      "NeutralTests#aliasesSafePlacementPermissionsAndOldEquipment",
+      "NeutralTests#hiddenAttackerGrantsNoAimAndExpiresWithoutThirdParty",
+      "NeutralTests#proximitySoundAndSquadCannotStartCombat",
+      "OptionalTargetTests#independentTargetsVerifiedLegacyRuntime",
+      "OptionalTargetTests#legacyControllerUsesSameNpcPolicyAndNativeGate",
+      "PeekRevalidationTests#cachedExitObstructedFindsAnotherWithoutRestarting",
+      "PerceptionTests#acquisitionContinuesPastFourBlocked",
+      "PerceptionTests#acquisitionDeferredKeepsCursor",
+      "PerceptionTests#hearingIsRegionAndFovIsSeparate",
+      "PerceptionTests#hiddenPositionFrozenAndExpires",
+      "QueryBudgetTests#optionalRaysRemainFairAcrossAcquisitionCadence",
+      "QueryBudgetTests#persistentRayPressureCannotStarveLastOfFifty",
+      "SquadTests#coordinatedFourNativeFire",
+      "SquadTests#delayedFrozenReportsAndLeaderDeath",
+      "StandTests#actualDamageTriggersButCancellationAndMobDoNot",
+      "StandTests#nativeRoundThenLocalCombatThenOriginalDefendPatrol",
+      "TargetTypeTests#npcDeathClearsContactAndQueuedNativeFire",
+      "TargetTypeTests#npcUnloadClearsContactAndLoadedIndex",
+      "TargetTypeTests#opposingNpcsFireNativeRoundsWithoutPlayers",
+      "TeamCommandTests#permissionCountAndInvalidNamesDoNotCreateAnything",
+      "TeamTests#deserializedLegacyDataResavesPendingMigrationUntilServerActivation",
+      "TeamTests#nativeScoreboardPersistsMembershipAndDoesNotResurrectRemovedTeams",
+      "TeamTests#schemasOneThroughFourMigrateWithoutLosingLegacyData",
+      "WeaponProfileTests#lmgNativeFire",
+      "WeaponProfileTests#weaponDistanceReallyMoves",
+      "WeaponScenarioTests#allyCrossingAndBehindTarget",
+      "WeaponScenarioTests#noTargetMaintenance",
+      "WeaponScenarioTests#tagDeathUnload",
+      "WeaponSnapshotTests#equipModePropertiesAndResourcesInvalidateWithoutReadDraw",
+      "WeaponSnapshotTests#measureSnapshotReads"
+    ],
+    "rule": "Latest user request: resume unfinished checks; retry only failed tests after fixes. Do not restart entire matrix."
+  },
+  "runs": [
+    {
+      "status": "PASS",
+      "profile": "FAST",
+      "legacy": true,
+      "executed": 1,
+      "selected": 1,
+      "seconds": 102.094,
+      "exit_code": 0,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=FAST",
+        "--console=plain",
+        "--rerun-tasks",
+        "-PgameTestHeapMb=2560",
+        "-Dorg.gradle.jvmargs=-Xmx768m",
+        "-PtestSelection=IndependentNpcTests#combatSmoke",
+        "-PlegacyCompatibility",
+        "--offline",
+        "-PgameTestDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261022T124430.029997Z-runtime",
+        "-PgameTestOutputDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261022T124430.029997Z-compiled"
+      ],
+      "log": "forge-addon\\build\\test-runs\\20261022T124430.029997Z-FAST-compat.log",
+      "runtime": "forge-addon\\build\\test-runs\\20261022T124430.029997Z-runtime",
+      "compiled_output": "forge-addon\\build\\test-runs\\20261022T124430.029997Z-compiled",
+      "tasks": [
+        ":extractTaczLua",
+        ":compileJava",
+        ":processResources",
+        ":classes",
+        ":compileCompatJava",
+        ":processCompatResources",
+        ":compatClasses",
+        ":compileCompatTestJava",
+        ":processCompatTestResources NO-SOURCE",
+        ":compatTestClasses",
+        ":downloadMcpConfig",
+        ":extractSrg",
+        ":createSrgToMcp",
+        ":downloadMCMeta",
+        ":downloadAssets",
+        ":extractNatives",
+        ":makeSrcDirs",
+        ":prepareRuns",
+        ":prepareRunGameTestServer",
+        ":prepareRunGameTestServerCompile",
+        ":runGameTestServer"
+      ]
+    },
+    {
+      "status": "PASS",
+      "profile": "FAST",
+      "legacy": true,
+      "executed": 1,
+      "selected": 1,
+      "seconds": 120.516,
+      "exit_code": 0,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=FAST",
+        "--console=plain",
+        "--rerun-tasks",
+        "-PgameTestHeapMb=2560",
+        "-Dorg.gradle.jvmargs=-Xmx768m",
+        "-PtestSelection=DefendPatrolTests#idleRadius128ExploresBeyondLegacyCap",
+        "-PlegacyCompatibility",
+        "--offline",
+        "-PgameTestDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261022T124612.279751Z-runtime",
+        "-PgameTestOutputDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261022T124612.279751Z-compiled"
+      ],
+      "log": "forge-addon\\build\\test-runs\\20261022T124612.279751Z-FAST-compat.log",
+      "runtime": "forge-addon\\build\\test-runs\\20261022T124612.279751Z-runtime",
+      "compiled_output": "forge-addon\\build\\test-runs\\20261022T124612.279751Z-compiled",
+      "tasks": [
+        ":extractTaczLua",
+        ":compileJava",
+        ":processResources",
+        ":classes",
+        ":compileCompatJava",
+        ":processCompatResources",
+        ":compatClasses",
+        ":compileCompatTestJava",
+        ":processCompatTestResources NO-SOURCE",
+        ":compatTestClasses",
+        ":downloadMcpConfig",
+        ":extractSrg",
+        ":createSrgToMcp",
+        ":downloadMCMeta",
+        ":downloadAssets",
+        ":extractNatives",
+        ":makeSrcDirs",
+        ":prepareRuns",
+        ":prepareRunGameTestServer",
+        ":prepareRunGameTestServerCompile",
+        ":runGameTestServer"
+      ]
+    },
+    {
+      "status": "PASS",
+      "profile": "STAGE",
+      "legacy": true,
+      "executed": 62,
+      "selected": 62,
+      "seconds": 618.985,
+      "exit_code": 0,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "runGameTestServer",
+        "compileCompatJava",
+        "-PcombatTests",
+        "-PtestProfile=STAGE",
+        "--console=plain",
+        "--rerun-tasks",
+        "-PgameTestHeapMb=2560",
+        "-Dorg.gradle.jvmargs=-Xmx768m",
+        "-PtestSelection=ActionRouteTests#forgeInteractionVetoAndIronDoor,ActionRouteTests#ladderDownAndStableExit,ActionRouteTests#orderCancellationFinishesCurrentLadderExit,ActivationTests#dormantMaintenanceAndHonestWake,AlphaResponsivenessTests#contactReacquireTrackingAndDeferred,AlphaResponsivenessTests#emergencyStopsPeekWhilePathDeferred,AlphaResponsivenessTests#failedDestinationRecoversLocally,AttackTests#approachFiresBeyondPreferenceWithNativeAds,AttackTests#legitimateMemoryPathDetoursSimpleBarrier,AttackTests#unreachableExplorationBacksOffWithoutPathSpam,CombatGameTests#combatLifecycle,CombatUpgradeTests#unfairNativeHearingAt192RetainsMemory,CombatUpgradeTests#unsafeVisibleContactDoesNotMonopolizeFirstPage,CoverTests#hazardsAndBudgets,CoverTests#moveReloadAndPeek,DefendPatrolTests#blockedWaypointBacksOffAndSelectsAnother,DefendPatrolTests#combatAndLiveMemoryInterruptThenPatrolResumes,DefendPatrolTests#idleRadius32ReallyMovesAndPauses,DefendPatrolTests#idleRadius4ReallyMovesAndPauses,DefendPatrolTests#independentPatrolOrderKeepsOldCardinalRoute,DefendPatrolTests#persistedDefendRebuildsPatrolAfterEntityLoad,DefendTerritoryTests#heightAndSlopeAreIndependentFromHorizontalCircle,DefendTerritoryTests#interiorEndpointRejectsExteriorDetourAndRecovery,HearingTests#hiddenInvisibleSourcesGrantOnlyExpiringRegionAndNeutralIgnores,IndependentNpcTests#finiteReloadConsumesReserve,IndependentNpcTests#finiteReserveAndBolt,IndependentNpcTests#nbtUnloadReload,ModeCommandTests#permissionSuggestionsAndOldCommandSurface,ModeCommandTests#validateWholeBatchBeforeMutationAndRequireConsoleTargets,NeutralOptionalTests#verifiedLegacyDamageAuthorizesPersonalResponse,NeutralTests#actualAlliedDamageIsPersonalAndNewAttackerReplacesIt,NeutralTests#actualTaczProjectileDamageAuthenticatesNpcShooter,NeutralTests#aliasesSafePlacementPermissionsAndOldEquipment,NeutralTests#hiddenAttackerGrantsNoAimAndExpiresWithoutThirdParty,NeutralTests#proximitySoundAndSquadCannotStartCombat,OptionalTargetTests#independentTargetsVerifiedLegacyRuntime,OptionalTargetTests#legacyControllerUsesSameNpcPolicyAndNativeGate,PeekRevalidationTests#cachedExitObstructedFindsAnotherWithoutRestarting,PerceptionTests#acquisitionContinuesPastFourBlocked,PerceptionTests#acquisitionDeferredKeepsCursor,PerceptionTests#hearingIsRegionAndFovIsSeparate,PerceptionTests#hiddenPositionFrozenAndExpires,QueryBudgetTests#optionalRaysRemainFairAcrossAcquisitionCadence,QueryBudgetTests#persistentRayPressureCannotStarveLastOfFifty,SquadTests#coordinatedFourNativeFire,SquadTests#delayedFrozenReportsAndLeaderDeath,StandTests#actualDamageTriggersButCancellationAndMobDoNot,StandTests#nativeRoundThenLocalCombatThenOriginalDefendPatrol,TargetTypeTests#npcDeathClearsContactAndQueuedNativeFire,TargetTypeTests#npcUnloadClearsContactAndLoadedIndex,TargetTypeTests#opposingNpcsFireNativeRoundsWithoutPlayers,TeamCommandTests#permissionCountAndInvalidNamesDoNotCreateAnything,TeamTests#deserializedLegacyDataResavesPendingMigrationUntilServerActivation,TeamTests#nativeScoreboardPersistsMembershipAndDoesNotResurrectRemovedTeams,TeamTests#schemasOneThroughFourMigrateWithoutLosingLegacyData,WeaponProfileTests#lmgNativeFire,WeaponProfileTests#weaponDistanceReallyMoves,WeaponScenarioTests#allyCrossingAndBehindTarget,WeaponScenarioTests#noTargetMaintenance,WeaponScenarioTests#tagDeathUnload,WeaponSnapshotTests#equipModePropertiesAndResourcesInvalidateWithoutReadDraw,WeaponSnapshotTests#measureSnapshotReads",
+        "-PlegacyCompatibility",
+        "--offline",
+        "-PgameTestDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261022T124812.931826Z-runtime",
+        "-PgameTestOutputDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261022T124812.931826Z-compiled"
+      ],
+      "log": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.log",
+      "runtime": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-runtime",
+      "compiled_output": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-compiled",
+      "tasks": [
+        ":extractTaczLua",
+        ":compileJava",
+        ":processResources",
+        ":classes",
+        ":compileCompatJava",
+        ":processCompatResources",
+        ":compatClasses",
+        ":compileCompatTestJava",
+        ":processCompatTestResources NO-SOURCE",
+        ":compatTestClasses",
+        ":downloadMcpConfig",
+        ":extractSrg",
+        ":createSrgToMcp",
+        ":downloadMCMeta",
+        ":downloadAssets",
+        ":extractNatives",
+        ":makeSrcDirs",
+        ":prepareRuns",
+        ":prepareRunGameTestServer",
+        ":prepareRunGameTestServerCompile",
+        ":runGameTestServer"
+      ]
+    }
+  ],
+  "tests": {
+    "QueryBudgetTests#fixedTickOrderCannotStarveLateOwnersAndUnloadClears": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "NeutralTests#returningNeutralCancelsUncreatedNativeBurstRounds": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "AttackTests#idleAttackReallyExploresBeyondOldAnchor": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "NeutralTests#lostVisualContactKeepsFrozenMemoryThenReturnsNeutral": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "TargetTypeTests#occludedNpcResolutionNeverRefreshesHiddenCoordinates": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "SectorTests#movingProtectedBodyBeforeAndAfterTargetAndDeferral": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "SectorTests#sideCrowdAllowsFiniteNativeRounds": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "TargetTypeTests#hiddenNpcWakesLodWithoutGrantingObservation": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "ModeCommandTests#aimRangeAndUnsupportedFrontEntity": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "NeutralTests#schemaMigrationPreservesConfiguredNpcsAndNeutralInventory": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "CombatUpgradeTests#unfairHintsSeparateAndHardClears": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "TargetTypeTests#npcDimensionTransferCannotResolveAcrossLevels": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "WeaponProfileTests#rifleNativeFire": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "ActionRouteTests#ladderDestroyedDuringClimb": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "DefendTerritoryTests#strafeAndRetreatCannotLeaveEdge": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "DefendTerritoryTests#commandSetterAndNbtRadiusContract": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "ActionRouteTests#orderCancellationClearsDoorThroat": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "IndependentNpcTests#nativeLifecycleWithoutNpcs": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "HearingTests#actualNpcNativeProjectileDeliversSound": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "WeaponProfileTests#independentFourAgainstOne": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "WeaponScenarioTests#boltWithoutTarget": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "TeamTests#nativeTeamChangesInvalidateFramesReportsAndClaims": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "CombatUpgradeTests#genuineNativeShotIsAudibleAt128": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "ActionRouteTests#unloadReleasesLadderLease": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "SuppressionTests#knownOpenPointWithoutHiddenTracking": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "CombatUpgradeTests#detection96": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "SectorTests#thirtyTwoSideObjectsNoLongerSaturateAndMeasure": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "StandTests#allPhasesAndOldHoldMigrateWithoutLiveContact": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "WeaponProfileTests#shotgunNativePellets": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "TeamCommandTests#twoCommandsCreateArmedOpposingTeamsWithSafePlacement": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "WeaponScenarioTests#reloadBehindWall": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "TargetTypeTests#defaultFactionAndScoreboardAlliesNeverAcquire": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "StandTests#deliveredReportIsProcessedBeforeEndingCombatPhase": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "DefendTerritoryTests#externalDisplacementReturnsThroughOutsideNodes": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "WeaponScenarioTests#nativeModesAndBurst": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "ActionRouteTests#woodenDoorFromEast": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "TeamCommandTests#aimedNpcExplicitPlayerAndAtomicMixedSelector": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "ActionRouteTests#ladderUpAndStableExit": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "ActionRouteTests#woodenDoorFromWest": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "NeutralTests#retaliationCannotBypassNativeReload": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "DefendTerritoryTests#radius128UsesLocalReturnSegments": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "CombatUpgradeTests#detection64": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "HearingTests#boundedLocalDeliveryCoalescesAndRotatesRecipients": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "ActionRouteTests#landingBlockedDuringClimb": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "IndependentNpcTests#dimensionTransfer": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "CombatUpgradeTests#unfairInfiniteReserveUsesNativeReloadAndHardRestoresFinite": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "NeutralTests#actualArrowCollisionUsesOwner": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "TargetTypeTests#npcPageBeyondSixteenAndDeferredKeepProgress": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "WeaponProfileTests#defendReturnAndOrderPersistence": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "ModeCommandTests#aliasesShareStatePersistenceAndInvalidation": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "LookControlTests#navigationCannotSnapAim": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "DefendTerritoryTests#visibleExternalTargetIsShotWithoutPursuit": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "WeaponScenarioTests#reactionThenLoss": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "PeekRevalidationTests#deferredDoesNotExportStalePeekAndCoverLossInvalidates": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "ActionRouteTests#fourNpcDoorAndLadderQueue": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "PerceptionTests#acquisitionContinuesBeyondSixteen": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "PerceptionTests#acquisitionRetainsVisiblePendingPerception": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "ActionRouteTests#knownTargetDoorLadderAndNativeCombat": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "PerceptionTests#acquisitionFiltersFovBeforeLos": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "AttackTests#hiddenRouteFrozenUntilExpiryThenFreeSearch": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "TeamTests#teamlessNpcAndPlayersHaveExplicitAllianceRules": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "NeutralTests#cancelledZeroUnknownSelfAndMobNeverAuthorizeRetaliation": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "TargetTypeTests#ordinaryMobsAnimalsArmorStandsAndSelfAreExcluded": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "TeamTests#playerJoiningTeamCancelsRemainingNativeBurstThenEnemyCanBeReacquired": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "TeamCommandTests#limitedSafeSpaceReportsPartialCountWithoutUnsafeSpawns": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "ModeCommandTests#aimSelectsHitInsteadOfNearestAndRespectsWall": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "QueryBudgetTests#deniedBeforeAcquireActivationAndSafetyThenResumes": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "WeaponProfileTests#pistolNativeFire": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "AlphaLocomotionTests#straightLaneNpcGaits": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "PerceptionTests#controllerAcquiresFifthWithCadence": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "CombatUpgradeTests#unfairRefreshesHiddenHintWithoutReplacingVisualMemory": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "CombatUpgradeTests#unloadedLosDoesNotLoadChunks": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "StandTests#waitHoldsDespiteSoundAndRejectedShot": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "WeaponProfileTests#sniperNativeBoltFire": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "WeaponProfileTests#smgNativeFire": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "WeaponScenarioTests#legacyNavigationCannotSnapAim": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "IndependentNpcTests#alliedDamageEventGuard": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "CombatUpgradeTests#detection128": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "NeutralTests#realMeleeReactsWithoutDelayThenDeathReturnsNeutral": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "ActionRouteTests#closedAgainBeforeNextNpc": {
+      "status": "PASS",
+      "evidence": "docs/testing/action-routes-interrupted-2026-10-22.json"
+    },
+    "IndependentNpcTests#combatSmoke": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124430.029997Z-FAST-compat.json"
+    },
+    "DefendPatrolTests#idleRadius128ExploresBeyondLegacyCap": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124612.279751Z-FAST-compat.json"
+    },
+    "ActionRouteTests#forgeInteractionVetoAndIronDoor": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "ActionRouteTests#ladderDownAndStableExit": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "ActionRouteTests#orderCancellationFinishesCurrentLadderExit": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "ActivationTests#dormantMaintenanceAndHonestWake": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "AlphaResponsivenessTests#contactReacquireTrackingAndDeferred": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "AlphaResponsivenessTests#emergencyStopsPeekWhilePathDeferred": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "AlphaResponsivenessTests#failedDestinationRecoversLocally": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "AttackTests#approachFiresBeyondPreferenceWithNativeAds": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "AttackTests#legitimateMemoryPathDetoursSimpleBarrier": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "AttackTests#unreachableExplorationBacksOffWithoutPathSpam": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "CombatGameTests#combatLifecycle": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "CombatUpgradeTests#unfairNativeHearingAt192RetainsMemory": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "CombatUpgradeTests#unsafeVisibleContactDoesNotMonopolizeFirstPage": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "CoverTests#hazardsAndBudgets": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "CoverTests#moveReloadAndPeek": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "DefendPatrolTests#blockedWaypointBacksOffAndSelectsAnother": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "DefendPatrolTests#combatAndLiveMemoryInterruptThenPatrolResumes": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "DefendPatrolTests#idleRadius32ReallyMovesAndPauses": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "DefendPatrolTests#idleRadius4ReallyMovesAndPauses": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "DefendPatrolTests#independentPatrolOrderKeepsOldCardinalRoute": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "DefendPatrolTests#persistedDefendRebuildsPatrolAfterEntityLoad": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "DefendTerritoryTests#heightAndSlopeAreIndependentFromHorizontalCircle": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "DefendTerritoryTests#interiorEndpointRejectsExteriorDetourAndRecovery": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "HearingTests#hiddenInvisibleSourcesGrantOnlyExpiringRegionAndNeutralIgnores": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "IndependentNpcTests#finiteReloadConsumesReserve": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "IndependentNpcTests#finiteReserveAndBolt": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "IndependentNpcTests#nbtUnloadReload": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "ModeCommandTests#permissionSuggestionsAndOldCommandSurface": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "ModeCommandTests#validateWholeBatchBeforeMutationAndRequireConsoleTargets": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "NeutralOptionalTests#verifiedLegacyDamageAuthorizesPersonalResponse": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "NeutralTests#actualAlliedDamageIsPersonalAndNewAttackerReplacesIt": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "NeutralTests#actualTaczProjectileDamageAuthenticatesNpcShooter": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "NeutralTests#aliasesSafePlacementPermissionsAndOldEquipment": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "NeutralTests#hiddenAttackerGrantsNoAimAndExpiresWithoutThirdParty": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "NeutralTests#proximitySoundAndSquadCannotStartCombat": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "OptionalTargetTests#independentTargetsVerifiedLegacyRuntime": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "OptionalTargetTests#legacyControllerUsesSameNpcPolicyAndNativeGate": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "PeekRevalidationTests#cachedExitObstructedFindsAnotherWithoutRestarting": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "PerceptionTests#acquisitionContinuesPastFourBlocked": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "PerceptionTests#acquisitionDeferredKeepsCursor": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "PerceptionTests#hearingIsRegionAndFovIsSeparate": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "PerceptionTests#hiddenPositionFrozenAndExpires": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "QueryBudgetTests#optionalRaysRemainFairAcrossAcquisitionCadence": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "QueryBudgetTests#persistentRayPressureCannotStarveLastOfFifty": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "SquadTests#coordinatedFourNativeFire": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "SquadTests#delayedFrozenReportsAndLeaderDeath": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "StandTests#actualDamageTriggersButCancellationAndMobDoNot": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "StandTests#nativeRoundThenLocalCombatThenOriginalDefendPatrol": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "TargetTypeTests#npcDeathClearsContactAndQueuedNativeFire": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "TargetTypeTests#npcUnloadClearsContactAndLoadedIndex": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "TargetTypeTests#opposingNpcsFireNativeRoundsWithoutPlayers": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "TeamCommandTests#permissionCountAndInvalidNamesDoNotCreateAnything": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "TeamTests#deserializedLegacyDataResavesPendingMigrationUntilServerActivation": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "TeamTests#nativeScoreboardPersistsMembershipAndDoesNotResurrectRemovedTeams": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "TeamTests#schemasOneThroughFourMigrateWithoutLosingLegacyData": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "WeaponProfileTests#lmgNativeFire": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "WeaponProfileTests#weaponDistanceReallyMoves": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "WeaponScenarioTests#allyCrossingAndBehindTarget": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "WeaponScenarioTests#noTargetMaintenance": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "WeaponScenarioTests#tagDeathUnload": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "WeaponSnapshotTests#equipModePropertiesAndResourcesInvalidateWithoutReadDraw": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    },
+    "WeaponSnapshotTests#measureSnapshotReads": {
+      "status": "PASS",
+      "evidence": "forge-addon\\build\\test-runs\\20261022T124812.931826Z-STAGE-compat.json"
+    }
+  },
+  "user_rule": "Do not rerun the chain; retry only failed tests and finish previously uncompleted checks."
+}

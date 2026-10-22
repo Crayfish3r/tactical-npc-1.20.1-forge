@@ -1,6 +1,6 @@
 # Проверка Tactical NPC AI 0.2.0
 
-Новое обновление и актуальные ручные действия: [team/короткие команды](docs/TEAM-COMMANDS.md). Для боя двух групп достаточно `/spawn npc team red count 4` и, в20–30 блоках, `/spawn npc team blue count 4`. Старые цифры/JAR ниже относятся к пакету08–14 до этого обновления; не использовать прежний SHA как проверку нового файла.
+Новое обновление и актуальные ручные действия: [единый интерфейс NPC](docs/COMMANDS.md). Для боя двух групп достаточно `/npc spawn team red count 4` и, в20–30 блоках, `/npc spawn team blue count 4`. Старые цифры/JAR ниже относятся к пакету08–14 до этого обновления; не использовать прежний SHA как проверку нового файла.
 
 Текущий пакет 08–14 и отдельные ручные сценарии: [BATCH-08-14](docs/BATCH-08-14.md).
 07 явно принят владельцем; 08–14 нельзя считать ACCEPTED по автоматическим проверкам.
@@ -44,52 +44,47 @@ Handoff пакета08–14 до team-обновления, 2026-10-20: core792,
 
 ```mcfunction
 /gamemode creative
-/tacticalnpc spawn
+/npc spawn
 ```
 
-Безопасно рядом с источником появляется собственный активный `tacticalnpcai:npc` в ATTACK: vanilla renderer, пустой AK-47, тег `tactical_ai`; `/spawn npc` использует тот же путь. Без team он враг остальным NPC и survival/adventure игрокам. Для готовых групп используйте `/spawn npc team red count 4`; team автоматически определяет союзников и squad-координацию. Native reload работает без цели. Без тега NPC не получает тактического контроллера. Низкоуровневый summon также доступен; затем выдайте оружие:
+Безопасно рядом с источником появляется собственный активный `tacticalnpcai:npc` в ATTACK: vanilla renderer, пустой AK-47, тег `tactical_ai`; имя появляется над NPC и в сообщении спавна. Без team он враг остальным NPC и survival/adventure игрокам. Для готовых групп используйте `/npc spawn team red count 4`; team автоматически определяет союзников и squad-координацию. Native reload работает без цели. Без тега NPC не получает тактического контроллера. Низкоуровневый summon также доступен; затем выдайте оружие:
 
 ```mcfunction
 /summon tacticalnpcai:npc ~3 ~ ~ {PersistenceRequired:1b}
-/tacticalnpc equip @e[type=tacticalnpcai:npc,sort=nearest,limit=1] tacz:glock_17
+/npc equip @e[type=tacticalnpcai:npc,sort=nearest,limit=1] tacz:glock_17
 /tag @e[type=tacticalnpcai:npc,sort=nearest,limit=1] add tactical_ai
 ```
 
 Проверяемые обычные образцы: `tacz:ak47`, `tacz:glock_17`, `tacz:aa12`, `tacz:ai_awp`, `tacz:uzi`, `tacz:m249`. Конкретные результаты native firing matrix смотрите в статусе, а не считайте перечень обещанием поддержки любого gunpack. M870 с неизвестным shooting script блокируется; для первого теста дробовика используйте AA-12.
 
 ```mcfunction
-/tacticalnpc ammo @e[type=tacticalnpcai:npc,sort=nearest,limit=1] finite 90
-/tacticalnpc ammo @e[type=tacticalnpcai:npc,sort=nearest,limit=1] infinite
+/npc ammo @e[type=tacticalnpcai:npc,sort=nearest,limit=1] finite 90
+/npc ammo @e[type=tacticalnpcai:npc,sort=nearest,limit=1] infinite
 ```
 
 По умолчанию резерв бесконечный, магазин расходуется и перезаряжается штатно. FINITE хранит native DummyAmmo: расходуется реальное конечное число патронов, после исчерпания повторной перезарядки нет. Смена ammo policy явно отменяет текущую reload и инвалидирует старые команды. Выдача оружия командой задаёт пустой магазин; смена loadout в FINITE задаёт настроенный начальный резерв для нового оружия. Подбор патронов с земли и полноценный инвентарь не реализованы.
 
 ## Приказы и team
 
-```mcfunction
-/tacticalnpc order @e[type=tacticalnpcai:npc,sort=nearest,limit=1] HOLD_POSITION 24
-/tacticalnpc order @e[type=tacticalnpcai:npc,sort=nearest,limit=1] DEFEND_AREA 16
-/tacticalnpc order @e[type=tacticalnpcai:npc,sort=nearest,limit=1] ASSAULT 24
-/tacticalnpc order @e[type=tacticalnpcai:npc,sort=nearest,limit=1] PATROL 16
-/tacticalnpc faction @e[type=tacticalnpcai:npc,sort=nearest,limit=1] red
-/npc team red
-/npc team red @s
-/npc team clear
-/npc info
-```
-
-Якорь задаётся текущей позицией NPC при выдаче приказа. STAND/HOLD_POSITION фиксирует WAIT без движения → COMBAT XZ6 после реального native shot/прошедшего допустимого damage → обычный DEFEND32 после окончания контакта с исходным anchor. Старый HOLD radius не заменяет фиксированные6/32. DEFEND_AREA/`npc mode defend` принимает4–128, ограничивает все добровольные сегменты/тело по XZ и возвращает к якорю; PATROL — отдельный прежний маршрут. ASSAULT/attack свободно ищет легитимно известную цель. Остальные старые radius аргументы остаются4–64. Одна native team — союзники; без team NPC не союзны друг другу. Сохранённый legacy NEUTRAL отвечает только личному допустимому attacker. Radius территории не увеличивает detection/weapon range и не загружает дальние chunks.
-
-Приказы, якорь, standPhase, loadout, ammo policy и serviceId сохраняются в NBT schema5; native team — в штатном scoreboard.dat. Schema1–4 явно мигрируют, архивируя прежние faction/squad UUID; существующая vanilla team имеет приоритет. Живые цели, память и пути не сохраняются. Неизвестная будущая schema отключает тактическое управление с диагностикой.
-
-## Автоматическая координация team
+Актуальный [справочник команд и таблица миграции](docs/COMMANDS.md). Все команды требуют OP2.
 
 ```mcfunction
-/spawn npc team red count 4
-/npc team red @e[type=tacticalnpcai:npc,distance=..30]
+/npc help
+/npc list 1
+/npc mode Steve stand
+/npc mode Steve defend 128
+/npc mode 32 assault
+/npc mode 32 patrol 16
+/npc team Steve red
+/npc team @s red
+/npc team Steve clear
+/npc info Steve
+/npc debug info Steve
 ```
 
-Одинаковая native team автоматически образует группу; отдельный squad UUID назначать не нужно. Старые faction/squad команды сохранены как алиасы назначения team: squad UUID становится её именем, clear удаляет принадлежность. В пределах одного измерения передаются только реальные зрительные наблюдения с задержкой 10 тиков и радиусом связи 48 блоков. Исходный tick и известная позиция сохраняются, report TTL ≤80, confidence уменьшается, uncertainty растёт. Нет доступа к скрытой сущности через squad. Локальные роли и ограниченный огневой контракт сохранены. Cover claims имеют TTL80 и освобождаются при stop/death/unload/смене цели или team.
+Радиус выбора1–128 — трёхмерное расстояние от позиции игрока до позиции NPC в том же измерении, без LOS, всех team. Радиус поведения defend4–128 ограничивает территорию по XZ; patrol4–64 сохраняет прежний маршрут. Anchor каждого NPC — его текущая позиция при приказе. Assault свободный, без радиуса поведения. Stand сохраняет WAIT → COMBAT XZ6 → DEFEND32. Старый NEUTRAL не меняется до явного приказа.
+
+NBT schema6 сохраняет имя, serviceId и прежние order/anchor/standPhase/loadout/ammo поля; scoreboard.dat владеет native team по UUID. Общий world/data/tacticalnpc_names.dat закрепляет имена за UUID, включая выгруженных и удалённых NPC. Новые имена не меняют scoreboard membership. Именные операции из консоли работают между измерениями, выгруженная сущность даёт явную ошибку без очереди и загрузки чанка. Hard применяется при загрузке конфигурации, управление NPC не сбрасывает serverconfig.
 
 ## Включение и сравнение исходного ИИ
 
@@ -101,7 +96,7 @@ Handoff пакета08–14 до team-обновления, 2026-10-20: core792,
 Снятие тега с собственного NPC освобождает тактическое движение/aim. Для исходного NPC при установленном compatibility artifact:
 
 ```mcfunction
-/tacticalnpc spawnlegacy
+/npc debug legacy spawn
 /tag @e[type=tacznpcs:npc,sort=nearest,limit=1] remove tactical_ai
 /tag @e[type=tacznpcs:npc,sort=nearest,limit=1] add tactical_ai
 ```

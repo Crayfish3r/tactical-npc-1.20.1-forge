@@ -1,15 +1,23 @@
 # Двери и вертикальные лестницы — 2026-10-22
 
+> Команды в этом датированном отчёте относятся к прежнему интерфейсу. Актуальные команды, постоянный Hard и таблица миграции: [COMMANDS](COMMANDS.md).
+
 Стек: Minecraft 1.20.1 / Forge 47.4.20 / Microsoft Java 17.0.19+10 /
 TaCZ 1.1.8-hotfix2; optional NPCs 2.1.0. Исходный чистый checkpoint:
 `f990246dea8e876cbacb3be2fd36540c7c0a20b7`.
 Снимок **до первой правки**: `forge-addon/build/action-route-baseline.tar`.
-Финальная матрица выполняется; измерения профиля ниже уже завершены.
+Автоматические проверки завершены: core936, FULL standalone132/132; combined —
+144/144 сценария покрыты с одиночными повторами после прерывания. Единого нового
+зелёного FULL combined нет. Dedicated/load/build/JAR checks PASS. **WAITING_PLAYTEST**.
 
 Перед продолжением навигации инструкции согласованы отдельным локальным commit
 `b57bd49d70cd07bbe9cbce2a23faccc1b37ac398`:
 [противоречия, подтверждение по коду и проверка](INSTRUCTION-ALIGNMENT-2026-10-22.md).
 В этом commit нет исходников навигации. Gameplay baseline остаётся прежним `f990246`.
+При финальном продолжении локальный HEAD уже `716200d` (`new mechanics: open doors,
+up stairs e.t.c`): основная реализация сохранена в этом commit. Текущие правки —
+завершающий test harness, combatSmoke fixture и итоговые evidence/docs.
+Опубликованность этого нового commit заново через GitHub API не проверялась.
 
 ## Контракт и управление
 
@@ -130,8 +138,50 @@ Fixture tickets освобождаются после успеха, следую
 на122тике и новый native projectile на126. Время включает ожидание готовности
 fixture chunks и native budgets; это тики теста, не гарантия wall-clock latency.
 
-Итоговые FULL standalone/combined, dedicated, load и production artifact receipts
-будут записаны в `docs/testing/action-routes-*` после выполнения.
+Окончательные результаты и продолжение после прерывания:
+
+| Проверка | Фактический результат | Доказательство |
+|---|---|---|
+| Pure Java |936 assertions PASS|[core](testing/action-routes-core-2026-10-22.txt)|
+| Affected STAGE combined |31/31 PASS,350,062s|[receipt](testing/action-routes-stage-2026-10-22.json)|
+| Affected DefendPatrol combined |7/7 PASS,308,203s|[receipt](testing/action-routes-defend-patrol-2026-10-22.json)|
+| FULL standalone |132/132 PASS,1126.391s|[receipt](testing/action-routes-full-standalone-2026-10-22.json), [physical results](testing/action-routes-full-standalone-results-2026-10-22.txt)|
+| Combined после прерывания |80 PASS сохранены;2 отказа повторены по одному;62 незавершённых выполнены. Все144 уникальных сценария имеют PASS evidence|[coverage ledger](testing/action-routes-combined-coverage-2026-10-22.json), [actual results](testing/action-routes-combined-results-2026-10-22.txt)|
+| IndependentNpcTests#combatSmoke |1/1 PASS,102.094s|raw receipt `forge-addon\build\test-runs\20261022T124430.029997Z-FAST-compat.json`|
+| DefendPatrolTests#idleRadius128ExploresBeyondLegacyCap |1/1 PASS,120.516s|raw receipt `forge-addon\build\test-runs\20261022T124612.279751Z-FAST-compat.json`|
+| 62 оставшихся сценария |62/62 PASS,618.985s|raw receipt `forge-addon\build\test-runs\20261022T124812.931826Z-STAGE-compat.json`|
+| Ordinary dedicated startup/reload/save/restart/stop |PASS,107.157s|[receipt](testing/action-routes-dedicated-2026-10-22.json), [properties/EULA unchanged](testing/action-routes-dedicated-preservation-2026-10-22.json)|
+| Plain compileJava/compileCompatJava/build |PASS,24.609s|[log](testing/action-routes-production-build-2026-10-22.txt)|
+| Distribution boundary |PASS,Java major61;без fixtures/вложенных JAR/NPCs imports в main|[verifier](testing/action-routes-production-artifacts-2026-10-22.json)|
+
+Последний запрос владельца изменил порядок приёмки: после исправления повторять только
+проблемный тест, без перезапуска всей цепочки. Поэтому FULL standalone132/132 —
+реальный завершённый прогон; последний FULL combined остался INTERRUPTED с80 PASS,
+2 FAIL и62 незавершёнными. Их точные ID восстановлены по batch order и progress bar;
+все144 записи ledger имеют отдельное PASS evidence, но это не новый единый FULL green.
+Standalone не повторялся после двух последних test-only исправлений согласно этому запросу.
+Последний предыдущий завершённый FULL combined143/144 остаётся FAIL в истории.
+
+`combatSmoke` получил достаточное место для четырёхблочного отхода внутри своего пола:
+origin x6.5 вместо3.5, target x14.5 вместо11.5. Требования движения>.25, настоящих
+projectiles, native reload, потери LOS и lifecycle сохранены; сравнение ведётся с новым
+фактическим origin, а не со старой точкой. У `idleRadius128...` отсутствовал lazy-loaded
+вложенный класс `DefendPatrolTests$Probe`; общий build/classes уже не содержал test classes.
+Причина внешнего изменения каталога не установлена. Runner теперь использует отдельные
+classes/resources на каждый запуск. Первый такой заход выявил ошибку compat classpath
+до запуска тестов (0 executed); output metadata исправлена, receipt сохранён.
+
+Обычная production-сборка выполнена последней без test/profile flags. Dedicated использует
+userdev: настоящий reload, native stack/reserve/team/приказы/UUID и сохранение после restart;
+это не distribution launcher. Все80 SHA входов измеренного after-профиля совпадают
+с текущим деревом. [Сводное evidence](testing/action-routes-validation-2026-10-22.json).
+
+Production artifacts:
+
+| Файл | bytes / classes | SHA-256 |
+|---|---|---|
+|`forge-addon\build\libs\tacticalnpcai-0.2.0.jar`|251595 /120|`78D46FAE9DE23925EF300C129967A28730A7842B112358FCCAEBDBA1EA50BF10`|
+|`forge-addon\build\libs\tacticalnpcai-0.2.0-npcs-compat.jar`|7680 /4|`63BE718EEEAA07A974326B25B5EFFFE24DF7DF9488B52EA7D6B2383C63402B5D`|
 
 История полной регрессии также сохраняется. Первый FULL standalone131:129 PASS,
 2 FAIL (external displacement return и combatSmoke). Для их flat fixtures явно
@@ -282,8 +332,23 @@ AI target≤2ms при30/50 не достигнут. Mean path requests/tick:30 
 50 —.977 →.182; уменьшение path retries и увеличение огня не объявляются независимыми
 оптимизациями. Полные CSV и JFR сохранены с границами измеряемых фаз.
 
-JFR финальной пары сохранены; их разбор выполняется после завершения игровых
-JVM. Старые summaries не выдаются за анализ новых записей.
+JFR окончательной пары разобраны после завершения игровых JVM, только по измеряемым
+окнам CSV, без startup/warmup/teardown. Серверные CPU samples:
+956 →1020; sampling counts не являются миллисекундами.
+
+| Категория | CPU samples до → после |
+|---|---|
+|action_navigation|2 →12|
+|goal_or_native_safety|0 →27|
+|native_maintenance|11 →21|
+|native_shoot|1 →1|
+|hearing_delivery|0 →0|
+|projectile_physics|0 →2|
+|profiling_fixture|21 →25|
+|other_server|921 →932|
+
+Allocation weights сохранены как sampling estimates; fixture/native scopes разделены.
+[Before JFR summary](testing/action-routes-jfr-before-2026-10-22.json), [after JFR summary](testing/action-routes-jfr-after-2026-10-22.json).
 
 ## Изменённые файлы
 
@@ -307,12 +372,18 @@ JVM. Старые summaries не выдаются за анализ новых �
   `forge-addon/build.gradle`: изолированный ordinary dedicated fixture.
 - `tools/testing/run-gametests.py`: полная пересборка выбранного test source set
   при переключении test/profile/production режимов, включая внутренние классы;
-  optional отдельные heap caps для game/build JVM через `gradle/testing.gradle`.
+  отдельные classes/resources на каждый run и optional heap caps для game/build
+  JVM через `gradle/testing.gradle`.
 - `tools/testing/run-action-routes.py`, `compare-action-routes.py`,
   `summarize-batch-jfr.py`, `tools/verify-production-artifacts.py`: receipts, сравнение,
   JFR boundaries, исключение нового profile из production JAR.
 - `docs/INTEGRATION-AUDIT.md`, `IMPLEMENTATION-STATUS.md`, этот отчёт и
   `docs/testing/action-routes-*`: аудит и фактические доказательства.
+
+Точный полный список: [изменённые файлы](testing/action-routes-changed-files-2026-10-22.json).
+Инструкции — отдельный commit `b57bd49`; основная навигация — commit `716200d`.
+Заключительные правки стенда/runner и evidence остаются рабочим diff.
+Я push/PR/merge не выполнял. Список файлов включает Stage2 целиком от `b57bd49`.
 
 ## Ручная приёмка production JAR
 

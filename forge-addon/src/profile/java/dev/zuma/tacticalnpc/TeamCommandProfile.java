@@ -34,8 +34,8 @@ public final class TeamCommandProfile {
         for(int x=1000;x<=1070;x++)for(int z=1000;z<=(LANES?1110:1070);z++)level.setBlock(new BlockPos(x,100,z),Blocks.STONE.defaultBlockState(),2);
         var source=server.createCommandSourceStack().withLevel(level).withSuppressedOutput();
         spawning=true;
-        int red=server.getCommands().getDispatcher().execute("spawn npc team profile-red count "+COUNT,source.withPosition(new Vec3(1012.5,101,1032.5)).withRotation(new Vec2(0,-90)));
-        int blue=server.getCommands().getDispatcher().execute("spawn npc team profile-blue count "+COUNT,source.withPosition(new Vec3(1044.5,101,1032.5)).withRotation(new Vec2(0,90)));
+        int red=server.getCommands().getDispatcher().execute("npc spawn team profile-red count "+COUNT,source.withPosition(new Vec3(1012.5,101,1032.5)).withRotation(new Vec2(0,-90)));
+        int blue=server.getCommands().getDispatcher().execute("npc spawn team profile-blue count "+COUNT,source.withPosition(new Vec3(1044.5,101,1032.5)).withRotation(new Vec2(0,90)));
         spawning=false;
         if(red!=COUNT || blue!=COUNT)throw new IllegalStateException("NPC spawn commands did not create exact requested cohorts");
         if(ACTORS.size()!=COUNT*2)throw new IllegalStateException("Unexpected native joined profile population: "+ACTORS.size());

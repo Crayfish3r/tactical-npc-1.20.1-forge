@@ -267,3 +267,34 @@ gate NPC interaction. Player-only events are not impersonated; claim mods needin
 their own permission API require a DoorAdapter. Exact scope, third-party reference
 commits/licenses and execution receipts: [ACTION-ROUTES](ACTION-ROUTES-2026-10-22.md).
 
+
+## Unified commands / names / Hard, 2026-10-22
+
+Pinned mapped Forge47.4.20 was inspected with `javap -c -p` for `ServerLevel`,
+`PersistentEntitySectionManager`, `ServerLevel$EntityCallbacks`, and `Entity`.
+`ServerLevel.addEntity` calls `Entity.onAddedToWorld()` only after successful native admission;
+its manager posts the cancellable join event and rejects duplicate UUIDs first. Chunk entity
+loads call the same admission hook after deserialization. The callback runs on server activation,
+so NBT decoding never allocates names or mutates SavedData/scoreboard.
+
+`DimensionDataStorage.computeIfAbsent(Function<CompoundTag,T>, Supplier<T>, String)` and
+`SavedData.save(CompoundTag)` are the verified1.20.1 APIs. Names use overworld data for all dimensions.
+Dimension transfer copies entity NBT before `addDuringTeleport`; an admitted destination entity
+can precede native tracking visibility (`ServerLevel.getEntity(UUID)` can still return null).
+The transient name index therefore uses weak per-instance handles, cleared on removal and guarded
+against an older instance's late leave callback. Tracking end can precede actual removal; the
+weak handle survives retracking of that same still-loaded instance. Actual remove/dimension
+removal clears it. It adds no chunk loading or Entity ownership.
+Raw local evidence: `forge-addon/build/command-{server,entity,admission,callback}-api.txt`.
+
+Verified `ArgumentTypeInfos.registerByClass` plus `SingletonArgumentInfo.contextFree` supplies
+client command-tree serialization for the shared name/radius/vanilla-selector argument.
+TaCZ `TimelessAPI.getAllCommonGunIndex()` supplies actual server gun-ID suggestions; existing
+`GunSupport.create`, native operator draw/cancelReload and runtime.onEquip are retained in a single
+operation. No new native shooting path, dependency, NPCs signature or Mixin.
+
+Ordinary config Loading/Reloading migrates legacy combat overrides to one Hard default set;
+GameTest fixture tuning is isolated by the existing selected-launcher property after initial Loading.
+[Current commands/migration](COMMANDS.md); [execution evidence](COMMAND-UNIFICATION-2026-10-22.md).
+
+Client suggestion audit: target nodes have an explicit custom provider. Pinned `SuggestionProviders.getName` maps unregistered providers to `minecraft:ask_server`; the serialized client command tree therefore asks the server for persistent NPC names. A GameTest round-trips ClientboundCommandsPacket through FriendlyByteBuf and checks that provider, in addition to dispatcher completion results. Raw API evidence: `forge-addon/build/command-suggestions-api.txt`.

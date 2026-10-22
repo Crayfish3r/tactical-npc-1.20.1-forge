@@ -8,18 +8,18 @@
 
 ```mcfunction
 /gamemode creative
-/spawn npc team red count 4
+/npc spawn team red count 4
 # Перейти на 20–30 блоков, повернуться к первой группе и создать противников:
-/spawn npc team blue count 4
+/npc spawn team blue count 4
 ```
 
-`/spawn npc` и `/tacticalnpc spawn` безопасно создают активного независимого NPC с native AK-47. Без team он враждебен другим NPC, включая таких же одиночек; survival/adventure игроки — противники кроме союзников. `/spawn npc team red count 4` сразу создаёт вооружённую группу; одна native Minecraft team определяет союз и автоматически включает прежнюю squad-координацию. `/npc team red` назначает NPC в прицеле, `/npc team red @s` присоединяет игрока, `/npc team clear` убирает принадлежность, `/npc info` показывает режим и патроны. Имена с пробелами/кириллицей заключайте в кавычки. Старые сохранённые режимы, включая NEUTRAL, сохраняются. [Правила, миграция и ручная приёмка обновления](docs/TEAM-COMMANDS.md).
+`/npc spawn` создаёт активного независимого NPC с native AK-47 и постоянным именем (Steve, Kevin, John и далее с суффиксами). `/npc team Steve red` назначает команду, `/npc team @s red` присоединяет игрока, `/npc team Steve clear` убирает принадлежность. `/npc mode 32 assault` отдаёт приказ всем живым загруженным независимым NPC в32 блоках от игрока; `/npc mode Kevin defend 16` задаёт оборону конкретного NPC без прицела и LOS. `/npc list [page]`, `/npc info Kevin` и `/npc help` показывают состояние и справку. [Полный синтаксис и миграция](docs/COMMANDS.md).
 
 Creative/spectator не атакуются. Стены, защищённые тела и незавершённая safety-проверка запрещают новый native round; союзный pre-damage guard защищает и от уже летящих bullets. Неизвестные shooting scripts, charge, inventory-fed, heat, explosive/incendiary свойства заблокированы.
 
-Пакет 08–14: [постоянный план и отдельные отчёты](docs/BATCH-08-14.md). Владелец принял 07 и разрешил последовательную работу, но автоматический PASS не является приёмкой владельца. STAND/HOLD_POSITION теперь WAIT на anchor → COMBAT XZ6 после реального native shot/damage → обычный DEFEND32 после окончания контакта. DEFEND принимает радиусы 4–128; PATROL остаётся отдельным. У `/npc mode attack|defend <radius>|stand [targets]` без targets выбирается NPC в прицеле до 32 блоков при LOS; консоль требует targets; permission 2.
+Пакет 08–14: [постоянный план и отдельные отчёты](docs/BATCH-08-14.md). Владелец принял 07 и разрешил последовательную работу, но автоматический PASS не является приёмкой владельца. STAND/HOLD_POSITION теперь WAIT на anchor → COMBAT XZ6 после реального native shot/damage → обычный DEFEND32 после окончания контакта. DEFEND принимает радиусы 4–128; PATROL остаётся отдельным. Приказы имеют синтаксис `/npc mode <имя|радиус|selector> assault|defend <4..128>|patrol <4..64>|stand`; permission2.
 
-Handoff пакета08–14 до team-обновления, 2026-10-20: core792, FULL98/98+110/110 и affected14/14+25/25 PASS; production main/compat и ordinary restart. [Исторические SHA/ручные действия](docs/STAGE-14-ACCEPTANCE.md), [ordinary профиль того среза](docs/testing/stage14-profile-2026-10-20.md). Общего ускорения сервера не доказано; для30/50 combat AI p95>2ms, часть больших сцен стреляет реже baseline и не получает performance credit. Human1v1/1v4 и приёмка08–14 — WAITING_PLAYTEST. Актуальные проверки/JAR отдельного обновления команд — в [TEAM-COMMANDS](docs/TEAM-COMMANDS.md).
+Handoff пакета08–14 до team-обновления, 2026-10-20: core792, FULL98/98+110/110 и affected14/14+25/25 PASS; production main/compat и ordinary restart. [Исторические SHA/ручные действия](docs/STAGE-14-ACCEPTANCE.md), [ordinary профиль того среза](docs/testing/stage14-profile-2026-10-20.md). Общего ускорения сервера не доказано; для30/50 combat AI p95>2ms, часть больших сцен стреляет реже baseline и не получает performance credit. Human1v1/1v4 и приёмка08–14 — WAITING_PLAYTEST. Актуальные проверки/JAR унификации команд — в [отчёте](docs/COMMAND-UNIFICATION-2026-10-22.md).
 
 ```bash
 bash ai-core/run-tests.sh
@@ -54,18 +54,9 @@ cd tactical-npc-1.20.1-forge/forge-addon
 
 Новый код — MIT. Применимые лицензии зависимостей и распространение модпака рассматриваются отдельно; чужие JAR не вложены в артефакты.
 
-## Боевые профили — 2026-10-22
+## Постоянный Hard
 
-`/tacticalnpc hard`: detection/hearing128, activation не меньше sight/hearing, память320тиков /
-160блоков, реакция3тика, поворот17°/тик и коррелированная ошибка.35° плюс native TaCZ spread.
-В старом мире значения могут отличаться: примените эту команду после обновления либо измените
-`world/serverconfig/tacticalnpcai-server.toml`. Forge47.4.20 сохраняет изменения команды
-в serverconfig этого мира через autosave; там же задаются ручные настройки. Hard сохраняет ammo policy каждого NPC.
-
-Опциональный `/tacticalnpc unfair`: hearing192, derived contact memory208, реакция1тик, squad report delay2тика,
-бесконечный резерв с обычной TaCZ перезарядкой и отдельная подсказка скрытой области каждые60тиков.
-Возврат в Hard очищает подсказки и восстанавливает сохранённую ammo policy.
-Оба режима сохраняют препятствия, native оружейную механику и защиту союзников.
+Обычная игра всегда использует Hard. При load/reload старые UNFAIR и сохранённые боевые overrides мигрируют к единому набору defaults в [ServerConfig](forge-addon/src/main/java/dev/zuma/tacticalnpc/config/ServerConfig.java); в логе появляется сообщение миграции. Диагностика и сохранённая ammo policy каждого NPC остаются самостоятельными. Переключающих профиль команд нет. Скрытые hints и профильный infinite-reserve override отключены; native reload/cooldown и защита союзников сохранены. Изменение чисел для автоматических экспериментов выполняется внутри тестовых fixtures.
 
 Давление: `suppressionDurationTicks=160`, `suppressionRoundBudget=48`,
 `suppressionBurstRounds=8`, `suppressionBurstPauseTicks=12`. Проверяются доступные сектора

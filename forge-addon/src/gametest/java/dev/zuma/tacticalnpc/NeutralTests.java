@@ -42,23 +42,23 @@ public final class NeutralTests {
             var at=h.absoluteVec(new Vec3(6.5,2,7.5));
             var source=h.getLevel().getServer().createCommandSourceStack().withLevel(h.getLevel()).withPosition(at).withSuppressedOutput();
             h.assertTrue(run(h,source.withPermission(0),"spawn stage07-other")==7,"unrelated /spawn child remains usable");
-            boolean denied=false;try{dispatcher.execute("spawn npc",source.withPermission(1));}catch(com.mojang.brigadier.exceptions.CommandSyntaxException e){denied=true;}
-            h.assertTrue(denied,"spawn npc requires permission 2");
+            boolean denied=false;try{dispatcher.execute("npc spawn",source.withPermission(1));}catch(com.mojang.brigadier.exceptions.CommandSyntaxException e){denied=true;}
+            h.assertTrue(denied,"npc spawn requires permission 2");
             h.setBlock(new BlockPos(9,1,7),Blocks.MAGMA_BLOCK);
-            h.assertTrue(run(h,source,"spawn npc")==1 && run(h,source,"tacticalnpc spawn")==1,"both aliases use safe independent spawn");
+            h.assertTrue(run(h,source,"npc spawn")==1 && run(h,source,"npc spawn")==1,"repeated commands use safe independent spawn");
             var all=new java.util.ArrayList<TacticalNpcEntity>();
             h.getLevel().getAllEntities().forEach(e->{if(e instanceof TacticalNpcEntity n)all.add(n);});
-            h.assertTrue(all.size()==2,"one independent NPC per alias");
+            h.assertTrue(all.size()==2,"one independent NPC per command");
             for(var n:all) {
                 h.assertTrue(!n.neutral() && n.order().equals("ASSAULT") && n.getTeam()==null && n.reactiveAttacker()==null && h.getLevel().noCollision(n),"safe teamless attack spawn, no reactive identity");
                 h.assertFalse(h.getLevel().getBlockState(n.blockPosition().below()).is(Blocks.MAGMA_BLOCK),"hazard candidate skipped");
                 h.assertTrue(IGun.getIGunOrNull(n.getMainHandItem())!=null,"AK loadout preserved");
             }
-            var n=all.get(0);String id=n.getUUID().toString();
-            h.assertTrue(run(h,source,"tacticalnpc equip "+id+" tacz:glock_17")==1,"old equip");
-            h.assertTrue(run(h,source,"tacticalnpc ammo "+id+" finite 7")==1,"old ammo");
+            var n=all.get(0);String id=n.npcName();
+            h.assertTrue(run(h,source,"npc equip "+id+" tacz:glock_17")==1,"old equip");
+            h.assertTrue(run(h,source,"npc ammo "+id+" finite 7")==1,"old ammo");
             h.assertTrue(!n.neutral() && n.ammoPolicy()==TacticalNpcEntity.AmmoPolicy.FINITE,"equipment preserves active spawn policy");
-            h.assertTrue(run(h,source,"npc mode attack "+id)==1 && !n.neutral(),"explicit mode activates same controller");
+            h.assertTrue(run(h,source,"npc mode "+id+" assault")==1 && !n.neutral(),"explicit mode activates same controller");
             all.forEach(Entity::discard);h.succeed();
         });
     }
@@ -159,9 +159,17 @@ public final class NeutralTests {
         });
         h.runAtTickTime(50+ServerConfig.MEMORY.get(),()->{h.assertTrue(n.controller().shots()==0,"opening wall after expiry does not provoke neutral");finish(h,n,p);});
     }
-    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="neutral-08-reload",timeoutTicks=230)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="neutral-08-reload",timeoutTicks=230)
     public static void retaliationCannotBypassNativeReload(GameTestHelper h) {
-        ScenarioIsolation.begin(h);var n=npc(h,"ak47",0);var p=player(h,11.5,7.5);
+        ScenarioIsolation.begin(h);
+        // An immobile reload probe must not select an unreachable cover cycle at a small room's wall.
+        // Keep every local cover candidate on the same open floor, with no nearby perimeter cover.
+        for(int x=20;x<=52;x++)for(int z=20;z<=44;z++){
+            h.setBlock(new BlockPos(x,1,z),Blocks.STONE);
+            for(int y=2;y<=8;y++)h.setBlock(new BlockPos(x,y,z),Blocks.AIR);
+        }
+        var n=npc(h,"ak47",0);var at=h.absoluteVec(new Vec3(32.5,2,32.5));n.moveTo(at.x,at.y,at.z,-90,0);n.enterNeutral();
+        var p=player(h,40.5,32.5);
         // This fixture isolates native reload/retaliation. Real movement/cover is covered
         // separately; random strafing must not remove the shooter's legitimate contact.
         n.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(0);

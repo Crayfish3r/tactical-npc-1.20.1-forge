@@ -1,0 +1,11 @@
+{
+  "status": "INTERRUPTED",
+  "profile": "FULL",
+  "legacy": true,
+  "selected": 149,
+  "completed_before_interrupt": 24,
+  "full_pass": false,
+  "reason": "Stopped own isolated sequence after reviewing a newly added packet regression: comparing SuggestionProviders wrapper identity is invalid; test repaired to invoke deserialized provider and verify actual customSuggestion request. No production source change in this repair.",
+  "log": "forge-addon\\build\\test-runs\\20261022T174931.534973Z-FULL-compat.log",
+  "timestamp": "2026-10-22T17:53:21.953437+00:00"
+}

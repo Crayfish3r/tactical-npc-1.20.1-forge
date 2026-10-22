@@ -118,12 +118,20 @@ public final class PerceptionTests {
         // Isolate acquisition/readiness from the existing idle sweep and weapon aim.
         h.onEachTick(()->{n.setYRot(-90);n.setYBodyRot(-90);n.setYHeadRot(-90);});
         h.runAtTickTime(45,()->{
-            h.assertTrue(n.controller()!=null && open.getUUID().equals(n.controller().targetId()),"page continuation must not replace a fresh visible candidate still awaiting perception=8 with cadence=2: target="+(n.controller()==null?null:n.controller().targetId())+" contact="+(n.controller()==null?null:n.controller().contactId())+" observation="+(n.controller()==null?null:n.controller().observation())+" entityTicks="+n.tickCount+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition())+" players="+h.getLevel().players().size()+" "+dev.zuma.tacticalnpc.combat.AiTelemetry.diagnostics(h.getLevel()));
-            h.assertTrue(open.getUUID().equals(n.controller().contactId()),"same identity reaches ContactReadiness without changing perception delay");
+            var probe=h.getLevel().clip(new net.minecraft.world.level.ClipContext(n.getEyePosition(),new dev.zuma.tacticalnpc.combat.VisibilitySensor().aimPoint(open),net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,n));
+            h.assertTrue(n.controller()!=null && open.getUUID().equals(n.controller().targetId()),"page continuation must not replace a fresh visible candidate still awaiting perception=8 with cadence=2: target="+(n.controller()==null?null:n.controller().targetId())+" contact="+(n.controller()==null?null:n.controller().contactId())+" observation="+(n.controller()==null?null:n.controller().observation())+" entityTicks="+n.tickCount+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition())+" players="+h.getLevel().players().size()+" npc="+n.position()+" open="+open.position()+" head="+n.getYHeadRot()+" LOS="+probe.getType()+" block="+probe.getBlockPos()+" blockState="+h.getLevel().getBlockState(probe.getBlockPos())+" actualPerception="+dev.zuma.tacticalnpc.config.ServerConfig.PERCEPTION.get()+" "+dev.zuma.tacticalnpc.combat.AiTelemetry.diagnostics(h.getLevel()));
+            h.assertTrue(open.getUUID().equals(n.controller().contactId()),"same identity reaches ContactReadiness without changing perception delay; npc="+n.position()+" open="+open.position()+" head="+n.getYHeadRot()+" LOS="+probe.getType()+" block="+probe.getBlockPos()+" state="+h.getLevel().getBlockState(probe.getBlockPos())+" perception="+dev.zuma.tacticalnpc.config.ServerConfig.PERCEPTION.get());
             acquisitionFinish(h,n,players);
         });
     }
     private static TacticalNpcEntity acquisitionNpc(GameTestHelper h,boolean controlled) {
+        // Sparse template air / falling gravel from earlier fixtures cannot define this LOS probe.
+        // Materialize the claimed open room and cap it above all sight/aim geometry.
+        for(int x=0;x<16;x++)for(int z=0;z<16;z++){
+            h.setBlock(new BlockPos(x,1,z),Blocks.STONE);
+            for(int y=2;y<=8;y++)h.setBlock(new BlockPos(x,y,z),Blocks.AIR);
+            h.setBlock(new BlockPos(x,9,z),Blocks.STONE);
+        }
         var n=NpcEntities.NPC.get().create(h.getLevel());var at=h.absoluteVec(new Vec3(3.5,2,7.5));
         n.moveTo(at.x,at.y,at.z,-90,0);n.setYHeadRot(-90);n.setYBodyRot(-90);n.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
         if(controlled) {n.setItemSlot(EquipmentSlot.MAINHAND,GunSupport.create(new ResourceLocation("tacz:ak47")));n.addTag(RuntimeRegistry.TAG);}

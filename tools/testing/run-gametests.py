@@ -63,8 +63,10 @@ def main():
     # structure remnants from earlier selections must not become test inputs.
     runtime = output / f"{name}-runtime"
     runtime.mkdir(exist_ok=False)
+    compiled = output / f"{name}-compiled"
     (runtime / "server.properties").write_text("# Isolated GameTest defaults\n", encoding="utf-8")
     command.append(f"-PgameTestDir={runtime}")
+    command.append(f"-PgameTestOutputDir={compiled}")
     log = output / f"{name}-{args.profile}{'-compat' if args.legacy else ''}.log"
     started = time.monotonic()
     with log.open("w", encoding="utf-8") as stream:
@@ -76,6 +78,7 @@ def main():
                    selected=selected, seconds=round(time.monotonic()-started, 3),
                    exit_code=result.returncode, command=command, log=str(log.relative_to(ROOT)),
                    runtime=str(runtime.relative_to(ROOT)),
+                   compiled_output=str(compiled.relative_to(ROOT)),
                    tasks=re.findall(r"^> Task (.+)$", text, flags=re.MULTILINE))
     log.with_suffix(".json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(json.dumps(summary, indent=2))

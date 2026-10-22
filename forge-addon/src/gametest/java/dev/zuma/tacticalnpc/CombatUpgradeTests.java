@@ -25,7 +25,7 @@ public final class CombatUpgradeTests {
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="upgrade-range128",timeoutTicks=140)
     public static void detection128(GameTestHelper h){range(h,128);}
     private static void range(GameTestHelper h,int range){
-        ScenarioIsolation.begin(h);ServerConfig.applyProfile(ServerConfig.Difficulty.HARD);
+        ScenarioIsolation.begin(h);ServerConfig.normalizeHard();
         var tickets=new java.util.ArrayList<ChunkPos>();
         for(int x=624;x<=634;x++)for(int z=624;z<=626;z++)if(h.getLevel().setChunkForced(x,z,true))tickets.add(new ChunkPos(x,z));
         // Remote lane prevents a long sight ray crossing another GameTest's structure/wall.
@@ -46,17 +46,16 @@ public final class CombatUpgradeTests {
             n.discard();p.discard();tickets.forEach(c->h.getLevel().setChunkForced(c.x,c.z,false));h.succeed();
         });
     }
-    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="upgrade-hints",timeoutTicks=170)
-    public static void unfairHintsSeparateAndHardClears(GameTestHelper h){
-        ScenarioIsolation.begin(h);var n=npc(h);n.setAmmoPolicy(TacticalNpcEntity.AmmoPolicy.FINITE,0);
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="upgrade-hints",timeoutTicks=140)
+    public static void legacyUnfairNormalizesToHardAndPreservesAmmo(GameTestHelper h){
+        ScenarioIsolation.begin(h);ServerConfig.DEBUG.set(true);ServerConfig.TELEMETRY.set(true);
+        ServerConfig.DIFFICULTY.set(ServerConfig.Difficulty.UNFAIR);ServerConfig.HEARING_RANGE.set(192.0);ServerConfig.REACTION.set(20);ServerConfig.TURN.set(2.0);
+        var n=npc(h);n.setAmmoPolicy(TacticalNpcEntity.AmmoPolicy.FINITE,17);
+        h.assertTrue(ServerConfig.normalizeHard() && !ServerConfig.normalizeHard() && !ServerConfig.unfair() && ServerConfig.DIFFICULTY.get()==ServerConfig.Difficulty.HARD && ServerConfig.HEARING_RANGE.get()==128 && ServerConfig.reaction()==3 && ServerConfig.TURN.get()==17,"migration resets every old combat preset and is idempotent");
+        h.assertTrue(ServerConfig.DEBUG.get() && ServerConfig.TELEMETRY.get() && n.needCheckAmmo() && n.ammoPolicy()==TacticalNpcEntity.AmmoPolicy.FINITE,"diagnostics and finite policy preserved");
+        ServerConfig.DEBUG.set(false);ServerConfig.TELEMETRY.set(false);
         var p=player(h,new Vec3(12.5,2,7.5));for(int y=1;y<=7;y++)for(int z=0;z<=15;z++)h.setBlock(new BlockPos(8,y,z),Blocks.STONE);
-        h.runAtTickTime(25,()->{h.assertTrue(n.controller().observation()==null && n.needCheckAmmo(),"Hard grants no hidden intel or infinite finite reserve");ServerConfig.DIFFICULTY.set(ServerConfig.Difficulty.UNFAIR);});
-        h.runAtTickTime(90,()->{
-            var o=n.controller().observation();h.assertTrue(o!=null && o.source()==Observation.Source.UNFAIR_HINT && !o.visible() && o.velocity().lengthSquared()==0,"explicit separate hint channel");
-            h.assertTrue(n.controller().targetId()==null && !n.needCheckAmmo(),"hint never visual; Unfair overrides reserve policy");
-            h.assertTrue(ProjectileProbe.count(n.getUUID())==0,"solid physical wall still prevents every shot");ServerConfig.DIFFICULTY.set(ServerConfig.Difficulty.HARD);
-        });
-        h.runAtTickTime(110,()->{h.assertTrue(n.controller().observation()==null && n.needCheckAmmo(),"Hard clears hints and restores finite reserve");n.discard();p.discard();h.succeed();});
+        h.runAtTickTime(110,()->{h.assertTrue(n.controller().observation()==null && n.needCheckAmmo() && ProjectileProbe.count(n.getUUID())==0,"old UNFAIR grants no hints, infinite override or wall fire");n.discard();p.discard();h.succeed();});
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="upgrade-nochunk",timeoutTicks=30)
     public static void unloadedLosDoesNotLoadChunks(GameTestHelper h){
@@ -71,7 +70,7 @@ public final class CombatUpgradeTests {
         });
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="upgrade-hint-refresh",timeoutTicks=150)
-    public static void unfairRefreshesHiddenHintWithoutReplacingVisualMemory(GameTestHelper h){
+    public static void legacyUnfairCannotRefreshHiddenPosition(GameTestHelper h){
         ScenarioIsolation.begin(h);ServerConfig.DIFFICULTY.set(ServerConfig.Difficulty.UNFAIR);
         var n=npc(h);var p=player(h,new Vec3(12.5,2,7.5));Vector3[] visual={null};
         h.runAtTickTime(30,()->{
@@ -80,21 +79,22 @@ public final class CombatUpgradeTests {
             var at=h.absoluteVec(new Vec3(12.5,2,13.5));p.setPos(at.x,at.y,at.z);
         });
         h.runAtTickTime(110,()->{
-            var o=n.controller().observation();h.assertTrue(o!=null && o.source()==Observation.Source.UNFAIR_HINT && !o.visible() && !o.position().equals(visual[0]),"periodic hint updates knowledge separately after visual track ages");
-            h.assertTrue(o.velocity().lengthSquared()==0 && n.controller().targetId()==null,"hidden hint carries no visual velocity or DIRECT target");
+            var o=n.controller().observation();h.assertTrue(o==null || o.source()!=Observation.Source.UNFAIR_HINT && !o.visible() && o.position().equals(visual[0]),"hidden position cannot refresh from legacy config");
             ServerConfig.DIFFICULTY.set(ServerConfig.Difficulty.HARD);n.discard();p.discard();h.succeed();
         });
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="upgrade-native-hearing128",timeoutTicks=420)
     public static void genuineNativeShotIsAudibleAt128(GameTestHelper h){
-        nativeHearing(h,128,ServerConfig.Difficulty.HARD);
+        nativeHearing(h,128);
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="upgrade-native-hearing192",timeoutTicks=420)
-    public static void unfairNativeHearingAt192RetainsMemory(GameTestHelper h){
-        nativeHearing(h,192,ServerConfig.Difficulty.UNFAIR);
+    public static void testOnlyNativeHearingAt192RetainsMemory(GameTestHelper h){
+        nativeHearing(h,192);
     }
-    private static void nativeHearing(GameTestHelper h,int range,ServerConfig.Difficulty profile){
-        ScenarioIsolation.begin(h);ServerConfig.applyProfile(profile);
+    private static void nativeHearing(GameTestHelper h,int range){
+        ScenarioIsolation.begin(h);ServerConfig.normalizeHard();
+        // Test-only acoustic experiment, not a gameplay profile.
+        ServerConfig.HEARING_RANGE.set((double)range);
         h.assertTrue(ServerConfig.memoryRange()>=ServerConfig.hearingRange()+16,"contact memory covers hearing with hysteresis");
         var tickets=new java.util.ArrayList<ChunkPos>();
         int low=10008-range-8;
@@ -124,7 +124,7 @@ public final class CombatUpgradeTests {
             }
             if(shooter.tickCount-ready[0]<140)return;
             h.assertTrue(shooter.distanceToSqr(listener)==range*range && ProjectileProbe.count(shooter.getUUID())>0 && heard[0],"native joined projectile delivers genuine regional hearing at"+range+" without visual observation: distanceSq="+shooter.distanceToSqr(listener)+" rounds="+ProjectileProbe.count(shooter.getUUID())+" heard="+heard[0]+" shooter="+shooter.position()+" listener="+listener.position()+" entityTicks="+shooter.tickCount+"/"+listener.tickCount+" ticking="+h.getLevel().isPositionEntityTicking(shooter.blockPosition())+"/"+h.getLevel().isPositionEntityTicking(listener.blockPosition())+" decision="+(shooter.controller()==null?null:shooter.controller().decision())+" listenerObservation="+(listener.controller()==null?null:listener.controller().observation())+" hearing="+java.util.Arrays.toString(dev.zuma.tacticalnpc.combat.GunHearing.measurements(h.getLevel())));
-            shooter.discard();listener.discard();p.discard();tickets.forEach(c->h.getLevel().setChunkForced(c.x,c.z,false));ServerConfig.DIFFICULTY.set(ServerConfig.Difficulty.HARD);h.succeed();
+            shooter.discard();listener.discard();p.discard();ServerConfig.HEARING_RANGE.set(128.0);tickets.forEach(c->h.getLevel().setChunkForced(c.x,c.z,false));ServerConfig.DIFFICULTY.set(ServerConfig.Difficulty.HARD);h.succeed();
         });
         h.runAtTickTime(410,()->h.fail("native hearing fixture did not complete its 140 active ticks: ready="+ready[0]+" entityTicks="+shooter.tickCount+"/"+listener.tickCount));
     }
@@ -155,19 +155,16 @@ public final class CombatUpgradeTests {
             return text.toString();
         }catch(ReflectiveOperationException e){return e.toString();}
     }
-    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="upgrade-unfair-reload",timeoutTicks=330)
-    public static void unfairInfiniteReserveUsesNativeReloadAndHardRestoresFinite(GameTestHelper h){
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="upgrade-finite-reload",timeoutTicks=330)
+    public static void legacyUnfairCannotOverrideFiniteReserve(GameTestHelper h){
         ScenarioIsolation.begin(h);ServerConfig.DIFFICULTY.set(ServerConfig.Difficulty.UNFAIR);
         var n=npc(h);n.setAmmoPolicy(TacticalNpcEntity.AmmoPolicy.FINITE,0);
         var gun=IGun.getIGunOrNull(n.getMainHandItem());gun.setCurrentAmmoCount(n.getMainHandItem(),1);gun.setBulletInBarrel(n.getMainHandItem(),true);
-        var p=player(h,new Vec3(14.5,2,7.5));long[] reloaded={0};
-        h.runAtTickTime(120,()->{
-            h.assertTrue(ProjectileProbe.count(n.getUUID())>2 && n.controller().reloads()>0 && !n.needCheckAmmo(),"Unfair fires beyond initial magazine only through an accepted native reload despite saved finite reserve0");
-            reloaded[0]=n.controller().reloads();ServerConfig.DIFFICULTY.set(ServerConfig.Difficulty.HARD);
-        });
+        var p=player(h,new Vec3(14.5,2,7.5));
+        h.runAtTickTime(120,()->{h.assertTrue(n.needCheckAmmo() && n.controller().reloads()==0 && ProjectileProbe.count(n.getUUID())<=2,"legacy UNFAIR never bypasses saved finite reserve0");ServerConfig.normalizeHard();});
         h.runAtTickTime(300,()->{
             var state=n.controller().weaponState();
-            h.assertTrue(n.needCheckAmmo() && n.ammoPolicy()==TacticalNpcEntity.AmmoPolicy.FINITE && !state.reserve() && state.rounds()==0 && n.controller().reloads()==reloaded[0],"Hard consumes remaining magazine, restores finite0 and never fabricates a new reserve/reload");
+            h.assertTrue(n.needCheckAmmo() && n.ammoPolicy()==TacticalNpcEntity.AmmoPolicy.FINITE && !state.reserve() && state.rounds()==0 && n.controller().reloads()==0,"migration leaves finite policy/native exhaustion unchanged");
             n.discard();p.discard();h.succeed();
         });
     }

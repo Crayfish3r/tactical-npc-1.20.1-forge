@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "world": "command-normal-20261022T182843",
+  "seconds": 112.704,
+  "output": "forge-addon\\build\\command-dedicated-check\\20261022T182843",
+  "scope": "plain dedicated startup, real reload, unified name/selector commands, native scoreboard team, PATROL/STAND/DEFEND128, name/UUID/policy/finite/native stack save/restart, natural remote chunk unload/load, actual UNFAIR config migration, clean stop; no human combat"
+}
