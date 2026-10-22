@@ -29,14 +29,25 @@ def main():
     parser.add_argument("--legacy", action="store_true", help="Only for adapter/integration risk or FULL matrix")
     parser.add_argument("--offline", action="store_true", help="Use only with populated pinned dependency cache")
     parser.add_argument("--plan", action="store_true", help="Gradle dry-run; never a test PASS")
+    parser.add_argument("--heap-mb", type=int, help="Optional fixed GameTest JVM heap (initial=max) for memory-constrained hosts")
+    parser.add_argument("--gradle-heap-mb", type=int, help="Optional build JVM heap cap, separate from the game JVM")
     args = parser.parse_args()
+    for value in [args.heap_mb, args.gradle_heap_mb]:
+        if value is not None and not 512 <= value <= 16384:
+            parser.error("Heap caps must be 512..16384 MiB")
     if (args.profile == "FULL") == bool(args.tests):
         parser.error("FULL forbids --tests; FAST/STAGE require --tests")
     if args.tests and not re.fullmatch(r"[A-Za-z0-9_#]+(?:,[A-Za-z0-9_#]+)*", args.tests):
         parser.error("Invalid selector syntax")
+    # Test/profile/production builds share the main output directory. Rebuild the
+    # selected source set, including nested classes, after switching run modes.
     command = [str(ROOT / "forge-addon" / ("gradlew.bat" if os.name == "nt" else "gradlew")),
                "runGameTestServer", "compileCompatJava", "-PcombatTests",
-               f"-PtestProfile={args.profile}", "--console=plain"]
+               f"-PtestProfile={args.profile}", "--console=plain", "--rerun-tasks"]
+    if args.heap_mb is not None:
+        command.append(f"-PgameTestHeapMb={args.heap_mb}")
+    if args.gradle_heap_mb is not None:
+        command.append(f"-Dorg.gradle.jvmargs=-Xmx{args.gradle_heap_mb}m")
     if args.tests:
         command.append(f"-PtestSelection={args.tests}")
     if args.legacy:

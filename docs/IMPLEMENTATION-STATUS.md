@@ -1,5 +1,10 @@
 # Фактические срезы разработки — обновлено 2026-10-22
 
+Новый срез навигации: [ACTION-ROUTES-2026-10-22](ACTION-ROUTES-2026-10-22.md).
+WALK/OPEN_DOOR/CLIMB_UP/CLIMB_DOWN, native physics/interactions, FIFO narrow leases,
+отдельные статусы ожидания и bounded recovery. Финальные результаты этого среза
+публикуются в его отчёте; прежние боевые receipts ниже остаются историческими.
+
 Текущий боевой срез: [COMBAT-UPGRADE-2026-10-22](COMBAT-UPGRADE-2026-10-22.md), от чистого `3077098f1338c3c8fdb1f564257fd71f8ea98701`. Detection/hearing128, согласованная память, отдельные preference/falloff/reach, подтверждённое ballistic lead, длительное native pressure, трёхчастный flank route/роли/utility, Hard и явно разрешённый Unfair реализованы без новых зависимостей/Mixins. AGENTS5/9 исключения только для Unfair.
 
 Core818, combined36/36, standalone24/24, final DEFEND7/7 PASS. Последний FULL129/131 с двумя FAIL (displacement return и посторонний gravel в lifecycle corridor) сохранён; после синхронизации test-only драйвера с entity ticks повтор DEFEND7/7 PASS; после подготовки воздушного коридора lifecycle/native9/9 PASS. Весь FULL не повторялся. Production build/verifier и ordinary dedicated reload/save/restart PASS. Matched dedicated9/9 до/после:30/50 —28→30 и43→50 shooters,1274→1357 и1943→2205 native rounds; MSPT p95 15,21→15,40 /19,60→18,37ms. Общего performance win нет, AI p95≤2ms не достигнут. **WAITING_PLAYTEST**; human1v1/1v4, distribution-client, natural chunk-edge ticking и soak остаются отдельными.

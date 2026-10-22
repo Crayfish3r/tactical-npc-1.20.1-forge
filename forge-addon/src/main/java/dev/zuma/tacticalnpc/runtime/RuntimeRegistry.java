@@ -38,6 +38,7 @@ public final class RuntimeRegistry {
         if(event.getLevel() instanceof ServerLevel level && event.getEntity() instanceof LivingEntity living){
             dev.zuma.tacticalnpc.combat.AiWorkBudget.of(level).forget(living.getUUID());
             dev.zuma.tacticalnpc.combat.GunHearing.forget(level,living.getUUID());
+            dev.zuma.tacticalnpc.combat.TransitionResources.forget(level,living.getUUID());
             var loaded=LOADED.get(level);if(loaded!=null)loaded.remove(living.getUUID());
             for(var goal:activeIn(level))goal.forget(living.getUUID());
         }

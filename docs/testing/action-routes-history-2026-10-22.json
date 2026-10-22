@@ -1,0 +1,112 @@
+[
+  {
+    "receipt": "forge-addon\\build\\test-runs\\20261022T043940.699912Z-FAST.json",
+    "status": "FAIL",
+    "profile": "FAST",
+    "legacy": false,
+    "executed": 0,
+    "seconds": 24.531,
+    "failures": []
+  },
+  {
+    "receipt": "forge-addon\\build\\test-runs\\20261022T044027.172172Z-FAST.json",
+    "status": "FAIL",
+    "profile": "FAST",
+    "legacy": false,
+    "executed": 9,
+    "seconds": 163.797,
+    "failures": [
+      [
+        "ladderdestroyedduringclimb",
+        "Didn't succeed or fail within 360 ticks"
+      ]
+    ]
+  },
+  {
+    "receipt": "forge-addon\\build\\test-runs\\20261022T044440.930452Z-FAST.json",
+    "status": "FAIL",
+    "profile": "FAST",
+    "legacy": false,
+    "executed": 3,
+    "seconds": 122.579,
+    "failures": [
+      [
+        "ladderdestroyedduringclimb",
+        "diagnostic cause: FAILURE:no physical progress: CLIMB_UP step=3 completed=1 opened=0 waiting=20 failed=1"
+      ]
+    ]
+  },
+  {
+    "receipt": "forge-addon\\build\\test-runs\\20261022T044809.631701Z-FAST.json",
+    "status": "FAIL",
+    "profile": "FAST",
+    "legacy": false,
+    "executed": 10,
+    "seconds": 164.219,
+    "failures": [
+      [
+        "woodendoorfromwest",
+        "Didn't succeed or fail within 240 ticks"
+      ]
+    ]
+  },
+  {
+    "receipt": "forge-addon\\build\\test-runs\\20261022T045128.952692Z-FAST.json",
+    "status": "FAIL",
+    "profile": "FAST",
+    "legacy": false,
+    "executed": 3,
+    "seconds": 108.609,
+    "failures": [
+      [
+        "ordercancellationfinishescurrentladderexit",
+        "cancellation completes actual upper landing: (95.51249998807907, -51.96783948570355, 7.5) FAILURE:transition deadline: CLIMB_UP step=3 completed=1 opened=0 climbed=0 waiting=20 failed=1"
+      ]
+    ]
+  },
+  {
+    "receipt": "forge-addon\\build\\test-runs\\20261022T045359.120031Z-STAGE.json",
+    "status": "FAIL",
+    "profile": "STAGE",
+    "legacy": false,
+    "executed": 19,
+    "seconds": 262.484,
+    "failures": [
+      [
+        "knowntargetdoorladderandnativecombat",
+        "arrival and actual native shot: pos=(536.421916932412, -52.0, 7.499619141556286) decision=CombatDecision[intent=PATROL, firePermitted=false, reason=free local exploration, weaponAction=NONE, movement=MovementCommand[mode=HOLD, destination=null, forward=0.0, sideways=0.0, speed=0.0, locomotion=WALK], aim=AimCommand[mode=NONE, point=null], frame=Frame[owner=3709a541-e240-4c7c-9122-501b59f99708, dimension=minecraft:overworld, tick=2302, generation=9], expires=2310] SUCCESS:cancelled step=3 completed=3 opened=1 climbed=1 waiting=0 failed=3"
+      ],
+      [
+        "unloadreleasesladderlease",
+        "Didn't succeed or fail within 240 ticks"
+      ]
+    ]
+  },
+  {
+    "receipt": "forge-addon\\build\\test-runs\\20261022T045839.259062Z-FAST.json",
+    "status": "PASS",
+    "profile": "FAST",
+    "legacy": false,
+    "executed": 2,
+    "seconds": 97.468,
+    "failures": []
+  },
+  {
+    "receipt": "forge-addon\\build\\test-runs\\20261022T050216.492808Z-STAGE.json",
+    "status": "FAIL",
+    "profile": "STAGE",
+    "legacy": false,
+    "executed": 0,
+    "seconds": 19.078,
+    "failures": []
+  },
+  {
+    "receipt": "forge-addon\\build\\test-runs\\20261022T050402.560902Z-FAST.json",
+    "status": "PASS",
+    "profile": "FAST",
+    "legacy": false,
+    "executed": 12,
+    "seconds": 195.907,
+    "failures": []
+  }
+]

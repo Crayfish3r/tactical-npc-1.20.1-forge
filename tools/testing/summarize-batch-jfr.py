@@ -53,6 +53,7 @@ def main():
         phases=sorted((epoch(r["start_utc"]),epoch(r["end_utc"]),f'{r["phase"]}:{r["npc_actors"]}:{r["repeat"]}') for r in csv.DictReader(phase_csv.open(encoding="utf-8")))
     else:
         phase_csv=args.recording.parent / "upgrade-phases.csv"
+        if not phase_csv.is_file():phase_csv=args.recording.parent / "actions-phases.csv"
         assert phase_csv.is_file(), "Requires actual phase/warmup boundaries next to JFR"
         phases=sorted((epoch(r["start"]),epoch(r["end"]),r["phase"]) for r in csv.DictReader(phase_csv.open(encoding="utf-8")))
     starts=[p[0] for p in phases]
@@ -72,8 +73,9 @@ def main():
         if any("GunHearing" in n for n in names):return "hearing_delivery"
         if any(any(token in n for token in ("TaczGunController.maintain", "LivingEntityDrawGun", "LivingEntityReload", "LivingEntityBolt", "LivingEntitySprint", "LivingEntityAim", "LivingEntityHeat", "LivingEntitySpeedModifier")) for n in names):return "native_maintenance"
         if any("LivingEntityShoot" in n for n in names):return "native_shoot"
+        if any("MovementExecutor" in n or "ActionRouteExecutor" in n or "ActionRoutePlanner" in n for n in names):return "action_navigation"
         if any("TacticalCombatGoal" in n for n in names):return "goal_or_native_safety"
-        if any("BatchProfile" in n or "ServerProfile" in n or "TeamCommandProfile" in n or "CombatUpgradeProfile" in n for n in names):return "profiling_fixture"
+        if any("BatchProfile" in n or "ServerProfile" in n or "TeamCommandProfile" in n or "CombatUpgradeProfile" in n or "ActionRouteProfile" in n for n in names):return "profiling_fixture"
         return "other_server"
     for event in events:
         kind, value = event["type"], event["values"]
@@ -102,7 +104,7 @@ def main():
             continue
         server_samples += 1
         hot[" <- ".join(names[:6])] += 1
-        if any(n.startswith("dev/zuma/tacticalnpc/") and not any(p in n for p in ("BatchProfile","ServerProfile","TeamCommandProfile","CombatUpgradeProfile")) for n in names):
+        if any(n.startswith("dev/zuma/tacticalnpc/") and not any(p in n for p in ("BatchProfile","ServerProfile","TeamCommandProfile","CombatUpgradeProfile","ActionRouteProfile")) for n in names):
             tactical_server += 1
         categories[scope] += 1
         phase_cpu[phases[index][2]][scope] += 1

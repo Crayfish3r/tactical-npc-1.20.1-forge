@@ -85,11 +85,11 @@ public final class CombatUpgradeTests {
             ServerConfig.DIFFICULTY.set(ServerConfig.Difficulty.HARD);n.discard();p.discard();h.succeed();
         });
     }
-    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="upgrade-native-hearing128",timeoutTicks=170)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="upgrade-native-hearing128",timeoutTicks=420)
     public static void genuineNativeShotIsAudibleAt128(GameTestHelper h){
         nativeHearing(h,128,ServerConfig.Difficulty.HARD);
     }
-    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="upgrade-native-hearing192",timeoutTicks=170)
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="upgrade-native-hearing192",timeoutTicks=420)
     public static void unfairNativeHearingAt192RetainsMemory(GameTestHelper h){
         nativeHearing(h,192,ServerConfig.Difficulty.UNFAIR);
     }
@@ -99,28 +99,61 @@ public final class CombatUpgradeTests {
         var tickets=new java.util.ArrayList<ChunkPos>();
         int low=10008-range-8;
         for(int x=Math.floorDiv(low,16)-1;x<=628;x++)for(int z=624;z<=626;z++)if(h.getLevel().setChunkForced(x,z,true))tickets.add(new ChunkPos(x,z));
-        for(int x=low;x<=10040;x++)for(int z=9998;z<=10002;z++)h.getLevel().setBlock(new BlockPos(x,100,z),Blocks.STONE.defaultBlockState(),2);
+        for(int x=low;x<=10040;x++)for(int z=9998;z<=10002;z++){
+            h.getLevel().setBlock(new BlockPos(x,100,z),Blocks.STONE.defaultBlockState(),2);
+            for(int y=101;y<=110;y++)h.getLevel().setBlock(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState(),2);
+        }
         var shooter=npc(h);shooter.moveTo(10008.5,101,10000.5,-90,0);shooter.setYHeadRot(-90);shooter.setYBodyRot(-90);shooter.setFaction("hearing-source");shooter.setOrder(OrderState.Kind.HOLD_POSITION,6);
         var listener=npc(h);listener.setPos(10008.5-range,101,10000.5);listener.setNoAi(true);listener.setInvisible(true);listener.setFaction("hearing-listener");
+        // Static acoustic measurement actors must not be knocked off the exact
+        // distance or driven into a critical-health retreat by unrelated damage.
+        // Native firing, cooldown, actual projectile and HEARING checks stay enabled.
+        shooter.setInvulnerable(true);listener.setInvulnerable(true);
         var p=player(h,new Vec3(12.5,2,7.5));p.setPos(10024.5,101,10000.5);boolean[] heard={false};
         for(int tick:new int[]{15,30})h.runAtTickTime(tick,()->h.getLevel().getEntitiesOfClass(LivingEntity.class,shooter.getBoundingBox().inflate(512)).stream().filter(e->e!=shooter && e!=listener && e!=p).forEach(Entity::discard));
-        h.onEachTick(()->{var o=listener.controller()==null?null:listener.controller().observation();if(o!=null && o.source()==Observation.Source.HEARING && o.subject().equals(shooter.getUUID()))heard[0]=true;});
-        h.runAtTickTime(140,()->{
-            h.assertTrue(shooter.distanceToSqr(listener)==range*range && ProjectileProbe.count(shooter.getUUID())>0 && heard[0],"native joined projectile delivers genuine regional hearing at"+range+" without visual observation");
+        int[] ready={-1};
+        h.onEachTick(()->{
+            var o=listener.controller()==null?null:listener.controller().observation();
+            if(o!=null && o.source()==Observation.Source.HEARING && o.subject().equals(shooter.getUUID()))heard[0]=true;
+            // These actors are relocated outside the template into fresh remote chunks.
+            // Measure the original 140-tick combat window in actual entity ticks after
+            // activation, rather than consuming it while those chunks become ticking.
+            if(ready[0]<0){
+                if(shooter.tickCount>=5 && listener.tickCount>=5 && h.getLevel().isPositionEntityTicking(shooter.blockPosition()) && h.getLevel().isPositionEntityTicking(listener.blockPosition()) && h.getLevel().isPositionEntityTicking(p.blockPosition()))ready[0]=shooter.tickCount;
+                return;
+            }
+            if(shooter.tickCount-ready[0]<140)return;
+            h.assertTrue(shooter.distanceToSqr(listener)==range*range && ProjectileProbe.count(shooter.getUUID())>0 && heard[0],"native joined projectile delivers genuine regional hearing at"+range+" without visual observation: distanceSq="+shooter.distanceToSqr(listener)+" rounds="+ProjectileProbe.count(shooter.getUUID())+" heard="+heard[0]+" shooter="+shooter.position()+" listener="+listener.position()+" entityTicks="+shooter.tickCount+"/"+listener.tickCount+" ticking="+h.getLevel().isPositionEntityTicking(shooter.blockPosition())+"/"+h.getLevel().isPositionEntityTicking(listener.blockPosition())+" decision="+(shooter.controller()==null?null:shooter.controller().decision())+" listenerObservation="+(listener.controller()==null?null:listener.controller().observation())+" hearing="+java.util.Arrays.toString(dev.zuma.tacticalnpc.combat.GunHearing.measurements(h.getLevel())));
             shooter.discard();listener.discard();p.discard();tickets.forEach(c->h.getLevel().setChunkForced(c.x,c.z,false));ServerConfig.DIFFICULTY.set(ServerConfig.Difficulty.HARD);h.succeed();
         });
+        h.runAtTickTime(410,()->h.fail("native hearing fixture did not complete its 140 active ticks: ready="+ready[0]+" entityTicks="+shooter.tickCount+"/"+listener.tickCount));
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="upgrade-safe-retarget",timeoutTicks=230)
     public static void unsafeVisibleContactDoesNotMonopolizeFirstPage(GameTestHelper h){
-        ScenarioIsolation.begin(h);var n=npc(h);var at=h.absoluteVec(new Vec3(3.5,2,32.5));n.moveTo(at.x,at.y,at.z,-90,0);n.setYHeadRot(-90);n.setYBodyRot(-90);n.setOrder(OrderState.Kind.HOLD_POSITION,6);
+        ScenarioIsolation.begin(h);ServerConfig.DEBUG.set(true);
+        // Measure unsafe-contact acquisition, independent of fall/damage/critical-HP
+        // interruptions. Both target pages stand in the same explicit flat room.
+        for(int x=1;x<=36;x++)for(int z=29;z<=38;z++){
+            h.setBlock(new BlockPos(x,1,z),Blocks.STONE);
+            for(int y=2;y<=8;y++)h.setBlock(new BlockPos(x,y,z),Blocks.AIR);
+        }
+        var n=npc(h);n.setInvulnerable(true);var at=h.absoluteVec(new Vec3(3.5,2,32.5));n.moveTo(at.x,at.y,at.z,-90,0);n.setYHeadRot(-90);n.setYBodyRot(-90);n.setOrder(OrderState.Kind.HOLD_POSITION,6);
         var players=new java.util.ArrayList<net.minecraft.server.level.ServerPlayer>();
         for(int i=0;i<16;i++)players.add(player(h,new Vec3(30.5,2,32.5+i*.15)));
         var near=player(h,new Vec3(14.5,2,32.5));players.add(near);
-        h.runAtTickTime(20,()->h.assertTrue(n.controller().observation()!=null && !near.getUUID().equals(n.controller().observation().subject()),"first sensor page initially contains only distant visible contacts"));
+        h.runAtTickTime(20,()->{h.assertTrue(n.getHealth()/n.getMaxHealth()>.4,"retarget fixture starts outside critical-health policy");h.assertTrue(n.controller().observation()!=null && !near.getUUID().equals(n.controller().observation().subject()),"first sensor page initially contains only distant visible contacts");});
         h.runAtTickTime(190,()->{
-            h.assertTrue(near.getUUID().equals(n.controller().targetId()),"sustained unsafe corridor resumes bounded page cursor and selects the closer genuinely visible target");
+            h.assertTrue(near.getUUID().equals(n.controller().targetId()),"sustained unsafe corridor resumes bounded page cursor and selects the closer genuinely visible target: hp="+n.getHealth()+"/"+n.getMaxHealth()+" npc="+n.position()+" near="+near.position()+" nearAlive="+near.isAlive()+" ticks="+n.tickCount+" target="+n.controller().targetId()+" decision="+n.controller().decision()+" observation="+n.controller().observation()+" "+retargetDiagnostics(n.controller()));
             players.forEach(Entity::discard);n.discard();h.succeed();
         });
+    }
+    private static String retargetDiagnostics(TacticalCombatGoal goal){
+        try{
+            var text=new StringBuilder();
+            for(String name:new String[]{"blockedFireTicks","nextOpportunityScan","nextTargetChange","nextScan","candidateId","activeLos"}){var f=TacticalCombatGoal.class.getDeclaredField(name);f.setAccessible(true);text.append(name).append('=').append(f.get(goal)).append(' ');}
+            var f=TacticalCombatGoal.class.getDeclaredField("sensor");f.setAccessible(true);var sensor=(VisibilitySensor)f.get(goal);text.append("sector=").append(sensor.lastSector());
+            return text.toString();
+        }catch(ReflectiveOperationException e){return e.toString();}
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="upgrade-unfair-reload",timeoutTicks=330)
     public static void unfairInfiniteReserveUsesNativeReloadAndHardRestoresFinite(GameTestHelper h){

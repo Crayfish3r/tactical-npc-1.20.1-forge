@@ -250,3 +250,20 @@ revalidates subject eligibility without inspecting hidden coordinates. No TaCZ A
 cooldown/damage rule, dependency, optional adapter class or Mixin was added. Native BURST
 regression counts actual joined projectiles while the target joins/leaves an allied team.
 
+## Action routes, 2026-10-22
+
+Pinned mapped Forge47.4.20 bytecode was inspected with `javap -c -p` for
+DoorBlock.setOpen(Entity,Level,BlockState,BlockPos,boolean), DoorInteractGoal,
+GroundPathNavigation, MoveControl, LivingEntity.onClimbable/handleOnClimbable/travel,
+and PathNavigationRegion. The latter uses ChunkSource.getChunkNow, including null
+unloaded slots; native local walking therefore does not request missing chunks.
+New geometry reads first require hasChunkAt, and no production path adds tickets.
+Vertical movement uses native MoveControl/JumpControl/gravity/ladder collision;
+no teleport, noClip, bullet spawning, new dependency or Mixin.
+
+Wooden door interaction uses native setOpen and verifies both halves plus body
+clearance. Forge getMobGriefingEvent and the cancellable RouteInteractions.OpenDoorEvent
+gate NPC interaction. Player-only events are not impersonated; claim mods needing
+their own permission API require a DoorAdapter. Exact scope, third-party reference
+commits/licenses and execution receipts: [ACTION-ROUTES](ACTION-ROUTES-2026-10-22.md).
+

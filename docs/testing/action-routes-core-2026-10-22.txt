@@ -1,0 +1,7 @@
+PASS: 72 policy checks
+PASS: 94 alpha temporal regression checks (R1/R2/R4/R5, contact, tracking, recovery, locomotion)
+PASS: 38 defend territory checks
+PASS: 235 defend patrol checks
+PASS: 353 attack route checks
+PASS: 26 combat upgrade checks
+Action route checks: 118 PASS

@@ -102,7 +102,7 @@ public final class TacticalCombatGoal extends Goal {
         var known=memory.sample(npc.level().getGameTime(),false,vector(npc.position()),ServerConfig.memoryRange());
         boolean matched=subject.equals(targetId) || subject.equals(candidateId) || subject.equals(contact.subject()) || known!=null && subject.equals(known.subject());
         memory.forget(subject);
-        if(matched){SquadRuntime.of((ServerLevel)npc.level()).releaseClaims(npc.getUUID());targetId=null;candidateId=null;contact.clear();freshVisible=false;decision=null;generation=GENERATIONS.incrementAndGet();nextPlan=0;movement.contactRestored();}
+        if(matched){SquadRuntime.of((ServerLevel)npc.level()).releaseClaims(npc.getUUID());targetId=null;candidateId=null;contact.clear();freshVisible=false;decision=null;generation=GENERATIONS.incrementAndGet();nextPlan=0;movement.contactRestored();movement.subject(null);}
     }
     public Observation observation() {
         var known=knowledge(memory.sample(npc.level().getGameTime(),freshVisible,vector(npc.position()),ServerConfig.memoryRange()),npc.level().getGameTime());
@@ -179,7 +179,7 @@ public final class TacticalCombatGoal extends Goal {
     private void combatTick() {
         runtime.requireServer();
         if(appliedProfile!=ServerConfig.DIFFICULTY.get()){runtime.operator().cancelReload();stop();appliedProfile=ServerConfig.DIFFICULTY.get();}
-        runtime.beforeTick();guns.maintain(npc.level().getGameTime());movement.guardTerritory();
+        runtime.beforeTick();guns.maintain(npc.level().getGameTime());
         long tick=npc.level().getGameTime(); double range=ServerConfig.RANGE.get();
         var neutral=neutralOwner();
         if(neutral!=null && neutral.reactiveAttacker()!=null) {
@@ -193,6 +193,8 @@ public final class TacticalCombatGoal extends Goal {
         if(hint!=null && !subjectAlive(hint.subject()))hint=null;
         var stored=memory.sample(tick,false,vector(npc.position()),ServerConfig.memoryRange());
         stored=knowledge(stored,tick);
+        // Expired knowledge cancels its route before activation/cadence can defer this tick.
+        movement.subject(stored==null?null:stored.subject());movement.guardTerritory();
         if(neutral!=null && targetId!=null && stored==null) {neutral.clearRetaliation();stop();}
         if(targetId==null && stored==null && (neutral==null || neutral.reactiveAttacker()==null)) {
             if(tick>=nextActivation) {
@@ -355,6 +357,7 @@ public final class TacticalCombatGoal extends Goal {
         if(ServerConfig.DEBUG.get() && tick%40==0 && visible) debug("gates action="+commands.weapon()+" reason="+decision.reason()+" clear="+clear+" occupied="+occupied+" aligned="+aligned+" busy="+gun.busy()+" ready="+gun.cooldownReady()+" valid="+commands.valid());
         boolean relocating=decision.intent()==TacticalIntent.RETREAT || decision.intent()==TacticalIntent.ADVANCE || decision.intent()==TacticalIntent.TAKE_COVER || decision.intent()==TacticalIntent.REPOSITION;
         guns.aim(commands.valid() && !relocating && !commands.movement().sprint() && (visible || decision.aim().mode()==AimCommand.Mode.SUPPRESS_AREA)); npc.setAggressive(observation!=null);
+        movement.subject(observation==null?null:observation.subject());
         movement.apply(commands.movement(),tick);
         long shots=guns.shots();
         guns.apply(commands.weapon(),tick);
@@ -379,6 +382,10 @@ public final class TacticalCombatGoal extends Goal {
         return Math.abs(Mth.wrapDegrees(yaw-npc.getYHeadRot()))<=error+2 && Math.abs(pitch-npc.getXRot())<=error+2;
     }
     @Override public void stop() {
+        stop(false);
+    }
+    public void stopForOrderChange(){stop(true);}
+    private void stop(boolean orderChange) {
         orderPlanner.resetPatrol();
         generation=GENERATIONS.incrementAndGet(); targetId=null; candidateId=null; contact.clear();freshVisible=false;memory.clear();covers.reset(); decision=null;
         sensor.resetAcquisition();
@@ -387,9 +394,11 @@ public final class TacticalCombatGoal extends Goal {
         blockedFireTicks=0;nextOpportunityScan=nextTargetChange=0;
         SquadRuntime.of((ServerLevel)npc.level()).release(npc.getUUID());
         try { guns.aim(false); } catch(RuntimeException | LinkageError ex) { TacticalNpcAiMod.LOGGER.warn("Could not reset aim for {}",npc.getUUID(),ex); }
-        npc.setAggressive(false); npc.setTarget(null); movement.stop(npc.level().getGameTime());
+        npc.setAggressive(false); npc.setTarget(null);
+        if(orderChange)movement.orderChanged(npc.level().getGameTime());else movement.stop(npc.level().getGameTime());
     }
     private static Vector3 vector(Vec3 v) { return new Vector3(v.x,v.y,v.z); }
     private static Vec3 vec(Vector3 v) {return new Vec3(v.x(),v.y(),v.z());}
+    public String movementDiagnostics(){return movement.actionDiagnostics();}
     private void debug(String message) { if(ServerConfig.DEBUG.get()) TacticalNpcAiMod.LOGGER.info("NPC {} {}",npc.getUUID(),message); }
 }

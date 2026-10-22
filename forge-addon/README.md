@@ -10,4 +10,11 @@ Minecraft 1.20.1, Forge 47.4.20, Java 17, Gradle 8.8 / ForgeGradle 6.0.54, TaCZ 
 
 Инструкции игроку, сценарии и фактические результаты: [MVP-TESTING](../MVP-TESTING.md). Срезы: [IMPLEMENTATION-STATUS](../docs/IMPLEMENTATION-STATUS.md).
 
+Деревянные vanilla двери и прямые вертикальные LadderBlock поддерживаются маршрутами
+WALK/OPEN_DOOR/CLIMB_UP/CLIMB_DOWN: серверные взаимодействия, native перемещение,
+очередь узких переходов и подтверждённый выход на площадку. Отдельного приказа
+для открытия или подъёма не требуется: боевой AI задаёт известную тактическую цель.
+Границы реализации, автоматические результаты, стоимость и ручная приёмка JAR:
+[ACTION-ROUTES](../docs/ACTION-ROUTES-2026-10-22.md).
+
 `-Pprofile runServer` — отдельный синтетический benchmark world в run/profile; `-PprofileQuick` оставляет combat 30/50. Для исходного контроллера добавьте `-PprofileLegacy -PlegacyCompatibility`: test-only task устанавливает минимальные factions/loadouts в **run/profile/config**, чтобы исходные goals сами выбирали survival dummy. Эти fixtures не распространяются в production JAR и не изменяют configs игрового мира. Методика и ограничения: [PROFILE-REPORT](../docs/PROFILE-REPORT-2026-10-11.md). После обычной сборки `tools/verify-production-artifacts.py` проверяет Java 17, отсутствие тестов/вложенных зависимостей и NPCs-ссылок в основном JAR.

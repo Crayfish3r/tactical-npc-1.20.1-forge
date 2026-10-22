@@ -43,7 +43,7 @@ public final class IndependentNpcTests {
         h.runAtTickTime(105,()->{h.assertTrue(npc.controller().reloads()==1,"one accepted reload"); npc.setYRot(-90);npc.setYHeadRot(-90);npc.getLookControl().setLookAt(p,10,10);wall(h,false);});
         h.runAtTickTime(106,()->h.assertTrue(npc.controller().shots()==0,"perception/reaction protects first tick of newly visible player"));
         h.runAtTickTime(190,()->{
-            h.assertTrue(npc.position().subtract(h.absoluteVec(new Vec3(3.5,2,7.5))).horizontalDistance()>.25,"independent strafe really moves horizontally");
+            h.assertTrue(npc.position().subtract(h.absoluteVec(new Vec3(3.5,2,7.5))).horizontalDistance()>.25,"independent strafe really moves horizontally: pos="+npc.position()+" ticks="+npc.tickCount+" ground="+npc.onGround()+" decision="+npc.controller().decision()+" movement="+npc.controller().movementDiagnostics());
             h.assertTrue(npc.controller().shots()>=2 && ProjectileProbe.count(npc.getUUID())>=2,"real TaCZ projectiles on own entity: requests="+npc.controller().shots()+" bullets="+ProjectileProbe.count(npc.getUUID())+" at="+npc.position()+" decision="+npc.controller().decision()+" observation="+npc.controller().observation());
             long shots=npc.controller().shots(); int bullets=ProjectileProbe.count(npc.getUUID()); long generation=npc.controller().generation();
             Vec3 reset=h.absoluteVec(new Vec3(3.5,2,7.5));npc.moveTo(reset.x,reset.y,reset.z,npc.getYRot(),npc.getXRot());npc.setDeltaMovement(Vec3.ZERO);
@@ -133,6 +133,12 @@ public final class IndependentNpcTests {
     }
     private static TacticalNpcEntity spawn(GameTestHelper h,String id,int rounds,boolean chamber) {
         ScenarioIsolation.begin(h);
+        // The lifecycle fixtures assume a flat empty room. Materialize it instead of
+        // depending on sparse template air or the surrounding generated world.
+        for(int x=0;x<16;x++)for(int z=0;z<16;z++){
+            h.setBlock(new BlockPos(x,1,z),Blocks.STONE);
+            for(int y=2;y<=7;y++)h.setBlock(new BlockPos(x,y,z),Blocks.AIR);
+        }
         var npc=NpcEntities.NPC.get().create(h.getLevel());var pos=h.absoluteVec(new Vec3(3.5,2,7.5));npc.moveTo(pos.x,pos.y,pos.z,-90,0);npc.setYHeadRot(-90);
         var stack=GunSupport.create(new ResourceLocation("tacz",id));var gun=IGun.getIGunOrNull(stack);gun.setCurrentAmmoCount(stack,rounds);gun.setBulletInBarrel(stack,chamber);
         npc.setItemSlot(EquipmentSlot.MAINHAND,stack);npc.addTag(RuntimeRegistry.TAG);h.getLevel().addFreshEntity(npc);return npc;

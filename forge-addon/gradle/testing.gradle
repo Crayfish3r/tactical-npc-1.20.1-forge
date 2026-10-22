@@ -35,6 +35,15 @@ if (!selection.isBlank()) {
     }
 }
 minecraft.runs.gameTestServer {
+    def heap = providers.gradleProperty('gameTestHeapMb').orNull
+    if (heap != null) {
+        if (!(heap ==~ /\d+/) || heap.toInteger() < 512 || heap.toInteger() > 16384) {
+            throw new GradleException('gameTestHeapMb must be 512..16384 MiB')
+        }
+        // Reserve the selected finite heap before the long matrix starts. Do not
+        // depend on a late G1 expansion succeeding under Windows commit pressure.
+        jvmArgs "-Xms${heap}m", "-Xmx${heap}m"
+    }
     property 'tactical.tests.catalog', catalog.join(',')
     property 'tactical.tests.selection', selection
     property 'tactical.tests.profile', testProfile

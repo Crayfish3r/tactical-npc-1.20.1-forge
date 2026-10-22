@@ -80,23 +80,41 @@ public final class DefendPatrolTests {
 
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-patrol-05-combat",timeoutTicks=550)
     public static void combatAndLiveMemoryInterruptThenPatrolResumes(GameTestHelper h) {
-        begin(h);var n=npc(h,4);var anchor=n.position();
+        begin(h);dev.zuma.tacticalnpc.config.ServerConfig.DEBUG.set(true);
+        // This measures interruption/resumption, not random initial gaze or generated
+        // terrain. Give both actors the flat room described by the scenario.
+        for(int x=24;x<=50;x++)for(int z=24;z<=38;z++){
+            h.setBlock(new BlockPos(x,1,z),Blocks.STONE);
+            for(int y=2;y<=8;y++)h.setBlock(new BlockPos(x,y,z),Blocks.AIR);
+        }
+        var n=npc(h,4,new UUID(6,405));n.getRandom().setSeed(60405);n.setInvulnerable(true);var anchor=n.position();
+        double speed=n.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).getBaseValue();
         var stack=GunSupport.create(new ResourceLocation("tacz:ak47"));var gun=com.tacz.guns.api.item.IGun.getIGunOrNull(stack);
         gun.setCurrentAmmoCount(stack,30);gun.setBulletInBarrel(stack,true);n.setItemSlot(EquipmentSlot.MAINHAND,stack);n.runtime().onEquip(stack);
         n.setAmmoPolicy(TacticalNpcEntity.AmmoPolicy.FINITE,0);
-        final net.minecraftforge.common.util.FakePlayer[] enemy={null};boolean[] before={false},memory={false},after={false};final Vec3[] resumedAt={null};double[] resumedMotion={0};
+        final net.minecraftforge.common.util.FakePlayer[] enemy={null};boolean[] before={false},memory={false},after={false},presented={false};final Vec3[] resumedAt={null};double[] resumedMotion={0};
         h.runAtTickTime(80,()->{
             var p=new net.minecraftforge.common.util.FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"patrol-contact"));
             p.setGameMode(GameType.SURVIVAL);p.setInvulnerable(true);p.moveTo(anchor.x+14,anchor.y,anchor.z);h.getLevel().addNewPlayer(p);enemy[0]=p;
+            // Hold the presentation pose only until genuine VISION, then restore
+            // normal motion. Never inject a contact, aim solution or weapon command.
+            n.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(0);
             n.setYRot(-90);n.setYHeadRot(-90);
         });
+        h.runAtTickTime(120,()->h.assertTrue(presented[0],"patrol fixture actually presented a visible exterior target: "+combatDiagnostic(n,enemy[0])));
         h.runAtTickTime(180,()->{
-            h.assertTrue(n.controller().shots()>0 && ProjectileProbe.count(n.getUUID())>0,"real native fire interrupts idle patrol against an exterior target");
+            h.assertTrue(n.controller().shots()>0 && ProjectileProbe.count(n.getUUID())>0,"real native fire interrupts idle patrol against an exterior target: "+combatDiagnostic(n,enemy[0]));
             var wall=BlockPos.containing(anchor.add(7,0,0));for(int z=-6;z<=6;z++)for(int y=0;y<5;y++)h.getLevel().setBlockAndUpdate(wall.offset(0,y,z),Blocks.STONE.defaultBlockState());
         });
         h.runAtTickTime(260,()->{enemy[0].discard();enemy[0]=null;});
         h.onEachTick(()->{
             inside(h,n);var c=n.controller();if(c==null || c.decision()==null)return;var d=c.decision();
+            if(enemy[0]!=null && !presented[0]){
+                var o=c.observation();
+                if(o!=null && o.visible() && o.source()==Observation.Source.VISION && o.subject().equals(enemy[0].getUUID())){
+                    presented[0]=true;n.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(speed);
+                }else{n.setYRot(-90);n.setYHeadRot(-90);n.setYBodyRot(-90);}
+            }
             if(h.getTick()<80)before[0]|=d.intent()==TacticalIntent.PATROL && d.movement().mode()==MovementCommand.Mode.NAVIGATE;
             if(h.getTick()>195 && h.getTick()<250 && c.observation()!=null && !c.observation().visible()) {
                 memory[0]=true;h.assertTrue(d.intent()!=TacticalIntent.PATROL,"live hidden-contact memory must keep search/combat, not resume idle patrol");
@@ -110,6 +128,9 @@ public final class DefendPatrolTests {
             h.assertTrue(n.ammoPolicy()==TacticalNpcEntity.AmmoPolicy.FINITE && gun.getDummyAmmoAmount(stack)==0,"patrol transitions do not replenish native finite reserve");
             budget(h,n,500);finish(n);h.succeed();
         });
+    }
+    private static String combatDiagnostic(TacticalNpcEntity n,net.minecraft.world.entity.Entity enemy){
+        var c=n.controller();return "hp="+n.getHealth()+"/"+n.getMaxHealth()+" pos="+n.position()+" enemy="+(enemy==null?null:enemy.position())+" entityTicks="+n.tickCount+" ticking="+((ServerLevel)n.level()).isPositionEntityTicking(n.blockPosition())+" nativeRounds="+ProjectileProbe.count(n.getUUID())+" decision="+(c==null?null:c.decision())+" observation="+(c==null?null:c.observation())+" weapon="+(c==null?null:c.weaponState())+" movement="+(c==null?null:c.movementDiagnostics());
     }
 
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-patrol-06-save",timeoutTicks=550)

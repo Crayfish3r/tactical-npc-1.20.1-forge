@@ -43,6 +43,7 @@ minecraft {
             if(project.hasProperty('profile')) {
                 property 'tactical.profile.batch',project.hasProperty('batchProfile').toString()
                 property 'tactical.profile.upgrade',project.hasProperty('upgradeProfile').toString()
+                property 'tactical.profile.actions',project.hasProperty('actionProfile').toString()
                 property 'tactical.profile.team',project.hasProperty('teamProfile').toString()
                 property 'tactical.profile.team.count',(project.findProperty('teamCount') ?: '15').toString()
                 property 'tactical.profile.team.crowded',project.hasProperty('teamCrowded').toString()

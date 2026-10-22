@@ -8,6 +8,7 @@ public final class ScenarioIsolation {
     private static final java.util.List<net.minecraft.world.level.ChunkPos> ADDED_CHUNKS=new java.util.ArrayList<>();
     private static net.minecraft.server.level.ServerLevel forcedLevel;
     public static void begin(GameTestHelper h) {
+        ActionRouteTests.releaseSceneChunks();
         if(!(h.getLevel().getServer() instanceof GameTestServer)) throw new IllegalStateException("Isolated harness requires GameTestServer");
         h.getLevel().getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false,h.getLevel().getServer());
         dev.zuma.tacticalnpc.config.ServerConfig.DEBUG.set(false);

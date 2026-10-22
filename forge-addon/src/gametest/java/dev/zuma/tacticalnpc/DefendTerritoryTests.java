@@ -91,7 +91,14 @@ public final class DefendTerritoryTests {
 
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-04-return",timeoutTicks=220)
     public static void externalDisplacementReturnsThroughOutsideNodes(GameTestHelper h) {
-        ScenarioIsolation.begin(h);var n=npc(h,10.5,10.5);var movement=new MovementExecutor(n.runtime());final Vec3[] anchor={null};
+        ScenarioIsolation.begin(h);
+        // This is a flat knockback/return fixture. Prepare the entire swept lane explicitly;
+        // sparse structure air and world-generated blocks must not become extra obstacles.
+        for(int x=6;x<=23;x++)for(int z=7;z<=14;z++){
+            h.setBlock(new BlockPos(x,1,z),Blocks.STONE);
+            for(int y=2;y<=8;y++)h.setBlock(new BlockPos(x,y,z),Blocks.AIR);
+        }
+        var n=npc(h,10.5,10.5);var movement=new MovementExecutor(n.runtime());final Vec3[] anchor={null};
         Runnable displace=()->{
             n.setOrder(OrderState.Kind.DEFEND_AREA,4);anchor[0]=n.position();n.setPos(n.getX()+6.988,n.getY(),n.getZ()+.311);
             var cell=n.blockPosition();
@@ -110,7 +117,7 @@ public final class DefendTerritoryTests {
             h.assertTrue(new CoverSensor(n.runtime()).withinOrderPath(path),"initial outside nodes are legal on an inward return: self="+n.position()+" nodes="+nodes);
             n.push(.6,.2,0);movement.guardTerritory();h.assertTrue(n.getDeltaMovement().x>0,"boundary guard preserves external knockback");
         };
-        int[] lastEntityTick={-1};
+        int[] lastEntityTick={-1};var trace=new java.util.ArrayList<String>();
         h.onEachTick(()->{
             // Production invokes this executor from the entity's own tick, never while its
             // destination chunk is still upgrading or its physics is paused by chunk status.
@@ -121,8 +128,9 @@ public final class DefendTerritoryTests {
             }
             if(lastEntityTick[0]==n.tickCount)return;lastEntityTick[0]=n.tickCount;
             movement.apply(MovementCommand.navigate(vector(anchor[0]),MovementCommand.Locomotion.RETREAT),h.getLevel().getGameTime());movement.guardTerritory();
+            if(n.tickCount%20==0){var p=n.getNavigation().getPath();trace.add(n.tickCount+":"+n.position()+" velocity="+n.getDeltaMovement()+" ground="+n.onGround()+" controller="+(n.controller()!=null)+" path="+(p==null?"null":p.getNextNodeIndex()+"/"+p.getNodeCount())+" "+movement.actionDiagnostics());}
         });
-        h.runAtTickTime(200,()->{h.assertTrue(anchor[0]!=null,"entity-ticking return fixture became ready");h.assertTrue(n.position().subtract(anchor[0]).horizontalDistance()<2,"displaced NPC really walked back inside: self="+n.position()+" anchor="+anchor[0]+" entityTicks="+n.tickCount+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition())+" recovery="+movement.recoveryStatus()+" navDone="+n.getNavigation().isDone()+" path="+n.getNavigation().getPath()+" movement="+movementDiagnostic(movement));n.discard();h.succeed();});
+        h.runAtTickTime(200,()->{h.assertTrue(anchor[0]!=null,"entity-ticking return fixture became ready");h.assertTrue(n.position().subtract(anchor[0]).horizontalDistance()<2,"displaced NPC really walked back inside: self="+n.position()+" anchor="+anchor[0]+" entityTicks="+n.tickCount+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition())+" recovery="+movement.recoveryStatus()+" navDone="+n.getNavigation().isDone()+" path="+n.getNavigation().getPath()+" movement="+movementDiagnostic(movement)+" trace="+trace);n.discard();h.succeed();});
     }
 
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-05-long-return",timeoutTicks=250)
@@ -154,14 +162,26 @@ public final class DefendTerritoryTests {
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-06-slope",timeoutTicks=200)
     public static void heightAndSlopeAreIndependentFromHorizontalCircle(GameTestHelper h) {
         ScenarioIsolation.begin(h);
-        for(int x=9;x<=12;x++)for(int z=9;z<=11;z++)for(int y=2;y<=x-8;y++)h.setBlock(new BlockPos(x,y,z),Blocks.STONE);
+        // The template floor is local y=0, while this scenario's feet/ramp start
+        // at y=2. Supply the intended y=1 support instead of an airborne start.
+        for(int x=6;x<=16;x++)for(int z=7;z<=14;z++){
+            h.setBlock(new BlockPos(x,1,z),Blocks.STONE);
+            for(int y=2;y<=8;y++)h.setBlock(new BlockPos(x,y,z),Blocks.AIR);
+        }
+        // End the ramp in an actual landing. Native navigation aims off the block
+        // centre; a taller step immediately past the goal makes that body footprint
+        // intersect the next rise instead of settling on the requested platform.
+        for(int x=9;x<=12;x++)for(int z=9;z<=11;z++)for(int y=2;y<=Math.min(x-8,3);y++)h.setBlock(new BlockPos(x,y,z),Blocks.STONE);
         var n=npc(h,9.5,10.5);var movement=new MovementExecutor(n.runtime());final Vec3[] goal={null};
         h.runAtTickTime(5,()->{
+            h.assertTrue(n.onGround() && Math.abs(n.getY()-h.absolutePos(new BlockPos(0,2,0)).getY())<.01,"ramp starts on actual supported ground");
             n.setOrder(OrderState.Kind.DEFEND_AREA,4);goal[0]=h.absoluteVec(new Vec3(11.5,4,10.5));
             h.assertTrue(new CoverSensor(n.runtime()).withinOrder(goal[0]),"height does not consume horizontal radius");
+            var standing=new CoverSensor(n.runtime()).safeStanding(goal[0]);
+            h.assertTrue(standing!=null && standing.distanceToSqr(goal[0])<.001,"ramp goal has supported body clearance");
         });
         h.onEachTick(()->{if(goal[0]!=null){movement.apply(MovementCommand.navigate(vector(goal[0])),h.getLevel().getGameTime());movement.guardTerritory();}});
-        h.runAtTickTime(180,()->{h.assertTrue(n.position().distanceTo(goal[0])<1 && n.getY()>h.absolutePos(new BlockPos(0,2,0)).getY(),"native navigation climbs checked slope inside circle: "+n.position());n.discard();h.succeed();});
+        h.runAtTickTime(180,()->{h.assertTrue(n.onGround() && n.position().distanceTo(goal[0])<1 && n.getY()>h.absolutePos(new BlockPos(0,2,0)).getY(),"native navigation climbs checked slope inside circle: self="+n.position()+" goal="+goal[0]+" ground="+n.onGround()+" ticks="+n.tickCount+" "+movement.actionDiagnostics());n.discard();h.succeed();});
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="defend-07-external-contact",timeoutTicks=230)
     public static void visibleExternalTargetIsShotWithoutPursuit(GameTestHelper h) {
@@ -184,7 +204,7 @@ public final class DefendTerritoryTests {
         n.setOnGround(true);h.getLevel().addFreshEntity(n);return n;
     }
     private static String movementDiagnostic(MovementExecutor movement){
-        try{var d=MovementExecutor.class.getDeclaredField("destination");var a=MovementExecutor.class.getDeclaredField("alternative");d.setAccessible(true);a.setAccessible(true);return "destination="+d.get(movement)+" alternative="+a.get(movement);}
+        try{var d=MovementExecutor.class.getDeclaredField("destination");var a=MovementExecutor.class.getDeclaredField("alternative");d.setAccessible(true);a.setAccessible(true);return "destination="+d.get(movement)+" alternative="+a.get(movement)+" actions="+movement.actionDiagnostics();}
         catch(ReflectiveOperationException e){return e.toString();}
     }
     private static Vector3 vector(Vec3 v){return new Vector3(v.x,v.y,v.z);}

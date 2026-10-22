@@ -53,6 +53,6 @@ public final class AiTelemetry {
         }
     }
     @SubscribeEvent public void unload(net.minecraftforge.event.level.LevelEvent.Unload event) {
-        if(event.getLevel() instanceof ServerLevel level){LEVELS.remove(level);SquadRuntime.remove(level);AiWorkBudget.remove(level);GunHearing.remove(level);}
+        if(event.getLevel() instanceof ServerLevel level){LEVELS.remove(level);SquadRuntime.remove(level);AiWorkBudget.remove(level);GunHearing.remove(level);TransitionResources.remove(level);}
     }
 }

@@ -9,6 +9,9 @@ import net.minecraft.world.phys.Vec3;
 public final class MovementExecutor {
     private final NpcRuntimeAdapter runtime;
     private final CoverSensor terrain;
+    private final ActionRouteExecutor actions;
+    private java.util.UUID subject;
+    private double actionSpeed=1;
     private final RouteRecovery recovery=new RouteRecovery();
     private MovementCommand.Mode mode;
     private Vec3 destination,checkpoint;
@@ -16,12 +19,20 @@ public final class MovementExecutor {
     private long nextPath,checkpointTick;
     private MovementCommand.Locomotion gait;
     private double forward,sideways;
-    public MovementExecutor(NpcRuntimeAdapter runtime) {this.runtime=runtime;terrain=new CoverSensor(runtime);}
+    public MovementExecutor(NpcRuntimeAdapter runtime) {this.runtime=runtime;terrain=new CoverSensor(runtime);actions=new ActionRouteExecutor(runtime);}
+    public String actionDiagnostics(){return actions.diagnostics();}
+    public ActionRoute.Status actionStatus(){return actions.status();}
+    public boolean actionActive(){return actions.active();}
+    public void subject(java.util.UUID id){runtime.requireServer();if(!java.util.Objects.equals(subject,id)){actions.cancelSafely();subject=id;}}
+    public void orderChanged(long tick){
+        runtime.requireServer();actions.cancelSafely();recovery.clear();alternative=null;failedPoint=null;destination=null;
+        if(!actions.active())stop(tick);
+    }
     public boolean blocked(long tick) {return recovery.status()==RouteRecovery.Status.RECOVERING || recovery.status()==RouteRecovery.Status.EXHAUSTED;}
     public Vector3 failedDestination(long tick) {return failedPoint!=null && recovery.rejected(failedPoint,tick)?failedPoint:null;}
     public RouteRecovery.Status recoveryStatus() {return recovery.status();}
     public void contactRestored() {
-        runtime.requireServer();recovery.cancelEpisode();alternative=null;destination=null;runtime.entity().getNavigation().stop();
+        runtime.requireServer();recovery.cancelEpisode();alternative=null;destination=null;if(!actions.active())runtime.entity().getNavigation().stop();
     }
     /** A patrol leg/contact transition cancels the episode, retaining failed-point backoff and budgets. */
     public void patrolLegChanged(){contactRestored();}
@@ -29,9 +40,22 @@ public final class MovementExecutor {
         runtime.requireServer();var npc=runtime.entity();var level=(ServerLevel)npc.level();
         // An intentionally immobile entity is not a failed path. Keep weapon/aim authority alive.
         if(npc.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)<=0){
+            actions.stop("immobile");
             npc.getNavigation().stop();npc.getMoveControl().strafe(0,0);npc.setSprinting(false);
             recovery.clear();alternative=null;failedPoint=null;destination=null;mode=MovementCommand.Mode.HOLD;
             return;
+        }
+        // HOLD supplies speed zero; a committed ladder exit must retain its last walking speed.
+        if(command.speed()>0)actionSpeed=command.speed();
+        if(actions.active()){
+            if(command.locomotion()==MovementCommand.Locomotion.RETREAT)actions.cancelSafely();
+            else if(command.mode()==MovementCommand.Mode.NAVIGATE && command.destination()!=null && actions.goal()!=null && command.destination().minus(actions.goal()).lengthSquared()>36)actions.cancelSafely();
+            if(actions.active()){
+                actions.tick(tick,actionSpeed);
+                checkpoint=npc.position();checkpointTick=tick;destination=null;
+                if(actions.status()==ActionRoute.Status.FAILURE)fail(actions.goal(),tick);
+                return;
+            }
         }
         if(command.locomotion()==MovementCommand.Locomotion.RETREAT && gait!=command.locomotion()) {
             recovery.clear();alternative=null;destination=null;
@@ -65,10 +89,16 @@ public final class MovementExecutor {
         }
         Vec3 point=standingSegment(vec(requested));
         var boundary=terrain.territory();
-        if(point==null || (boundary==null?!terrain.withinOrder(point):!boundary.permitsStep(vector(npc.position()),vector(point)))) {fail(requested,tick);return;}
+        if(point==null){
+            if(!recovery.rejected(requested,tick) && tick>=nextPath){actions.start(vec(requested),tick);actions.tick(tick,actionSpeed);}
+            return;
+        }
+        if(boundary==null?!terrain.withinOrder(point):!boundary.permitsStep(vector(npc.position()),vector(point))) {fail(requested,tick);return;}
         if(npc.position().distanceToSqr(point)<.5) {
-            npc.setSprinting(false);
             if(alternative!=null) {AiTelemetry.route(level,AiTelemetry.Route.ARRIVED);recovery.accepted();alternative=null;failedPoint=null;}
+            // A completed leg must release the previous native move/strafe input.
+            // Keep external velocity intact: halt stops control, not knockback.
+            halt();
             return;
         }
         if(tick-checkpointTick>=20) {
@@ -82,10 +112,12 @@ public final class MovementExecutor {
         if(!AiWorkBudget.of(level).path(npc.getUUID(),recovering?4:20)) return; // Deferred is not failure.
         nextPath=tick+(recovering?4:20);
         var path=npc.getNavigation().createPath(net.minecraft.core.BlockPos.containing(point),0);
+        // A prohibited native detour is an immediate policy failure, not an interaction search.
+        if(path!=null && path.canReach() && !terrain.withinOrderPath(path)){fail(vector(point),tick);return;}
         if(path!=null && path.canReach() && safePath(path)) {
             npc.getNavigation().moveTo(path,command.speed());destination=point;
             if(recovering) AiTelemetry.route(level,AiTelemetry.Route.ALTERNATIVE);
-        } else fail(vector(point),tick);
+        } else {actions.start(point,tick);actions.tick(tick,actionSpeed);}
     }
     private void fail(Vector3 point,long tick) {
         runtime.entity().getNavigation().stop();runtime.entity().setSprinting(false);destination=null;failedPoint=point;alternative=null;
@@ -93,7 +125,7 @@ public final class MovementExecutor {
         AiWorkBudget.of((ServerLevel)runtime.entity().level()).pathFailed(runtime.entity().getUUID());
         AiTelemetry.route((ServerLevel)runtime.entity().level(),AiTelemetry.Route.FAILED);
     }
-    public void stop(long tick) {apply(MovementCommand.hold(),tick);recovery.clear();alternative=null;failedPoint=null;}
+    public void stop(long tick) {runtime.requireServer();actions.stop("controller stopped");subject=null;apply(MovementCommand.hold(),tick);recovery.clear();alternative=null;failedPoint=null;}
     private boolean safePath(net.minecraft.world.level.pathfinder.Path path) {
         if(path.getNodeCount()>128 || !terrain.withinOrderPath(path)) return false;
         for(int i=0;i<path.getNodeCount();i++) {var node=path.getNode(i);if(terrain.safeStanding(new Vec3(node.x+.5,node.y,node.z+.5))==null) return false;}
@@ -101,7 +133,11 @@ public final class MovementExecutor {
     }
     /** Runs every controller tick, including activation/cadence deferrals. No path budget spent. */
     public void guardTerritory() {
-        runtime.requireServer();var boundary=terrain.territory();if(boundary==null)return;
+        runtime.requireServer();if(actions.active()){
+            actions.tick(runtime.entity().level().getGameTime(),actionSpeed);
+            if(actions.status()==ActionRoute.Status.FAILURE)fail(actions.goal(),runtime.entity().level().getGameTime());
+        }
+        var boundary=terrain.territory();if(boundary==null)return;
         var npc=runtime.entity();var path=npc.getNavigation().getPath();
         if(path!=null && !path.isDone() && !terrain.withinOrderPath(path)) {halt();return;}
         if(mode==MovementCommand.Mode.STRAFE && !safeStrafe())halt();

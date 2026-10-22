@@ -11,8 +11,10 @@ import net.minecraftforge.fml.LogicalSide;
 
 public final class ShotSafetyEvents {
     @SubscribeEvent public void death(net.minecraftforge.event.entity.living.LivingDeathEvent event) {
-        if(event.getEntity().level() instanceof net.minecraft.server.level.ServerLevel level)
+        if(event.getEntity().level() instanceof net.minecraft.server.level.ServerLevel level){
+            dev.zuma.tacticalnpc.combat.TransitionResources.forget(level,event.getEntity().getUUID());
             for(var goal:RuntimeRegistry.activeIn(level)) goal.forget(event.getEntity().getUUID());
+        }
     }
     @SubscribeEvent public void starting(net.minecraftforge.event.server.ServerStartingEvent event) { GunSupport.verifyResources(event.getServer().getResourceManager()); }
     @SubscribeEvent public void reload(net.minecraftforge.event.OnDatapackSyncEvent event) {

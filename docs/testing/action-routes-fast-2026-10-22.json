@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "profile": "FAST",
+  "legacy": false,
+  "executed": 12,
+  "selected": 12,
+  "seconds": 195.907,
+  "exit_code": 0,
+  "command": [
+    "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+    "runGameTestServer",
+    "compileCompatJava",
+    "-PcombatTests",
+    "-PtestProfile=FAST",
+    "--console=plain",
+    "-PtestSelection=ActionRouteTests",
+    "--offline",
+    "-PgameTestDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261022T050402.560902Z-runtime"
+  ],
+  "log": "forge-addon\\build\\test-runs\\20261022T050402.560902Z-FAST.log",
+  "runtime": "forge-addon\\build\\test-runs\\20261022T050402.560902Z-runtime",
+  "tasks": [
+    ":extractTaczLua UP-TO-DATE",
+    ":compileJava",
+    ":processResources UP-TO-DATE",
+    ":classes",
+    ":downloadMcpConfig",
+    ":extractSrg UP-TO-DATE",
+    ":createSrgToMcp UP-TO-DATE",
+    ":downloadMCMeta UP-TO-DATE",
+    ":downloadAssets UP-TO-DATE",
+    ":extractNatives UP-TO-DATE",
+    ":makeSrcDirs",
+    ":prepareRuns",
+    ":prepareRunGameTestServer",
+    ":prepareRunGameTestServerCompile",
+    ":runGameTestServer",
+    ":compileCompatJava UP-TO-DATE"
+  ]
+}

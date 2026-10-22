@@ -35,6 +35,7 @@ public final class AiWorkBudget {
     }
     // Four 32-block safety sections replace one former full corridor query (stage 11).
     private final QueryLane contactQueries=new QueryLane(1024,16,32),optionalQueries=new QueryLane(32,1,2);
+    private final QueryLane routeNodes=new QueryLane(512,64,64);
     private int queries,queryDenials,worldQueries;
     private long maximumDeferredAge;
     private static final class RayWait {
@@ -49,6 +50,7 @@ public final class AiWorkBudget {
         if(b.tick!=level.getGameTime()) {
             b.tick=level.getGameTime();Arrays.fill(b.used,0);b.owners.clear();b.queries=0;b.queryDenials=0;b.worldQueries=0;
             b.contactQueries.reset(b.tick);b.optionalQueries.reset(b.tick);
+            b.routeNodes.reset(b.tick);
             b.reservedActive=b.prepareRays(b.activeWait,b.activeCredit,4,64);
             b.reservedOptional=b.prepareRays(b.optionalWait,b.optionalCredit,6,21);
             b.nextPaths.entrySet().removeIf(e->e.getValue()+200<b.tick);
@@ -89,6 +91,7 @@ public final class AiWorkBudget {
     public long maximumDeferredAge(){return maximumDeferredAge;}
     public void forget(UUID owner){
         contactQueries.forget(owner);optionalQueries.forget(owner);nextPaths.remove(owner);owners.remove(owner);
+        routeNodes.forget(owner);
         activeWait.remove(owner);optionalWait.remove(owner);
         reservedActive-=activeCredit.getOrDefault(owner,0);reservedOptional-=optionalCredit.getOrDefault(owner,0);activeCredit.remove(owner);optionalCredit.remove(owner);
     }
@@ -111,6 +114,8 @@ public final class AiWorkBudget {
         if(!available)waitRay(owner,false);return available;
     }
     public boolean candidate(UUID owner) { return take(owner,1,128,6); }
+    public boolean routeNode(UUID owner){return routeNodes.take(owner,tick);}
+    public int routeNodes(){return routeNodes.spent.values().stream().mapToInt(Integer::intValue).sum();}
     public boolean path(UUID owner) {
         return path(owner,20);
     }

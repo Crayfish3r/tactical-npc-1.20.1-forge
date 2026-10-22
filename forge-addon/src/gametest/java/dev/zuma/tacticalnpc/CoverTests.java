@@ -17,8 +17,19 @@ import net.minecraftforge.gametest.*;
 public final class CoverTests {
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="wide_arena",batch="cover-01",timeoutTicks=320)
     public static void moveReloadAndPeek(GameTestHelper h) {
+        ScenarioIsolation.begin(h);
         dev.zuma.tacticalnpc.config.ServerConfig.DEBUG.set(true);
-        ScenarioIsolation.begin(h);dev.zuma.tacticalnpc.config.ServerConfig.STRAFE.set(0.0);var n=NpcEntities.NPC.get().create(h.getLevel());n.setUUID(new java.util.UUID(13,1));n.getRandom().setSeed(130013);Vec3 origin=h.absoluteVec(new Vec3(3.5,2,7.5));n.moveTo(origin.x,origin.y,origin.z,-90,0);n.setYHeadRot(-90);
+        // Cover/peek is exercised independently of the separate suppression-sector
+        // reposition policy. The latter has its own native-pressure fixtures.
+        dev.zuma.tacticalnpc.config.ServerConfig.SUPPRESSION.set(false);
+        for(int x=0;x<40;x++)for(int z=0;z<32;z++){
+            h.setBlock(new BlockPos(x,1,z),Blocks.STONE);
+            for(int y=2;y<=8;y++)h.setBlock(new BlockPos(x,y,z),Blocks.AIR);
+        }
+        // This fixture tests the cover/reload/emergency cycle for 270 ticks. Keep
+        // its legitimate contact alive for that cycle; memory expiry has separate tests.
+        dev.zuma.tacticalnpc.config.ServerConfig.MEMORY.set(600);
+        dev.zuma.tacticalnpc.config.ServerConfig.STRAFE.set(0.0);var n=NpcEntities.NPC.get().create(h.getLevel());n.setUUID(new java.util.UUID(13,1));n.getRandom().setSeed(130013);Vec3 origin=h.absoluteVec(new Vec3(3.5,2,7.5));n.moveTo(origin.x,origin.y,origin.z,-90,0);n.setYHeadRot(-90);
         n.setOrder(dev.zuma.tacticalnpc.core.OrderState.Kind.ASSAULT,24);
         var stack=GunSupport.create(new ResourceLocation("tacz:ak47"));var gun=IGun.getIGunOrNull(stack);gun.setCurrentAmmoCount(stack,30);gun.setBulletInBarrel(stack,true);n.setItemSlot(EquipmentSlot.MAINHAND,stack);n.addTag(RuntimeRegistry.TAG);h.getLevel().addFreshEntity(n);
         for(int y=1;y<6;y++)for(int z=8;z<=13;z++)h.setBlock(new BlockPos(6,y,z),Blocks.STONE);
@@ -38,7 +49,7 @@ public final class CoverTests {
             }
             if(peekFire[0] && emergencyAt[0]<0) {n.setHealth(4);emergencyAt[0]=h.getLevel().getGameTime();}
             if(emergencyAt[0]>=0 && h.getLevel().getGameTime()>emergencyAt[0]+1) {
-                h.assertTrue(n.controller().decision().intent()==dev.zuma.tacticalnpc.core.TacticalIntent.RETREAT,"critical HP interrupts real PEEK on next controller tick");
+                h.assertTrue(n.controller().decision().intent()==dev.zuma.tacticalnpc.core.TacticalIntent.RETREAT,"critical HP interrupts real PEEK on next controller tick: decision="+n.controller().decision()+" observation="+n.controller().observation()+" emergencyAt="+emergencyAt[0]+" now="+h.getLevel().getGameTime()+" entityTicks="+n.tickCount);
                 h.assertTrue(ProjectileProbe.count(n.getUUID())==lastBullets[0],"emergency cancels subsequent native rounds");emergency[0]=true;
             }
             lastBullets[0]=ProjectileProbe.count(n.getUUID());

@@ -142,7 +142,7 @@ public final class TacticalNpcEntity extends PathfinderMob {
         standPhase=kind==OrderState.Kind.HOLD_POSITION?StandPhase.WAIT:StandPhase.NONE;standDamageSource=null;standDamageUntil=0;
         order=kind.name();leash=radius;anchor=new Vector3(getX(),getY(),getZ());
         if(standPhase==StandPhase.WAIT)leash=6;
-        if(controller!=null) controller.stop();
+        if(controller!=null) controller.stopForOrderChange();
         getNavigation().stop();
     }
     public void setFaction(String value) {
