@@ -1,0 +1,25 @@
+{
+  "status": "FAIL",
+  "output": "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\skin-smoke\\20261022T202741Z",
+  "scope": "one graphical standalone skin sequence; no GameTest matrix",
+  "eula_source_sha256": "e4db182aa77b5e31657f4b83f8973c79a8c65217a4383200f9f59f7c94752fad",
+  "server_command": [
+    "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+    "runServer",
+    "-PdedicatedDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\skin-smoke\\20261022T202741Z\\server",
+    "-PclientSmoke",
+    "--offline",
+    "--console=plain",
+    "-Dorg.gradle.jvmargs=-Xmx1024m"
+  ],
+  "client_command": [
+    "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+    "runClient",
+    "-PclientSmoke",
+    "--offline",
+    "--console=plain",
+    "-Dorg.gradle.jvmargs=-Xmx1024m"
+  ],
+  "error": "Client exit 1",
+  "server_exit": 0
+}

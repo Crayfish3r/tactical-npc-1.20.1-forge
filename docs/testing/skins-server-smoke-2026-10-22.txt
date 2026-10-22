@@ -1,0 +1,188 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.8/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :extractTaczLua UP-TO-DATE
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :downloadMcpConfig
+> Task :extractSrg UP-TO-DATE
+> Task :createSrgToMcp UP-TO-DATE
+> Task :downloadMCMeta UP-TO-DATE
+> Task :downloadAssets UP-TO-DATE
+> Task :extractNatives UP-TO-DATE
+> Task :makeSrcDirs
+> Task :prepareRuns
+> Task :prepareRunServer
+> Task :prepareRunServerCompile UP-TO-DATE
+
+> Task :runServer
+2026-10-22 22:27:56,768 main WARN Advanced terminal features are not available in this environment
+[22:27:56] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgeserveruserdev, --gameDir, ., --fml.forgeVersion, 47.4.20, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --nogui]
+[22:27:56] [main/INFO] [cp.mo.mo.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.19 by Microsoft; OS Windows 11 arch amd64 version 10.0
+[22:27:57] [main/WARN] [ne.mi.fm.lo.FMLConfig/CORE]: Configuration file C:\MCDev\[TACZ] Military NPC\forge-addon\build\skin-smoke\20261022T202741Z\server\config\fml.toml is not correct. Correcting
+[22:27:57] [main/INFO] [ne.mi.fm.lo.FMLConfig/CORE]: Incorrect key [earlyWindowSkipGLVersions] was corrected from null to []
+[22:27:57] [main/INFO] [ne.mi.fm.lo.FMLConfig/CORE]: Incorrect key [earlyWindowLogHelpMessage] was corrected from null to true
+[22:27:57] [main/INFO] [ne.mi.fm.lo.FMLConfig/CORE]: Incorrect key [earlyWindowSquir] was corrected from null to false
+[22:27:57] [main/INFO] [ne.mi.fm.lo.FMLConfig/CORE]: Incorrect key [earlyWindowShowCPU] was corrected from null to false
+[22:27:57] [main/INFO] [ne.mi.fm.lo.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgeserveruserdev
+[22:27:57] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/C:/Users/makar/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23128!/ Service=ModLauncher Env=SERVER
+[22:27:57] [main/WARN] [ne.mi.fm.lo.mo.ModFileParser/LOADING]: Mod file C:\Users\makar\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.4.20\c354b21002937b393c4f86163a98dccdf1d51e72\javafmllanguage-1.20.1-47.4.20.jar is missing mods.toml file
+[22:27:57] [main/WARN] [ne.mi.fm.lo.mo.ModFileParser/LOADING]: Mod file C:\Users\makar\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.4.20\865d75f8c18329ddb31db5856701ab86609108b5\lowcodelanguage-1.20.1-47.4.20.jar is missing mods.toml file
+[22:27:57] [main/WARN] [ne.mi.fm.lo.mo.ModFileParser/LOADING]: Mod file C:\Users\makar\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.4.20\af599930362212ae937e392709f49047e6abbbf\mclanguage-1.20.1-47.4.20.jar is missing mods.toml file
+[22:27:57] [main/WARN] [ne.mi.fm.lo.mo.ModFileParser/LOADING]: Mod file C:\Users\makar\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.4.20\e8cc697c69f3911e76caa2f005d9486597cd7448\fmlcore-1.20.1-47.4.20.jar is missing mods.toml file
+[22:27:57] [main/INFO] [ne.mi.fm.lo.mo.JarInJarDependencyLocator/]: Found 8 dependencies adding them to mods collection
+[22:27:59] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
+[22:27:59] [main/INFO] [cp.mo.mo.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgeserveruserdev' with arguments [--gameDir, ., --nogui]
+[22:28:00] [main/INFO] [mixin/]: Remapping refMap tacz.refmap.json using C:\MCDev\[TACZ] Military NPC\forge-addon/build/createSrgToMcp/output.srg
+[22:28:00] [main/INFO] [mixin/]: Remapping refMap tacz.refmap.json using C:\MCDev\[TACZ] Military NPC\forge-addon/build/createSrgToMcp/output.srg
+[22:28:00] [main/INFO] [mixin/]: Remapping refMap simplebedrockmodel.refmap.json using C:\MCDev\[TACZ] Military NPC\forge-addon/build/createSrgToMcp/output.srg
+[22:28:01] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.3.6).
+[22:28:07] [modloading-worker-0/INFO] [ne.mi.co.ForgeMod/FORGEMOD]: Forge mod loading, version 47.4.20, for MC 1.20.1 with MCP 20230612.114412
+[22:28:07] [modloading-worker-0/INFO] [ne.mi.co.MinecraftForge/FORGE]: MinecraftForge v47.4.20 Initialized
+[22:28:07] [modloading-worker-0/INFO] [de.zu.ta.TacticalNpcAiMod/]: Tactical NPC AI 0.2.0: independent runtime / TaCZ 1.1.8-hotfix2; optional NPCs 2.1.0 compatibility
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Configuration file C:\MCDev\[TACZ] Military NPC\forge-addon\build\skin-smoke\20261022T202741Z\server\config\tacz-common.toml is not correct. Correcting
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key gun was corrected from null to its default, SimpleCommentedConfig:{}. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key gun.DefaultGunFireSoundDistance was corrected from null to its default, 64. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key gun.DefaultGunSilenceSoundDistance was corrected from null to its default, 16. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key gun.DefaultGunOtherSoundDistance was corrected from null to its default, 16. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key gun.CreativePlayerConsumeAmmo was corrected from null to its default, true. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key gun.AutoReloadWhenRespawn was corrected from null to its default, false. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key ammo was corrected from null to its default, SimpleCommentedConfig:{}. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key ammo.ExplosiveAmmoDestroysBlock was corrected from null to its default, true. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key ammo.ExplosiveAmmoFire was corrected from null to its default, false. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key ammo.ExplosiveAmmoKnockBack was corrected from null to its default, true. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key ammo.ExplosiveAmmoVisibleDistance was corrected from null to its default, 192. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key ammo.PassThroughBlocks was corrected from null to its default, []. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key ammo.DestroyGlass was corrected from null to its default, true. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key ammo.IgniteBlock was corrected from null to its default, true. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key ammo.IgniteEntity was corrected from null to its default, true. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key ammo.GlobalBulletSpeedModifier was corrected from null to its default, 2.0. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key other was corrected from null to its default, SimpleCommentedConfig:{}. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key other.DefaultPackDebug was corrected from null to its default, false. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key other.TargetSoundDistance was corrected from null to its default, 128. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key other.ServerHitboxOffset was corrected from null to its default, 3.0. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key other.ServerHitboxLatencyFix was corrected from null to its default, true. 
+[22:28:07] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key other.ServerHitboxLatencyMaxSaveMs was corrected from null to its default, 1000.0. 
+[22:28:08] [main/INFO] [tacz/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:shoot_cool_down for minecraft:living_entity
+[22:28:08] [main/INFO] [tacz/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:melee_cool_down for minecraft:living_entity
+[22:28:08] [main/INFO] [tacz/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:reload_state for minecraft:living_entity
+[22:28:08] [main/INFO] [tacz/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:aiming_progress for minecraft:living_entity
+[22:28:08] [main/INFO] [tacz/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:draw_cool_down for minecraft:living_entity
+[22:28:08] [main/INFO] [tacz/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:is_aiming for minecraft:living_entity
+[22:28:08] [main/INFO] [tacz/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:sprint_time for minecraft:living_entity
+[22:28:08] [main/INFO] [tacz/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:is_bolting for minecraft:living_entity
+[22:28:08] [main/INFO] [tacz/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:throwable_using for minecraft:living_entity
+[22:28:08] [Forge Version Check/INFO] [ne.mi.fm.VersionChecker/]: [forge] Starting version check at https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json
+[22:28:08] [Forge Version Check/INFO] [ne.mi.fm.VersionChecker/]: [forge] Found status: OUTDATED Current: 47.4.20 Target: 47.4.28
+[22:28:09] [main/INFO] [mojang/YggdrasilAuthenticationService]: Environment: authHost='https://authserver.mojang.com', accountsHost='https://api.mojang.com', sessionHost='https://sessionserver.mojang.com', servicesHost='https://api.minecraftservices.com', name='PROD'
+[22:28:09] [main/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/C:/MCDev/%5BTACZ%5D%20Military%20NPC/forge-addon/build/fg_cache/net/minecraftforge/forge/1.20.1-47.4.20_mapped_official_1.20.1/forge-1.20.1-47.4.20_mapped_official_1.20.1.jar%23191!/assets/.mcassetsroot' uses unexpected schema
+[22:28:09] [main/WARN] [minecraft/VanillaPackResourcesBuilder]: Assets URL 'union:/C:/MCDev/%5BTACZ%5D%20Military%20NPC/forge-addon/build/fg_cache/net/minecraftforge/forge/1.20.1-47.4.20_mapped_official_1.20.1/forge-1.20.1-47.4.20_mapped_official_1.20.1.jar%23191!/data/.mcassetsroot' uses unexpected schema
+[22:28:09] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Configuration file C:\MCDev\[TACZ] Military NPC\forge-addon\build\skin-smoke\20261022T202741Z\server\tacz\tacz-pre.toml is not correct. Correcting
+[22:28:09] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key gunpack was corrected from null to its default, SimpleCommentedConfig:{}. 
+[22:28:09] [main/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key gunpack.DefaultPackDebug was corrected from null to its default, false. 
+[22:28:09] [main/INFO] [tacz/]: Exporting resource pack /assets/tacz/custom/tacz_default_gun to C:\MCDev\[TACZ] Military NPC\forge-addon\build\skin-smoke\20261022T202741Z\server\tacz\tacz_default_gun
+[22:28:15] [main/INFO] [tacz/GunPackFinder]: Start scanning for gun packs in C:\MCDev\[TACZ] Military NPC\forge-addon\build\skin-smoke\20261022T202741Z\server\tacz
+[22:28:15] [main/INFO] [tacz/GunPackFinder]: - tacz_default_gun, Main namespace: tacz
+[22:28:15] [main/INFO] [tacz/GunPackFinder]: Found 1 possible gunpack(s) and added them to resource set.
+[22:28:15] [main/INFO] [minecraft/MinecraftServer]: Found new data pack tacz_resources, loading it automatically
+[22:28:16] [main/ERROR] [minecraft/DedicatedServerProperties]: No key layers in MapLike[{}]
+[22:28:18] [main/INFO] [minecraft/RecipeManager]: Loaded 8 recipes
+[22:28:18] [main/INFO] [minecraft/AdvancementList]: Loaded 1271 advancements
+[22:28:19] [Server thread/INFO] [minecraft/DedicatedServer]: Starting minecraft server version 1.20.1
+[22:28:19] [Server thread/INFO] [minecraft/DedicatedServer]: Loading properties
+[22:28:19] [Server thread/INFO] [minecraft/DedicatedServer]: Default game type: SURVIVAL
+[22:28:19] [Server thread/INFO] [minecraft/MinecraftServer]: Generating keypair
+[22:28:19] [Server thread/INFO] [minecraft/DedicatedServer]: Starting Minecraft server on 127.0.0.1:25585
+[22:28:19] [Server thread/INFO] [minecraft/ServerConnectionListener]: Using default channel type
+[22:28:19] [Server thread/WARN] [minecraft/DedicatedServer]: **** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!
+[22:28:19] [Server thread/WARN] [minecraft/DedicatedServer]: The server will make no attempt to authenticate usernames. Beware.
+[22:28:19] [Server thread/WARN] [minecraft/DedicatedServer]: While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.
+[22:28:19] [Server thread/WARN] [minecraft/DedicatedServer]: To change this, set "online-mode" to "true" in the server.properties file.
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Configuration file .\skin-smoke\serverconfig\tacticalnpcai-server.toml is not correct. Correcting
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key difficultyProfile was corrected from null to its default, HARD. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key suppressionDurationTicks was corrected from null to its default, 160. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key suppressionRoundBudget was corrected from null to its default, 48. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key suppressionBurstRounds was corrected from null to its default, 8. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key suppressionBurstPauseTicks was corrected from null to its default, 12. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key unfairHintIntervalTicks was corrected from null to its default, 60. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key enabled was corrected from null to its default, true. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key debug was corrected from null to its default, false. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key telemetry was corrected from null to its default, false. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key suppression was corrected from null to its default, true. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key detectionRange was corrected from null to its default, 128.0. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key activationRange was corrected from null to its default, 128.0. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key horizontalFov was corrected from null to its default, 140.0. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key perceptionTicks was corrected from null to its default, 1. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key reacquireTicks was corrected from null to its default, 1. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key activeAcquisitionTicks was corrected from null to its default, 3. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key memoryTicks was corrected from null to its default, 320. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key memoryRange was corrected from null to its default, 160.0. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key hearingRange was corrected from null to its default, 128.0. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key turnRate was corrected from null to its default, 17.0. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key aimError was corrected from null to its default, 0.35. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key reactionTicks was corrected from null to its default, 3. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key strafeSpeed was corrected from null to its default, 0.55. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Configuration file .\skin-smoke\serverconfig\tacz-server.toml is not correct. Correcting
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key interact_key was corrected from null to its default, SimpleCommentedConfig:{}. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key interact_key.InteractKeyWhitelistBlocks was corrected from null to its default, []. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key interact_key.InteractKeyWhitelistEntities was corrected from null to its default, []. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key interact_key.InteractKeyBlacklistBlocks was corrected from null to its default, []. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key interact_key.InteractKeyBlacklistEntities was corrected from null to its default, []. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key base_multiplier was corrected from null to its default, SimpleCommentedConfig:{}. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key base_multiplier.DamageBaseMultiplier was corrected from null to its default, 1.0. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key base_multiplier.ArmorIgnoreBaseMultiplier was corrected from null to its default, 1.0. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key base_multiplier.HeadShotBaseMultiplier was corrected from null to its default, 1.0. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key base_multiplier.WeightSpeedMultiplier was corrected from null to its default, 0.015. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key misc was corrected from null to its default, SimpleCommentedConfig:{}. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key misc.HeadShotAABB was corrected from null to its default, []. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key misc.AmmoBoxStackSize was corrected from null to its default, 3. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key misc.ClientGunPackDownloadUrls was corrected from null to its default, []. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key misc.EnableCrawl was corrected from null to its default, true. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key misc.EnableDefaultGunSmithTableFilter was corrected from null to its default, true. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key misc.ServerShootNetworkCheck was corrected from null to its default, true. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key misc.ServerShootCooldownCheck was corrected from null to its default, true. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Configuration file .\skin-smoke\serverconfig\forge-server.toml is not correct. Correcting
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server was corrected from null to its default, SimpleCommentedConfig:{}. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server.removeErroringBlockEntities was corrected from null to its default, false. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server.removeErroringEntities was corrected from null to its default, false. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server.fullBoundingBoxLadders was corrected from null to its default, false. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server.zombieBaseSummonChance was corrected from null to its default, 0.1. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server.zombieBabyChance was corrected from null to its default, 0.05. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server.permissionHandler was corrected from null to its default, forge:default_handler. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server.advertiseDedicatedServerToLan was corrected from null to its default, true. 
+[22:28:19] [Server thread/WARN] [ne.mi.co.ForgeConfigSpec/CORE]: Incorrect key server.useItemWithDurationZero was corrected from null to its default, false. 
+[22:28:19] [Server thread/INFO] [minecraft/DedicatedServer]: Preparing level "skin-smoke"
+[22:28:20] [Server thread/INFO] [minecraft/MinecraftServer]: Preparing start region for dimension minecraft:overworld
+[22:28:21] [Worker-Main-7/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 0%
+[22:28:21] [Worker-Main-6/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 0%
+[22:28:21] [Worker-Main-4/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 4%
+[22:28:21] [Worker-Main-4/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 30%
+[22:28:22] [Worker-Main-7/INFO] [minecraft/LoggerChunkProgressListener]: Preparing spawn area: 72%
+[22:28:22] [Server thread/INFO] [minecraft/LoggerChunkProgressListener]: Time elapsed: 2222 ms
+[22:28:22] [Server thread/INFO] [minecraft/DedicatedServer]: Done (3.058s)! For help, type "help"
+[22:28:22] [Server thread/INFO] [ne.mi.ga.ForgeGameTestHooks/]: Enabled Gametest Namespaces: []
+[22:28:22] [Server thread/INFO] [ne.mi.se.pe.PermissionAPI/]: Successfully initialized permission handler forge:default_handler
+[22:28:22] [Server thread/INFO] [de.zu.ta.TacticalNpcAiMod/]: Pinned TaCZ xmag reload script verified: true
+[22:28:23] [Server thread/INFO] [minecraft/MinecraftServer]: Gamerule doMobSpawning is now set to: false
+[22:28:23] [Server thread/INFO] [minecraft/MinecraftServer]: Gamerule doDaylightCycle is now set to: false
+[22:29:46] [Server thread/INFO] [minecraft/ServerLoginPacketListenerImpl]: com.mojang.authlib.GameProfile@3f61199c[id=<null>,name=TacticalSmoke,properties={},legacy=false] (/127.0.0.1:61027) lost connection: Disconnected
+[22:30:58] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping the server
+[22:30:58] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server
+[22:30:58] [Server thread/INFO] [minecraft/MinecraftServer]: Saving players
+[22:30:58] [Server thread/INFO] [minecraft/MinecraftServer]: Saving worlds
+[22:30:58] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[skin-smoke]'/minecraft:overworld
+[22:30:59] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[skin-smoke]'/minecraft:the_end
+[22:30:59] [Server thread/INFO] [minecraft/MinecraftServer]: Saving chunks for level 'ServerLevel[skin-smoke]'/minecraft:the_nether
+[22:30:59] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (skin-smoke): All chunks are saved
+[22:30:59] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[22:30:59] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[22:30:59] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.8/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 3m 18s
+11 actionable tasks: 3 executed, 8 up-to-date

@@ -298,3 +298,32 @@ GameTest fixture tuning is isolated by the existing selected-launcher property a
 [Current commands/migration](COMMANDS.md); [execution evidence](COMMAND-UNIFICATION-2026-10-22.md).
 
 Client suggestion audit: target nodes have an explicit custom provider. Pinned `SuggestionProviders.getName` maps unregistered providers to `minecraft:ask_server`; the serialized client command tree therefore asks the server for persistent NPC names. A GameTest round-trips ClientboundCommandsPacket through FriendlyByteBuf and checks that provider, in addition to dispatcher completion results. Raw API evidence: `forge-addon/build/command-suggestions-api.txt`.
+
+## Independent NPC skins, 2026-10-22
+
+Pinned mapped Minecraft1.20.1 / Forge47.4.20 `javap -c` confirms that
+`PlayerModel<T extends LivingEntity>` extends `HumanoidModel<T>` and calls its `setupAnim`
+before copying the body/arm/leg poses into jacket/sleeves/trousers. `ModelLayers.PLAYER`
+with `new PlayerModel<>(root,false)` is the standard four-pixel-arm skin layout;
+all three supplied PNGs are64x64 and have opaque pixels at the full-width arm edge.
+The original files are copied byte-for-byte, including indexed/alpha data in the blue PNG.
+
+`HumanoidMobRenderer` installs `CustomHeadLayer`, `ElytraLayer` and `ItemInHandLayer`.
+The renderer retains that superclass and adds the verified four-argument
+`HumanoidArmorLayer(parent,inner,outer,context.getModelManager())` using player armor layers.
+TaCZ1.1.8-hotfix2 still hooks `HumanoidModel` and `ItemInHandLayer`; the model change does not
+replace its native weapon renderer or animations. No NPCs classes, new dependency or Mixin.
+
+Pinned `Entity.getTeam()` reads `level().getScoreboard().getPlayersTeam(getScoreboardName())`.
+Texture selection reads that API each render, mapping exact team names `1`/`2` to red/blue
+and everything else to default. Existing scoreboard synchronization and persistence own
+membership; no cached skin, custom packet or NBT schema change is introduced.
+[Skin mapping and targeted client smoke](../forge-addon/README.md).
+
+Validation: `compileJava processResources -PclientSmoke --offline` passed, including the renderer
+and test-only fixture. The first PowerShell invocation failed before compilation because its
+JVM argument was unquoted; that log is preserved. PNG/source/processed-resource identity and
+64x64 layout checks passed. One graphical-client attempt did not complete Forge login to the
+isolated server; no NPC skin stage ran (0/5), no screenshot or visual PASS is claimed. The owned
+client was stopped after diagnosis and the server stopped cleanly. No FULL/STAGE/combined or
+load matrix was run. [Exact scope, hashes and retained logs](testing/skins-validation-2026-10-22.json).

@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-22",
+  "branch": "feature",
+  "scope": "client renderer and three supplied skin resources",
+  "versions": {
+    "minecraft": "1.20.1",
+    "forge": "47.4.20",
+    "tacz": "1.1.8-hotfix2",
+    "java": "17.0.19",
+    "gradle": "8.8"
+  },
+  "compile": {
+    "status": "PASS",
+    "command": "gradlew.bat compileJava processResources -PclientSmoke --offline --console=plain -Dorg.gradle.jvmargs=-Xmx1024m",
+    "log": "skins-compile-2026-10-22.txt",
+    "seconds_reported_by_gradle": 20,
+    "notes": "Includes production renderer and test-only visual fixture. Initial unquoted PowerShell argument failed before compilation; original log preserved separately."
+  },
+  "resources": {
+    "status": "PASS",
+    "checks": [
+      "All PNGs 64x64, standard four-pixel arms",
+      "Source and resource files byte-identical",
+      "Processed resources match source resources",
+      "Default source attachment named military_skin.png; military_skin(1).png absent"
+    ],
+    "mapping": {
+      "1": "military_skin_red.png",
+      "2": "military_skin_blue.png",
+      "none_or_other": "military_skin_default.png"
+    }
+  },
+  "visual": {
+    "status": "NOT RUN",
+    "completed_states": 0,
+    "planned_states": [
+      "none",
+      "1",
+      "2",
+      "none",
+      "skin_other"
+    ],
+    "connection_attempt": "FAIL",
+    "diagnosis": "Client connected to local server but Forge login handshake did not complete. Server debug log sent 25 handshake messages, then recorded Disconnected. No fixture admission or skin stage log. Root cause unresolved. Owned client was stopped after diagnosis; isolated server exited cleanly with code 0. No retry.",
+    "receipt": "skins-client-smoke-2026-10-22.json",
+    "client_log": "skins-client-smoke-2026-10-22.txt",
+    "server_log": "skins-server-smoke-2026-10-22.txt",
+    "raw_runtime": "forge-addon\\build\\skin-smoke\\20261022T202741Z",
+    "handshake_diagnostic": "skins-handshake-diagnostic-2026-10-22.txt"
+  },
+  "not_run": [
+    "FULL",
+    "GameTest STAGE",
+    "combined",
+    "load/JFR/soak",
+    "fresh save/restart",
+    "human animation/armor/weapon acceptance"
+  ],
+  "persistence": "No persistence/schema changes. Skin is a pure lookup of existing synced and saved vanilla scoreboard membership; no new cached state.",
+  "inputs_sha256": {
+    "forge-addon/src/main/java/dev/zuma/tacticalnpc/client/NpcClient.java": "0c9f647503c9a395b7f22522b7e151fc3876932e133bda2c20cda731d90d8c8b",
+    "forge-addon/src/clientSmoke/java/dev/zuma/tacticalnpc/ClientSmokeFixture.java": "04f4a99707414aebb7806164be226327c1856ae03ba592b4415b75b18181b019",
+    "forge-addon/src/clientSmoke/java/dev/zuma/tacticalnpc/ClientSmokeProbe.java": "520d571708b73bfe1bbaa5dfce712f0a4cbb9fbc1fd11d2fde5a3d770a916815",
+    "forge-addon/src/main/resources/assets/tacticalnpcai/textures/entity/npc/military_skin_blue.png": "2ee1a728e638029876475dc20606bf855fb059d14ad7557bc4018e88b693a383",
+    "forge-addon/src/main/resources/assets/tacticalnpcai/textures/entity/npc/military_skin_default.png": "1b4f5f2398dce975bf1ea56e1043ba6065afdbe5f1530518f7aea45e0b1983da",
+    "forge-addon/src/main/resources/assets/tacticalnpcai/textures/entity/npc/military_skin_red.png": "eb2ff56da25b93aef812a37265cffc46d1fa502ed069641933c3be6500be9c89"
+  }
+}

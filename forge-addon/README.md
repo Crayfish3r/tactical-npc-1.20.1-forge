@@ -4,7 +4,7 @@ Minecraft 1.20.1, Forge 47.4.20, Java 17, Gradle 8.8 / ForgeGradle 6.0.54, TaCZ 
 
 Из этой директории: `gradlew.bat build --offline`. Результаты: `build/libs/tacticalnpcai-0.2.0.jar` и optional `tacticalnpcai-0.2.0-npcs-compat.jar`. На клиент и сервер ставьте основной JAR с TaCZ; для сравнения оригинального NPC добавьте NPCs и compatibility JAR. Старый 0.1.0 одновременно не устанавливать.
 
-`-PcombatTests runGameTestServer` запускает независимый набор. Дополнительный `-PlegacyCompatibility` включает исходный NPC и его тесты. `-PclientSmoke runClient` подключается к локальному серверу 127.0.0.1:25585 и проверяет отрисовку вооружённого NPC и синхронизацию заполненного магазина после native reload; требует запущенного соответствующего тестового runServer. Эти флаги добавляют тестовые исходники, обычный build их исключает.
+`-PcombatTests runGameTestServer` запускает независимый набор. Дополнительный `-PlegacyCompatibility` включает исходный NPC и его тесты. `-PclientSmoke runClient` подключается к локальному серверу 127.0.0.1:25585 и проверяет отрисовку вооружённого NPC и синхронизацию заполненного магазина после native reload, смену скинов и внешний слой; требует запущенного соответствующего тестового `-PclientSmoke runServer`. Тестовая сцена содержит обычного и одетого в железную броню NPC, меняет команды без пересоздания и сохраняет пять скриншотов в `run/client-standalone/screenshots/`. Эти флаги добавляют тестовые исходники, обычный build их исключает.
 
 Самостоятельные source sets: main, compat, compatTest. Main включает чистое ядро из ../ai-core/src/main/java; реальные NPCs imports находятся в compat/compatTest. TaCZ предоставляет LivingEntityMixin/IGunOperator и native tick, собственный runtime их не копирует. Собственных Mixins нет; Access Transformer нужен только optional legacy goal ownership.
 
@@ -20,3 +20,13 @@ WALK/OPEN_DOOR/CLIMB_UP/CLIMB_DOWN: серверные взаимодейств�
 `-Pprofile runServer` — отдельный синтетический benchmark world в run/profile; `-PprofileQuick` оставляет combat 30/50. Для исходного контроллера добавьте `-PprofileLegacy -PlegacyCompatibility`: test-only task устанавливает минимальные factions/loadouts в **run/profile/config**, чтобы исходные goals сами выбирали survival dummy. Эти fixtures не распространяются в production JAR и не изменяют configs игрового мира. Методика и ограничения: [PROFILE-REPORT](../docs/PROFILE-REPORT-2026-10-11.md). После обычной сборки `tools/verify-production-artifacts.py` проверяет Java 17, отсутствие тестов/вложенных зависимостей и NPCs-ссылок в основном JAR.
 
 Пользовательские команды объединены под `/npc`: [справочник и миграция](../docs/COMMANDS.md). Постоянные имена, явные цели и Hard включаются без optional NPCs.
+
+Независимый NPC использует приложенные military-скины в `assets/tacticalnpcai/textures/entity/npc/`:
+
+| Vanilla scoreboard team | Текстура |
+|---|---|
+| `1` | `military_skin_red.png` |
+| `2` | `military_skin_blue.png` |
+| Без команды или любая другая команда | `military_skin_default.png` |
+
+Renderer читает текущую vanilla team на каждом кадре: `/npc team Steve 1`, затем `2` и `clear` меняют скин сразу после синхронизации scoreboard. После загрузки мира выбор следует сохранённой vanilla membership; отдельного поля скина в NBT нет. Стандартная player-модель использует UV 64×64 и руки шириной четыре пикселя; отображаются hat, jacket, sleeves и trousers, сохраняются humanoid/TaCZ-анимации, предметы в руках, имена и слой брони. Исходный обычный файл приложения `military_skin.png` добавлен под допустимым ресурсным именем `military_skin_default.png`; изображения скопированы без изменений. Optional NPCs renderer не изменён.
