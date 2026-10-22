@@ -16,4 +16,6 @@ Inputs: current native-team membership, observation events and per-level [SquadB
 6. Preserve per-round ally geometry and native safety. Coordinate suppression and actual flank routes using permitted knowledge, without instant shared hidden coordinates.
 
 ## Verify
-Use scoped delayed-report/expiry, profile-switch, leader-death, dimension and reservation GameTests. Add actual coordinated combat and multi-group load when this behavior/performance is affected or requested. Follow [testing profiles](../../../docs/TESTING-PROFILES.md); report actual active actors, native rounds and arrivals rather than role labels alone.
+Before running, identify changed files, behavior and the minimum relevant delayed-report/expiry, profile-switch, leader-death, dimension and reservation checks. Add affected core suites when core/contracts change, actual coordinated combat for behavior risk and multi-group load for performance risk or an explicit request. Follow [testing profiles](../../../docs/TESTING-PROFILES.md) for combined, dedicated save/restart and FULL triggers.
+
+Diagnose FAIL before repeating the failing test and necessary related regressions; explain each additional run. Reuse applicable final-input coverage for one final STAGE assessment, including shared fixtures/helpers and runtime dependencies; retain original FAIL and disclose multiple-run coverage. Report actual active actors, native rounds and arrivals rather than role labels alone. Completed-stage load matrices are not automatic requirements for a new task.

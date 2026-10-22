@@ -16,4 +16,6 @@ Inputs: pinned TaCZ API, runtime support and current [configuration](../../../fo
 6. Predict only from confirmed visual velocity and verified ballistic units. Revalidate obstacles, allies, ammo/mode and command identity/TTL for every native round in either profile; hidden hints carry no target velocity and do not permit wall penetration.
 
 ## Verify
-Use scoped core/native GameTests for changed modes, reload, bolt, ammo exhaustion, stale commands, hidden contact and ally crossing. Exercise actual native projectile joins/events. Follow [testing profiles](../../../docs/TESTING-PROFILES.md) for adapter, dedicated and external gun-pack risks; distinguish measured behavior from human balance acceptance.
+Before running, identify changed files, behavior and the minimum native GameTests for affected modes, reload, bolt, ammo exhaustion, stale commands, hidden contact and ally crossing; add relevant core suites when core/contracts change. Exercise actual native projectile joins/events. Follow [testing profiles](../../../docs/TESTING-PROFILES.md) for adapter/shared-runtime, dedicated save/restart, external gun-pack and FULL risks.
+
+Diagnose FAIL before retrying the failing test and necessary related regressions; explain each additional run. Reuse applicable final-input results, including shared fixtures/helpers, resources, config, dependencies and runtime, for one final STAGE assessment. Preserve original failures and disclose multiple-run coverage; a selective PASS is not a new green FULL. Distinguish measured behavior from human balance acceptance.

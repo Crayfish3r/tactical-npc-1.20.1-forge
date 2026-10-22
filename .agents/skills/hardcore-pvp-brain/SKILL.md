@@ -16,4 +16,6 @@ Inputs: current core policy, observation provenance, effective profile and comba
 6. Compare range accuracy, first-fire/hit latency, cover use and action success on comparable maps. Human TTK/win rate and counterplay require human playtest; do not manufacture challenge by arbitrary damage or hidden DIRECT tracking.
 
 ## Verify
-Run affected [core suites](../../../ai-core/run-tests.sh) and scoped combat GameTests using [testing profiles](../../../docs/TESTING-PROFILES.md). Include expiry/provenance, emergency interruption and profile-switch regressions when touched. Report the effective settings and reproducible seeds, without promoting historical results to current PASS.
+State changed files, behavior and the minimum checks before running. Select affected [core suites](../../../ai-core/run-tests.sh) when core/contracts change and scoped combat GameTests using [testing profiles](../../../docs/TESTING-PROFILES.md). Include expiry/provenance, emergency interruption and profile-switch regressions when touched. Diagnose FAIL before retrying the failing test and necessary related regressions; explain each additional run and retain original FAIL.
+
+Reuse applicable final-input results for one final STAGE assessment under the shared input/dependency rules; disclose multiple-run coverage. FULL, combined and profiling follow the current risk/request policy, not historical stage mandates. Report effective settings and reproducible seeds without promoting historical or scoped results to a new fully green FULL.

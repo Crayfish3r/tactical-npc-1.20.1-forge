@@ -16,4 +16,6 @@ Apply [project rules](../../../AGENTS.md) to the API surface actually used. Inpu
 6. Update the audit with reproducible commands, signatures, versions and unresolved compatibility risks. Preserve license/attribution evidence if reusing code.
 
 ## Verify
-Give an explicit go/no-go per affected API/adapter. Continue independent work when only the optional NPCs audit is unavailable; mark optional compilation/runtime checks NOT RUN or BLOCKED rather than inventing a result. Numerical behavior comes from the source owners in AGENTS.md.
+Give an explicit go/no-go per affected API/adapter. Choose minimal checks before running under [testing profiles](../../../docs/TESTING-PROFILES.md); API/instruction documentation alone needs static links/frontmatter/diff checks, not game JVMs. Reuse verified signatures and validation receipts only while their relevant source/test/helper/resource/config/dependency/runtime inputs remain applicable; changes invalidate affected evidence, not all history. Explain each additional run, retain original FAIL and disclose multiple-run coverage at the final STAGE assessment.
+
+Continue independent work when only the optional NPCs audit is unavailable; mark optional compilation/runtime checks NOT RUN or BLOCKED rather than inventing a result. Numerical behavior comes from the source owners in AGENTS.md; historical audits do not impose new FULL runs.
