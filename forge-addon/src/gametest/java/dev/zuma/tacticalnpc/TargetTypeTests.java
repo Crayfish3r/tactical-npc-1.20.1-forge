@@ -100,24 +100,31 @@ public final class TargetTypeTests {
     public static void npcDimensionTransferCannotResolveAcrossLevels(GameTestHelper h){lifecycle(h,2);}
     private static void lifecycle(GameTestHelper h,int change) {
         begin(h);var a=npc(h,2.5,7.5,"red",true);var b=npc(h,13.5,7.5,"blue",false);long[] shots={0},generation={0};Entity[] moved={null};
-        h.runAtTickTime(55,()->{
-            h.assertTrue(a.controller()!=null,"lifecycle source must retain controller; change="+change+" alive="+a.isAlive()+" removed="+a.isRemoved()+" tags="+a.getTags()+" ticks="+a.tickCount+" ticking="+h.getLevel().isPositionEntityTicking(a.blockPosition())+" position="+a.position());
-            h.assertTrue(b.getUUID().equals(a.controller().contactId()) && a.controller().shots()>0,"real NPC combat before lifecycle change");generation[0]=a.controller().generation();
-            if(change==0){b.setInvulnerable(false);b.hurt(h.getLevel().damageSources().genericKill(),1000);}
-            else if(change==1)b.remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
-            else {var nether=h.getLevel().getServer().getLevel(Level.NETHER);moved[0]=b.changeDimension(nether,new net.minecraftforge.common.util.ITeleporter(){
-                @Override public net.minecraft.world.level.portal.PortalInfo getPortalInfo(Entity e,ServerLevel dest,java.util.function.Function<ServerLevel,net.minecraft.world.level.portal.PortalInfo> fallback){return new net.minecraft.world.level.portal.PortalInfo(new Vec3(8,110,8),Vec3.ZERO,0,0);}
-            });h.assertTrue(moved[0]!=null && moved[0].level()==nether,"real cross-dimension transfer");}
-            h.assertTrue(a.controller()!=null,"lifecycle source controller lost during target transfer; alive="+a.isAlive()+" removed="+a.isRemoved()+" tags="+a.getTags()+" position="+a.position());
-            h.assertTrue(a.controller().generation()!=generation[0] && a.controller().contactId()==null && a.controller().targetId()==null && a.controller().observation()==null && !a.controller().allowNativeFire(),"lifecycle invalidates target/generation/memory/native gate immediately");shots[0]=a.controller().shots();
-            if(change!=0)h.assertTrue(CombatTargets.resolve(h.getLevel(),b.getUUID())==null && RuntimeRegistry.loadedNpcCount(h.getLevel())==1,"old level index and resolver exclude departed NPC");
+        long[] changedAt={-1};
+        h.onEachTick(()->{
+            if(changedAt[0]<0){
+                if(a.controller()==null || !b.getUUID().equals(a.controller().contactId()) || a.controller().shots()==0 || ProjectileProbe.count(a.getUUID())==0)return;
+                generation[0]=a.controller().generation();
+                if(change==0){b.setInvulnerable(false);b.hurt(h.getLevel().damageSources().genericKill(),1000);}
+                else if(change==1)b.remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
+                else {var nether=h.getLevel().getServer().getLevel(Level.NETHER);moved[0]=b.changeDimension(nether,new net.minecraftforge.common.util.ITeleporter(){
+                    @Override public net.minecraft.world.level.portal.PortalInfo getPortalInfo(Entity e,ServerLevel dest,java.util.function.Function<ServerLevel,net.minecraft.world.level.portal.PortalInfo> fallback){return new net.minecraft.world.level.portal.PortalInfo(new Vec3(8,110,8),Vec3.ZERO,0,0);}
+                });h.assertTrue(moved[0]!=null && moved[0].level()==nether,"real cross-dimension transfer");}
+                h.assertTrue(a.controller()!=null,"source retains controller after target lifecycle change");
+                h.assertTrue(a.controller().generation()!=generation[0] && a.controller().contactId()==null && a.controller().targetId()==null && a.controller().observation()==null && !a.controller().allowNativeFire(),"lifecycle invalidates target/generation/memory/native gate immediately");shots[0]=a.controller().shots();
+                if(change!=0)h.assertTrue(CombatTargets.resolve(h.getLevel(),b.getUUID())==null && RuntimeRegistry.loadedNpcCount(h.getLevel())==1,"old level index and resolver exclude departed NPC");
+                changedAt[0]=h.getTick();
+            }else if(h.getTick()-changedAt[0]>=55){
+                h.assertTrue(a.controller().shots()==shots[0] && a.controller().observation()==null,"no stale post-lifecycle fire for 55 ticks after an actual native projectile");if(moved[0]!=null)moved[0].discard();finish(h);
+            }
         });
-        h.runAtTickTime(110,()->{h.assertTrue(a.controller().shots()==shots[0] && a.controller().observation()==null,"no stale post-lifecycle fire");if(moved[0]!=null)moved[0].discard();finish(h);});
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="targets-09-activation",timeoutTicks=100)
     public static void hiddenNpcWakesLodWithoutGrantingObservation(GameTestHelper h) {
         begin(h);var a=npc(h,2.5,7.5,"red",true);var b=npc(h,13.5,7.5,"blue",false);wall(h);var frames=new HashSet<Long>();
         h.onEachTick(()->{if(h.getTick()>20 && h.getTick()<45 && a.controller()!=null && a.controller().decision()!=null)frames.add(a.controller().decision().frame().tick());});
+        // Finish cadence measurement before isolating the explicit sensor/budget probe.
+        h.runAtTickTime(50,()->a.setNoAi(true));
         h.runAtTickTime(60,()->{
             var sensor=new VisibilitySensor();noPlayers(h);h.assertTrue(sensor.activation(a,64)==VisibilitySensor.Nearby.PRESENT,"supported NPC proximity wakes without players");
             h.assertTrue(frames.size()>=4 && a.controller().observation()==null && a.controller().shots()==0,"active cadence without hidden target knowledge: frames="+frames.size());

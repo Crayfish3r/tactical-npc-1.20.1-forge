@@ -103,7 +103,7 @@ public final class TeamTests {
                 h.assertTrue(n.faction().equals("old-red") && n.serviceId().equals(service) && n.runtime().orderState().radius()==128 && n.ammoPolicy()==TacticalNpcEntity.AmmoPolicy.FINITE,"schema "+schema+" preserves identity, order and finite policy");
                 h.assertTrue(n.neutral()==(schema>=3),"old configured neutral state is not silently activated");
                 var migrated=n.saveWithoutId(new CompoundTag()).getCompound("tacticalnpc");
-                h.assertTrue(migrated.getInt("schema")==6 && migrated.getString("legacyFaction").equals("old-red") && migrated.getUUID("legacySquad").equals(oldSquad),"legacy faction and squad UUID archived exactly");
+                h.assertTrue(migrated.getInt("schema")==7 && migrated.getString("legacyFaction").equals("old-red") && migrated.getUUID("legacySquad").equals(oldSquad),"legacy faction and squad UUID archived exactly");
                 h.assertFalse(migrated.contains("faction") || migrated.contains("squad"),"no second mutable membership in new entity schema");
             }
             n.discard();h.succeed();

@@ -1,4 +1,11 @@
-# Фактические срезы разработки — обновлено 2026-10-22
+# Фактические срезы разработки — обновлено 2026-10-23
+
+Новый локальный срез интеграции TT: [Match NPC API v1](MATCH-NPC-API.md),
+[валидация 2026-10-23](MATCH-NPC-VALIDATION-2026-10-23.md). Транзакционные группы,
+индивидуальные loadouts, внешняя fail-closed политика, schema7 и cleanup после
+рестарта без сканирования мира. Публикация основного JAR для ForgeGradle consumer;
+TacticalTablet/NPCs не требуются. Это рабочие изменения в `feature`, не опубликованный
+commit и не человеческая приёмка TT. Предыдущие отчёты ниже относятся к своим срезам.
 
 Новый срез навигации: [ACTION-ROUTES-2026-10-22](ACTION-ROUTES-2026-10-22.md).
 WALK/OPEN_DOOR/CLIMB_UP/CLIMB_DOWN, native physics/interactions, FIFO narrow leases,

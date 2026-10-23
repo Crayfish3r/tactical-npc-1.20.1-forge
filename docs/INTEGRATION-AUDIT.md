@@ -1,5 +1,28 @@
 # Compatibility audit: independent NPC / optional NPCs 2.1.0
 
+## Match API audit, 2026-10-23
+
+Independent Forge production layer only; no TacticalTablet classes, new library or Mixin.
+Pinned TaCZ/NPCs SHA256 rechecked unchanged against the values below; JDK17.0.19,
+Minecraft1.20.1 / Forge47.4.20. `javap` on the pinned TaCZ JAR reconfirmed
+`GunFireEvent(LivingEntity,ItemStack,LogicalSide)` with `getShooter()` and
+`EntityHurtByGunEvent.Pre(Entity,Entity,LivingEntity,ResourceLocation,ResourceLocation,float,Pair,boolean,float,LogicalSide)`
+with inherited `getBullet/getHurtEntity/getAttacker/getLogicalSide`.
+The existing audited native per-cartridge event and pre-damage cancellation path is reused.
+
+`javap` on the cached Forge47.4.20 mapped JAR reconfirmed
+`ServerPlayer.hasDisconnected()`, Forge `Entity.isAddedToWorld()/getPersistentData()`,
+`ServerChunkCache.getChunkNow(int,int)`,
+`Scoreboard.removePlayerFromTeam(String)/getPlayersTeam(String)`.
+Lifecycle uses post-admission `onAddedToWorld`, existing removal hooks and overworld
+`SavedData` via the same `computeIfAbsent` pattern as `NpcNames`.
+No deserializer-thread registry/team mutation; old/corrupt ownership is checked on admission.
+
+GO for these independent public/event APIs. Optional NPCs signatures were not changed;
+its existing source set remains separate. Native geometry, reload/bolt, rounds,
+ordinary disk restart and external published-JAR consumer evidence are recorded in
+[MATCH-NPC-VALIDATION](MATCH-NPC-VALIDATION-2026-10-23.md).
+
 ## Combat upgrade audit, 2026-10-22
 
 Pinned artifacts rehashed unchanged: TaCZ 1.1.8-hotfix2 SHA256

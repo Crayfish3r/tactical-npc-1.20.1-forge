@@ -113,7 +113,7 @@ def run(output, index, first):
                 probe_name=unload_reload(process,log)
                 assert probe_name not in ("Steve","Kevin")
             data = capture(process, log)
-            assert "schema: 6" in data["policy"] and "leash: 128.0d" in data["policy"] and 'name: "Steve"' in data["policy"], data["policy"]
+            assert "schema: 7" in data["policy"] and "leash: 128.0d" in data["policy"] and 'name: "Steve"' in data["policy"], data["policy"]
             offset=len(text(log))
             team_selector=SELECTOR.replace(',limit=1',',team=team-update,limit=1')
             send(process,f"execute if entity {team_selector} run say TEAM_MEMBERSHIP_PRESENT","npc info Steve")

@@ -49,7 +49,7 @@ public final class ModeCommandTests {
             h.assertTrue(dev.zuma.tacticalnpc.config.ServerConfig.STRAFE.get()==.22,"NPC management never resets serverconfig");
             h.assertTrue(n.controller()==controller && gun.getCurrentAmmoCount(stack)==rounds && gun.getDummyAmmoAmount(stack)==reserve && gun.hasBulletInBarrel(stack)==chamber && n.runtime().operator().getSynShootCoolDown()==cooldown,"orders preserve native ammo/cooldown and controller ownership");
             var saved=new CompoundTag();n.save(saved);var restored=(TacticalNpcEntity)EntityType.loadEntityRecursive(saved,h.getLevel(),e->e);
-            h.assertTrue(saved.getCompound("tacticalnpc").getInt("schema")==6 && restored!=null && expected.equals(restored.runtime().orderState()) && name.equals(restored.npcName()) && n.serviceId().equals(restored.serviceId()),"schema6 persists name, service identity and existing state");
+            h.assertTrue(saved.getCompound("tacticalnpc").getInt("schema")==7 && restored!=null && expected.equals(restored.runtime().orderState()) && name.equals(restored.npcName()) && n.serviceId().equals(restored.serviceId()),"schema7 persists name, service identity and existing state");
             restored.discard();h.assertTrue(run(h,source,"npc info "+name)==1,"unadmitted NBT clone cannot evict original loaded index");
             n.discard();h.succeed();
         });
@@ -82,8 +82,9 @@ public final class ModeCommandTests {
             var source=console(h).withPermission(2);var d=h.getLevel().getServer().getCommands().getDispatcher();
             for(String text:new String[]{"npc help","npc spawn","npc list","npc info "+n.npcName(),"npc mode "+n.npcName()+" assault","npc team "+n.npcName()+" red","npc equip "+n.npcName()+" tacz:ak47","npc ammo "+n.npcName()+" finite 1","npc debug diagnostics"})reject(h,source.withPermission(1),text);
             h.assertTrue(n.order().equals("HOLD_POSITION"),"permission1 changes nothing");
-            h.assertTrue(d.getRoot().getChild("tacticalnpc")==null && (d.getRoot().getChild("spawn")==null || d.getRoot().getChild("spawn").getChild("npc")==null),"removed root/alias registrations absent");
-            for(String text:new String[]{"npc order","npc faction","npc squad","npc hard","npc unfair","tacticalnpc hard","tacticalnpc unfair","spawn npc"})reject(h,source,text);
+            h.assertTrue(d.getRoot().getChild("tacticalnpc").getChild("spawn")!=null && d.getRoot().getChild("spawn").getChild("npc")!=null,"spawn compatibility aliases registered");
+            reject(h,source.withPermission(1),"spawn npc");reject(h,source.withPermission(1),"tacticalnpc spawn");
+            for(String text:new String[]{"npc order","npc faction","npc squad","npc hard","npc unfair","tacticalnpc hard","tacticalnpc unfair"})reject(h,source,text);
             h.assertTrue(suggestions(d,source,"npc ").containsAll(java.util.List.of("help","spawn","list","info","mode","team","equip","ammo","debug")),"sections complete");
             h.assertTrue(suggestions(d,source,"npc mode "+n.npcName()+" ").containsAll(java.util.List.of("assault","defend","patrol","stand")),"four modes complete");
             h.assertTrue(suggestions(d,source,"npc info "+n.npcName().substring(0,1)).contains(n.npcName()),"names complete");

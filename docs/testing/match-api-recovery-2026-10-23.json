@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "profile": "FAST",
+  "legacy": false,
+  "executed": 10,
+  "selected": 10,
+  "seconds": 109.625,
+  "exit_code": 0,
+  "command": [
+    "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+    "runGameTestServer",
+    "compileCompatJava",
+    "-PcombatTests",
+    "-PtestProfile=FAST",
+    "--console=plain",
+    "--rerun-tasks",
+    "-PtestSelection=MatchNpcApiTests#fluidsHeadHazardsAndWorldBorderRejectSpawn,MatchNpcApiTests#deactivationRevokesAnActuallyLaunchedNativeBullet,MatchNpcApiTests#bindingNbtReloadPreservesNativeState,MatchNpcApiTests#schemasOneThroughSixRemainManual,MatchNpcApiTests#malformedBindingNeverBecomesManual,MatchNpcApiTests#spawnAliasesRemainManualAndPermissionChecked,TargetTypeTests#hiddenNpcWakesLodWithoutGrantingObservation,TargetTypeTests#npcDeathClearsContactAndQueuedNativeFire,TargetTypeTests#npcUnloadClearsContactAndLoadedIndex,TargetTypeTests#npcDimensionTransferCannotResolveAcrossLevels",
+    "--offline",
+    "-PgameTestDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261023T101918.546124Z-runtime",
+    "-PgameTestOutputDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261023T101918.546124Z-compiled"
+  ],
+  "log": "forge-addon\\build\\test-runs\\20261023T101918.546124Z-FAST.log",
+  "runtime": "forge-addon\\build\\test-runs\\20261023T101918.546124Z-runtime",
+  "compiled_output": "forge-addon\\build\\test-runs\\20261023T101918.546124Z-compiled",
+  "tasks": [
+    ":extractTaczLua",
+    ":compileJava",
+    ":processResources",
+    ":classes",
+    ":downloadMcpConfig",
+    ":extractSrg",
+    ":createSrgToMcp",
+    ":downloadMCMeta",
+    ":downloadAssets",
+    ":extractNatives",
+    ":makeSrcDirs",
+    ":prepareRuns",
+    ":prepareRunGameTestServer",
+    ":prepareRunGameTestServerCompile",
+    ":runGameTestServer",
+    ":compileCompatJava"
+  ]
+}

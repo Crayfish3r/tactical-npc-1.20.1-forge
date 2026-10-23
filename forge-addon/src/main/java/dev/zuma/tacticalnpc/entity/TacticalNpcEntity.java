@@ -33,6 +33,17 @@ public final class TacticalNpcEntity extends PathfinderMob {
     private boolean pendingLegacyTeam;
     private net.minecraft.world.scores.Team observedTeam;
     private int initialReserve=120;
+    private UUID ownerMatchId,groupId;
+    private boolean invalidMatchBinding;
+    public UUID ownerMatchId(){return ownerMatchId;}
+    public UUID groupId(){return groupId;}
+    public boolean invalidMatchBinding(){return invalidMatchBinding;}
+    /** One-time binding, before native admission. Team membership remains scoreboard-owned. */
+    public void bindMatch(UUID match,UUID group){
+        runtime.requireServer();
+        if(ownerMatchId!=null || isAddedToWorld())throw new IllegalStateException("Match binding is immutable after admission");
+        ownerMatchId=java.util.Objects.requireNonNull(match);groupId=java.util.Objects.requireNonNull(group);
+    }
     private UUID serviceId=UUID.randomUUID();
     private String npcName="";
     private double leash=24;
@@ -78,7 +89,10 @@ public final class TacticalNpcEntity extends PathfinderMob {
     }
     @Override public void onAddedToWorld() {
         super.onAddedToWorld();
-        if(!level().isClientSide)dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).join(this);
+        if(!level().isClientSide){
+            if(!dev.zuma.tacticalnpc.api.MatchNpcRegistry.of(getServer()).admit(this)){discard();return;}
+            dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).join(this);
+        }
     }
     @Override public void onRemovedFromWorld() {
         // Forge also calls this on temporary tracking loss, before actual entity unload.
@@ -191,6 +205,9 @@ public final class TacticalNpcEntity extends PathfinderMob {
     @Override public void tick() {
         if(!level().isClientSide) {
             runtime.requireServer();
+            if(invalidMatchBinding || ownerMatchId!=null && !dev.zuma.tacticalnpc.api.MatchNpcRegistry.of(getServer()).isActive(ownerMatchId)){
+                release();getNavigation().stop();setTarget(null);super.tick();return;
+            }
             syncTeam();
             if(!initialized) { runtime.operator().initialData(); initialized=true; }
             boolean enabled=isAlive() && ServerConfig.ENABLED.get() && getTags().contains(RuntimeRegistry.TAG);
@@ -207,11 +224,14 @@ public final class TacticalNpcEntity extends PathfinderMob {
         if(controller!=null) { goalSelector.removeGoal(controller); controller.stop(); controller=null; }
         RuntimeRegistry.release(this);
     }
-    @Override public void remove(Entity.RemovalReason reason) { if(!level().isClientSide) {dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).leave(this);release();} super.remove(reason); }
-    @Override protected void removeAfterChangingDimensions() { if(!level().isClientSide) {dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).leave(this);release();} super.removeAfterChangingDimensions(); }
+    @Override public void remove(Entity.RemovalReason reason) { if(!level().isClientSide) {dev.zuma.tacticalnpc.api.MatchNpcRegistry.of(getServer()).leave(this);dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).leave(this);release();} super.remove(reason); }
+    @Override protected void removeAfterChangingDimensions() { if(!level().isClientSide) {dev.zuma.tacticalnpc.api.MatchNpcRegistry.of(getServer()).leave(this);dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).leave(this);release();} super.removeAfterChangingDimensions(); }
     @Override public void addAdditionalSaveData(CompoundTag root) {
         super.addAdditionalSaveData(root);
-        CompoundTag tag=new CompoundTag(); tag.putInt("schema",6); tag.putUUID("serviceId",serviceId);
+        CompoundTag tag=new CompoundTag(); tag.putInt("schema",7); tag.putUUID("serviceId",serviceId);
+        if(ownerMatchId!=null)tag.putUUID("ownerMatchId",ownerMatchId);
+        if(groupId!=null)tag.putUUID("groupId",groupId);
+        if(invalidMatchBinding)tag.putBoolean("invalidMatchBinding",true);
         tag.putString("name",npcName);
         tag.putString("standPhase",standPhase.name());
         tag.putBoolean("neutral",neutral);
@@ -228,12 +248,15 @@ public final class TacticalNpcEntity extends PathfinderMob {
     @Override public void readAdditionalSaveData(CompoundTag root) {
         super.readAdditionalSaveData(root);
         CompoundTag tag=root.getCompound("tacticalnpc");
+        ownerMatchId=tag.hasUUID("ownerMatchId")?tag.getUUID("ownerMatchId"):null;
+        groupId=tag.hasUUID("groupId")?tag.getUUID("groupId"):null;
+        invalidMatchBinding=tag.getBoolean("invalidMatchBinding") || tag.contains("ownerMatchId") && ownerMatchId==null || tag.contains("groupId") && groupId==null || (ownerMatchId==null)!=(groupId==null);
         npcName=tag.getString("name"); // Decode only; the server admission callback allocates/migrates names.
         if(tag.isEmpty()) return;
         reactiveAttacker=null;reactiveUntil=0;neutral=false;
         pendingLegacyTeam=false;
         standDamageSource=null;standDamageUntil=0;standPhase=StandPhase.NONE;
-        if(tag.getInt("schema")<1 || tag.getInt("schema")>6) {
+        if(tag.getInt("schema")<1 || tag.getInt("schema")>7) {
             removeTag(RuntimeRegistry.TAG); ammoPolicy=AmmoPolicy.FINITE; initialReserve=0;
             dev.zuma.tacticalnpc.TacticalNpcAiMod.LOGGER.warn("NPC {} unsupported NBT schema {}; tactical control disabled",getUUID(),tag.getInt("schema"));
             return;

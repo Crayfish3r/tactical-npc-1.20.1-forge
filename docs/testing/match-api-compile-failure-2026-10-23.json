@@ -1,0 +1,30 @@
+{
+  "status": "FAIL",
+  "profile": "STAGE",
+  "legacy": false,
+  "executed": 0,
+  "selected": 0,
+  "seconds": 18.204,
+  "exit_code": 1,
+  "command": [
+    "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+    "runGameTestServer",
+    "compileCompatJava",
+    "-PcombatTests",
+    "-PtestProfile=STAGE",
+    "--console=plain",
+    "--rerun-tasks",
+    "-PtestSelection=MatchNpcApiTests,TeamCommandTests,TeamTests,ModeCommandTests,NpcNameTests,IndependentNpcTests,TargetTypeTests",
+    "--offline",
+    "-PgameTestDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261023T100918.678103Z-runtime",
+    "-PgameTestOutputDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261023T100918.678103Z-compiled"
+  ],
+  "log": "forge-addon\\build\\test-runs\\20261023T100918.678103Z-STAGE.log",
+  "runtime": "forge-addon\\build\\test-runs\\20261023T100918.678103Z-runtime",
+  "compiled_output": "forge-addon\\build\\test-runs\\20261023T100918.678103Z-compiled",
+  "tasks": [
+    ":extractTaczLua",
+    ":compileJava",
+    ":compileJava FAILED"
+  ]
+}

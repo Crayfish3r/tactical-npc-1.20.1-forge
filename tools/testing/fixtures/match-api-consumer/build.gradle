@@ -1,0 +1,26 @@
+plugins { id 'java'; id 'net.minecraftforge.gradle' version '6.0.54' }
+java { toolchain.languageVersion = JavaLanguageVersion.of(17) }
+def npcProject = file(providers.gradleProperty('tacticalNpcProject').get())
+repositories {
+    maven { url = new File(npcProject, 'build/repository') }
+    flatDir { dirs new File(npcProject, 'libs') }
+}
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.4.20'
+    implementation fg.deobf('dev.zuma.tacticalnpc:tacticalnpcai:0.2.0')
+    implementation fg.deobf('local:tacz:1.20.1-1.1.8-hotfix2')
+}
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+    runs {
+        server {
+            workingDirectory file(providers.gradleProperty('probeRuntime').get())
+            args '--nogui'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            property 'tactical.match.probe.phase', providers.gradleProperty('probePhase').get()
+            mods { matchapiprobe { source sourceSets.main } }
+        }
+    }
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }

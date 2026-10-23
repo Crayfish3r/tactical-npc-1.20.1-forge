@@ -52,6 +52,11 @@ cd tactical-npc-1.20.1-forge/forge-addon
 
 Архитектура: perception → immutable snapshot → decision → action arbitration → Forge/TaCZ adapter. Ядро `ai-core/` не импортирует игровые API; сущностями управляет server thread. `src/compat/` изолирует оригинальные goals, фракции и AutoGunOperator. Подробности подтверждённых API: [аудит](docs/INTEGRATION-AUDIT.md), контракты испытаний: [TEST_PLAN](docs/TEST_PLAN.md).
 
+Серверная интеграция Battle Royale: [Match NPC API v1](docs/MATCH-NPC-API.md) —
+типизированный транзакционный spawn, индивидуальные loadouts, внешняя fail-closed
+политика целей, очистка матчей и orphan NPC после рестарта. Основной JAR публикуется
+в Maven repository для `fg.deobf`; зависимости от TacticalTablet нет.
+
 Новый код — MIT. Применимые лицензии зависимостей и распространение модпака рассматриваются отдельно; чужие JAR не вложены в артефакты.
 
 ## Постоянный Hard

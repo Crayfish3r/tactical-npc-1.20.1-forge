@@ -25,6 +25,7 @@ public final class TacticalNpcAiMod {
         // Warm SavedData before ordinary ticks, including worlds without any NPCs yet.
         MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.event.server.ServerStartedEvent event)->{
             dev.zuma.tacticalnpc.command.NpcNames.of(event.getServer());
+            dev.zuma.tacticalnpc.api.MatchNpcRegistry.of(event.getServer()).startup();
         });
         MinecraftForge.EVENT_BUS.register(new dev.zuma.tacticalnpc.combat.AiTelemetry());
         LOGGER.info("Tactical NPC AI 0.2.0: independent runtime / TaCZ 1.1.8-hotfix2; optional NPCs 2.1.0 compatibility");

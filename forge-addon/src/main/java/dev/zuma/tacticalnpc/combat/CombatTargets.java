@@ -20,6 +20,7 @@ public final class CombatTargets {
     }
     public static boolean validSubject(PathfinderMob owner,LivingEntity target) {
         if(target==null || target==owner || target.level()!=owner.level() || !target.isAlive() || target.isRemoved() || !supported(target))return false;
+        if(owner instanceof dev.zuma.tacticalnpc.entity.TacticalNpcEntity npc && !dev.zuma.tacticalnpc.api.MatchNpcRegistry.permits(npc,target))return false;
         return !(target instanceof Player player && (player.isCreative() || player.isSpectator()));
     }
     public static boolean eligible(PathfinderMob owner,LivingEntity target) {

@@ -1,0 +1,22 @@
+{
+  "result": "PASS",
+  "command": "python -B tools/verify-production-artifacts.py",
+  "exit_code": 0,
+  "artifacts": [
+    {
+      "file": "forge-addon/build/libs/tacticalnpcai-0.2.0.jar",
+      "bytes": 301604,
+      "sha256": "6FAA7CB48C012B9959E9386094A560765707E89DFBFB6CC28837525C69C4C806",
+      "classes": 137,
+      "java_major": 61
+    },
+    {
+      "file": "forge-addon/build/libs/tacticalnpcai-0.2.0-npcs-compat.jar",
+      "bytes": 7680,
+      "sha256": "D9C3C37DE785BACD28BDB69A57209E9CA22A5A00324875C50774562EC2890C90",
+      "classes": 4,
+      "java_major": 61
+    }
+  ],
+  "publication_same_main_sha256": true
+}

@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'idea'
+    id 'maven-publish'
     id 'net.minecraftforge.gradle' version '6.0.54'
 }
 
@@ -8,6 +9,18 @@ group = 'dev.zuma.tacticalnpc'
 version = '0.2.0'
 base { archivesName = 'tacticalnpcai' }
 java { toolchain.languageVersion = JavaLanguageVersion.of(17) }
+java { withSourcesJar() }
+publishing {
+    publications {
+        tacticalNpc(MavenPublication) {
+            artifactId = 'tacticalnpcai'
+            artifact(tasks.named('jar'))
+            artifact(tasks.named('sourcesJar'))
+            pom { name = 'Tactical NPC AI'; description = 'Independent server NPC and public match API for Forge 1.20.1' }
+        }
+    }
+    repositories { maven { name = 'integration'; url = layout.buildDirectory.dir('repository') } }
+}
 sourceSets {
     compat {
         compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath

@@ -19,6 +19,9 @@ public final class NpcCommands {
     static {ARGUMENTS.register("target",()->ArgumentTypeInfos.registerByClass(NpcTargetArgument.class,SingletonArgumentInfo.contextFree(NpcTargetArgument::new)));}
     public static void registerArguments(IEventBus bus){ARGUMENTS.register(bus);}
     @SubscribeEvent public void register(RegisterCommandsEvent event){
+        // Spawn-only compatibility aliases share the exact partial administrator spawn path.
+        event.getDispatcher().register(Commands.literal("spawn").then(spawnAlias("npc")));
+        event.getDispatcher().register(Commands.literal("tacticalnpc").requires(s->s.hasPermission(2)).then(spawn()));
         event.getDispatcher().register(Commands.literal("npc").requires(s->s.hasPermission(2))
             .executes(c->help(c.getSource()))
             .then(Commands.literal("help").executes(c->help(c.getSource())))
@@ -61,7 +64,10 @@ public final class NpcCommands {
             .executes(c->NpcOperations.equip(c,ResourceLocationArgument.getId(c,"gun"),legacy));
     }
     private static LiteralArgumentBuilder<CommandSourceStack> spawn(){
-        return Commands.literal("spawn").executes(c->NpcSpawning.spawnIndependent(c.getSource(),null,1))
+        return spawnAlias("spawn");
+    }
+    private static LiteralArgumentBuilder<CommandSourceStack> spawnAlias(String name){
+        return Commands.literal(name).requires(s->s.hasPermission(2)).executes(c->NpcSpawning.spawnIndependent(c.getSource(),null,1))
             .then(Commands.literal("count").then(Commands.argument("count",IntegerArgumentType.integer(1,16)).executes(c->NpcSpawning.spawnIndependent(c.getSource(),null,IntegerArgumentType.getInteger(c,"count")))))
             .then(Commands.literal("team").then(Commands.argument("team",StringArgumentType.string())
                 .suggests((c,b)->SharedSuggestionProvider.suggest(c.getSource().getServer().getScoreboard().getTeamNames().stream().map(StringArgumentType::escapeIfRequired),b))
