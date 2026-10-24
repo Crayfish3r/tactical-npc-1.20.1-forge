@@ -8,7 +8,8 @@ import net.minecraft.server.MinecraftServer;
  * Match IDs are single-use per save. Policies never persist or resume after restart. */
 public interface TacticalNpcMatchApi {
     static TacticalNpcMatchApi get(MinecraftServer server){return MatchNpcRegistry.of(server);}
-    /** Register a new ID or replace its policy during this live session. Closed IDs cannot reopen. */
+    /** Register a fresh ID or replace its policy during this live session. Closed IDs cannot reopen.
+     * The bounded persistent used-ID filter may conservatively reject a fresh UUID; see migration docs. */
     void registerPolicy(UUID matchId, MatchNpcPolicy policy);
     SpawnResult spawn(SpawnGroupRequest request);
     /** Immediately revoke fire/damage and stop loaded controllers, without loading chunks. */

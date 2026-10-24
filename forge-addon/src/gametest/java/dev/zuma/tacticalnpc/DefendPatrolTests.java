@@ -140,6 +140,9 @@ public final class DefendPatrolTests {
         h.runAtTickTime(180,()->{
             h.assertTrue(original.position().distanceTo(h.absoluteVec(new Vec3(31.5,2,31.5)))>1,"original actually patrolled before save");
             original.save(saved);order[0]=original.runtime().orderState();position[0]=original.position();original.discard();
+            h.assertTrue(saved.getCompound("tacticalnpc").getInt("schema")==7,"current writer uses schema7");
+            // Exercise the supported legacy reader explicitly, independently of the writer version.
+            saved.getCompound("tacticalnpc").putInt("schema",6);
             h.assertTrue(original.controller()==null,"unload/remove releases original controller and route state");
         });
         h.runAtTickTime(182,()->{

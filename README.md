@@ -17,6 +17,11 @@
 
 Creative/spectator не атакуются. Стены, защищённые тела и незавершённая safety-проверка запрещают новый native round; союзный pre-damage guard защищает и от уже летящих bullets. Неизвестные shooting scripts, charge, inventory-fed, heat, explosive/incendiary свойства заблокированы.
 
+Имена TacticalNPC скрыты над головами, но доступны через команды, `npcName()` и NBT.
+Временные match-owned имена и завершённые матчи очищаются; одноразовые ID защищены
+ограниченным постоянным фильтром. [Совместимость старых миров и ограничения](docs/SAVED-DATA-MIGRATION.md),
+[проверки lifecycle и размеров SavedData](docs/SAVED-DATA-VALIDATION-2026-10-24.md).
+
 Пакет 08–14: [постоянный план и отдельные отчёты](docs/BATCH-08-14.md). Владелец принял 07 и разрешил последовательную работу, но автоматический PASS не является приёмкой владельца. STAND/HOLD_POSITION теперь WAIT на anchor → COMBAT XZ6 после реального native shot/damage → обычный DEFEND32 после окончания контакта. DEFEND принимает радиусы 4–128; PATROL остаётся отдельным. Приказы имеют синтаксис `/npc mode <имя|радиус|selector> assault|defend <4..128>|patrol <4..64>|stand`; permission2.
 
 Handoff пакета08–14 до team-обновления, 2026-10-20: core792, FULL98/98+110/110 и affected14/14+25/25 PASS; production main/compat и ordinary restart. [Исторические SHA/ручные действия](docs/STAGE-14-ACCEPTANCE.md), [ordinary профиль того среза](docs/testing/stage14-profile-2026-10-20.md). Общего ускорения сервера не доказано; для30/50 combat AI p95>2ms, часть больших сцен стреляет реже baseline и не получает performance credit. Human1v1/1v4 и приёмка08–14 — WAITING_PLAYTEST. Актуальные проверки/JAR унификации команд — в [отчёте](docs/COMMAND-UNIFICATION-2026-10-22.md).

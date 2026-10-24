@@ -1,5 +1,28 @@
 # Compatibility audit: independent NPC / optional NPCs 2.1.0
 
+## SavedData lifecycle / names audit, 2026-10-24
+
+Independent Forge layer, same pinned dependencies and hashes below. `javap -c -p`
+against Forge47.4.20 mapped official1.20.1 reconfirmed:
+
+- `Entity.RemovalReason.shouldDestroy()` is true for KILLED/DISCARDED and false for
+  UNLOADED_TO_CHUNK, UNLOADED_WITH_PLAYER and CHANGED_DIMENSION. Existing removal,
+  tracking and dimension hooks retain instance identity checks; no new Mixin/event scan.
+- `DimensionDataStorage.readSavedData` catches `Exception`, logs and returns null;
+  `computeIfAbsent` then calls the supplier. The guarded supplier refuses an empty
+  replacement when the overworld `data/<registry>.dat` exists/unreadable. Version/type
+  errors come from the strict schema loader before this fallback.
+- `PlayerTeam.setNameTagVisibility(Team.Visibility)` and `Team.Visibility.NEVER`
+  use native scoreboard sync/persistence. Only newly reserved API teams are changed.
+- `EntityRenderer.render` posts RenderNameTagEvent; ALLOW bypasses shouldShowName,
+  then calls virtual `renderNameTag`. Both overrides in the existing Dist.CLIENT
+  TacticalNpcEntity renderer prevent names, including crosshair selection. No
+  client symbol was added to server entity/registry classes.
+
+GO for these pinned APIs; TaCZ operation, core contracts and optional NPCs signatures
+are unchanged. Schema migration/one-use filter limits: [SavedData migration](SAVED-DATA-MIGRATION.md).
+Executed validation: [2026-10-24 report](SAVED-DATA-VALIDATION-2026-10-24.md).
+
 ## Match API audit, 2026-10-23
 
 Independent Forge production layer only; no TacticalTablet classes, new library or Mixin.

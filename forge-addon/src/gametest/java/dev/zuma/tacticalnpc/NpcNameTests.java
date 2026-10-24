@@ -21,7 +21,7 @@ public final class NpcNameTests {
         for(int i=0;i<65;i++){
             var npc=create(h);npc.addTag("names-pool-info");h.getLevel().addFreshEntity(npc);all.add(npc);
             h.assertTrue(NpcNames.valid(npc.npcName()) && used.add(npc.npcName().toLowerCase(Locale.ROOT)),"65 globally unique nonnumeric names");
-            h.assertTrue(npc.hasCustomName() && npc.isCustomNameVisible() && npc.getCustomName().getString().equals(npc.npcName()),"visible persistent user name");
+            h.assertTrue(npc.hasCustomName() && !npc.isCustomNameVisible() && npc.getCustomName().getString().equals(npc.npcName()),"hidden persistent API name");
         }
         var store=NpcNames.of(h.getLevel().getServer());var saved=store.save(new CompoundTag());var reloaded=NpcNames.load(saved);
         h.assertTrue(all.stream().anyMatch(n->n.npcName().matches(".*[2-9][0-9]*")),"suffixes after base pool");

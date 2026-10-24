@@ -1,0 +1,60 @@
+{
+  "status": "PASS",
+  "output": "forge-addon\\build\\name-client-check\\20261024T054158",
+  "clients": [
+    {
+      "connection": 1,
+      "exit_code": 0,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "--offline",
+        "--console=plain",
+        "-PclientSmoke",
+        "-PclientSmokeConnect",
+        "-PclientSmokePort=25597",
+        "runClient",
+        "-PclientDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\name-client-check\\20261024T054158\\client"
+      ],
+      "log": "forge-addon\\build\\name-client-check\\20261024T054158\\client-1.log"
+    },
+    {
+      "connection": 2,
+      "exit_code": 0,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "--offline",
+        "--console=plain",
+        "-PclientSmoke",
+        "-PclientSmokeConnect",
+        "-PclientSmokePort=25597",
+        "runClient",
+        "-PclientDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\name-client-check\\20261024T054158\\client"
+      ],
+      "log": "forge-addon\\build\\name-client-check\\20261024T054158\\client-2.log"
+    }
+  ],
+  "scope": "graphical standalone client; aimed NPC at <6 blocks; API team NEVER; team recreation on reconnect; native NBT unload/readmission; forced RenderNameTagEvent ALLOW; vanilla VisibleSheep positive control; five skin stages per connection",
+  "server_command": [
+    "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+    "--offline",
+    "--console=plain",
+    "-PclientSmoke",
+    "-PclientSmokeConnect",
+    "-PclientSmokePort=25597",
+    "runServer",
+    "-PdedicatedDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\name-client-check\\20261024T054158\\server"
+  ],
+  "screenshots": [
+    "forge-addon\\build\\name-client-check\\20261024T054158\\client\\screenshots\\skin-smoke-0-tnpc_4e3333d6d42546f59f24034d87a813c2-1792820733070.png",
+    "forge-addon\\build\\name-client-check\\20261024T054158\\client\\screenshots\\skin-smoke-0-tnpc_fe2b640460c94354aef1f907c18e54c0-1792820641537.png",
+    "forge-addon\\build\\name-client-check\\20261024T054158\\client\\screenshots\\skin-smoke-1-1-1792820646329.png",
+    "forge-addon\\build\\name-client-check\\20261024T054158\\client\\screenshots\\skin-smoke-1-1-1792820739163.png",
+    "forge-addon\\build\\name-client-check\\20261024T054158\\client\\screenshots\\skin-smoke-2-2-1792820654292.png",
+    "forge-addon\\build\\name-client-check\\20261024T054158\\client\\screenshots\\skin-smoke-2-2-1792820747167.png",
+    "forge-addon\\build\\name-client-check\\20261024T054158\\client\\screenshots\\skin-smoke-3-none-1792820662280.png",
+    "forge-addon\\build\\name-client-check\\20261024T054158\\client\\screenshots\\skin-smoke-3-none-1792820755167.png",
+    "forge-addon\\build\\name-client-check\\20261024T054158\\client\\screenshots\\skin-smoke-4-skin_other-1792820670287.png",
+    "forge-addon\\build\\name-client-check\\20261024T054158\\client\\screenshots\\skin-smoke-4-skin_other-1792820763163.png"
+  ],
+  "seconds": 252.0
+}

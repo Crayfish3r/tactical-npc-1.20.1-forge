@@ -22,7 +22,7 @@
 | `/npc ammo <target> finite <0..1000000>` | Конечный начальный резерв для каждого выбранного NPC |
 | `/npc ammo <target> infinite` | Сохранённая политика бесконечного резерва; обычная перезарядка |
 | `/npc debug info <target>` | Дополнительно UUID, serviceId, STAND phase и источник наблюдения |
-| `/npc debug diagnostics` | Текущая агрегированная диагностика измерения источника |
+| `/npc debug diagnostics` | Диагностика AI измерения и серверные счётчики имён/матчей: permanent, temporary, active, pendingCleanup, loaded |
 | `/npc debug legacy spawn` | Optional NPCs2.1.0 spawn |
 | `/npc debug legacy equip <selector> <gun-id>` | Тот же equip для поддерживаемого optional runtime |
 
@@ -55,9 +55,9 @@
 
 ## Постоянные имена и миграция
 
-Реестр [NpcNames](../forge-addon/src/main/java/dev/zuma/tacticalnpc/command/NpcNames.java) сохраняется в overworld `data/tacticalnpc_names.dat`, общий для всего сервера. Пул из50 простых латинских имён после исчерпания продолжается Steve2, Kevin2, … Steve3. Имя отображается над NPC, при спавне, в list/info. UUID/serviceId остаются внутренними идентификаторами. NBT schema6 хранит отдельное поле `tacticalnpc.name`.
+Реестр [NpcNames](../forge-addon/src/main/java/dev/zuma/tacticalnpc/command/NpcNames.java) сохраняется в overworld `data/tacticalnpc_names.dat`, общий для всего сервера. Пул из50 простых латинских имён после исчерпания продолжается Steve2, Kevin2, … Steve3. Имя доступно при спавне, в list/info, API и NBT, но скрыто над головой даже при наведении. UUID/serviceId остаются внутренними идентификаторами. NBT сущности schema7 сохраняет отдельное поле `tacticalnpc.name`; реестр имён пишет schema2 и читает schema1.
 
-Реестр авторитетен для уже известного UUID. Старые NPC получают имя при первом успешном добавлении в загруженный мир; ради миграции выгруженные чанки не обходятся. Копия NBT с другим UUID и занятым именем получает новое; копия с тем же UUID подчиняется native запрету двойного UUID. Числовые имена и специальные NaN/Infinity запрещены. Native scoreboard membership продолжает использовать UUID, появление имени не меняет team. Имена удалённых NPC остаются закреплёнными навсегда, поэтому list включает записи `unloaded/absent`; отличить естественно выгруженного от внешне удалённого NPC по сохранённому реестру нельзя.
+Реестр авторитетен для уже известного UUID. Старые NPC получают имя при первом успешном добавлении в загруженный мир; ради миграции выгруженные чанки не обходятся. Копия NBT с другим UUID и занятым именем получает новое; копия с тем же UUID подчиняется native запрету двойного UUID. Числовые имена и специальные NaN/Infinity запрещены. Native scoreboard membership продолжает использовать UUID, появление имени не меняет team. Имена удалённых административных NPC остаются закреплёнными, поэтому list включает их записи `unloaded/absent`. Временные имена API удаляются при окончательном removal/rollback/cleanup матча и повторно используются. Unload сохраняет оба вида имён. Старые записи без доказанного временного происхождения сохраняются: [миграция и ограничения](SAVED-DATA-MIGRATION.md).
 
 Временный индекс хранит UUID, измерение, ID экземпляра и WeakReference, не удерживающий Entity. Присвоение выполняется в `onAddedToWorld` после native admission, отменённый spawn не резервирует имя. Выгрузка/удаление убирают только текущий экземпляр из индекса; краткая потеря native tracking без удаления не уничтожает слабый handle; restart и перенос измерения восстанавливают связь. NBT-декодирование не трогает мир или реестр с deserializer thread. Реестр прогревается на ServerStarted до обычных тиков, включая миры без NPC.
 

@@ -78,11 +78,14 @@ public final class MatchNpcApiTests {
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="match-05-rollback",timeoutTicks=45)
     public static void nativeAdmissionFailureRollsBackEntitiesAndTeam(GameTestHelper h){
         var s=scene(h);h.runAtTickTime(5,()->{int[] admitted={0};int teams=h.getLevel().getScoreboard().getPlayerTeams().size();
+            var names=dev.zuma.tacticalnpc.command.NpcNames.of(h.getLevel().getServer());var before=names.counts();var saved=names.save(new CompoundTag());
             Consumer<EntityJoinLevelEvent> reject=e->{if(e.getEntity() instanceof TacticalNpcEntity n && s.match().equals(n.ownerMatchId()) && ++admitted[0]==2)e.setCanceled(true);};
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH,false,EntityJoinLevelEvent.class,reject);
             SpawnResult result;try{result=s.api().spawn(request(h,s,"ak47","ak47","ak47","ak47"));}finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(reject);}
             h.assertTrue(result.status()==SpawnResult.Status.ENTITY_REJECTED && result.entityIds().isEmpty() && admitted[0]==2,"native second admission actually rejected");
-            h.assertTrue(s.api().activeNpcCount(s.match())==0 && teams==h.getLevel().getScoreboard().getPlayerTeams().size(),"rollback leaves no actors/team");finish(h,s);
+            h.assertTrue(s.api().activeNpcCount(s.match())==0 && teams==h.getLevel().getScoreboard().getPlayerTeams().size(),"rollback leaves no actors/team");
+            h.assertTrue(before.equals(names.counts()) && saved.equals(names.save(new CompoundTag())),"rollback leaves no names/owners/loaded reservations or serialized growth");
+            finish(h,s);
         });
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="match-14-geometry",timeoutTicks=45)

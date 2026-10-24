@@ -85,7 +85,7 @@ public final class TacticalNpcEntity extends PathfinderMob {
     public void assignNpcName(String name) {
         runtime.requireServer();
         if(!dev.zuma.tacticalnpc.command.NpcNames.valid(name))throw new IllegalArgumentException("NPC name must start with a Latin letter");
-        npcName=name;setCustomName(net.minecraft.network.chat.Component.literal(name));setCustomNameVisible(true);
+        npcName=name;setCustomName(net.minecraft.network.chat.Component.literal(name));setCustomNameVisible(false);
     }
     @Override public void onAddedToWorld() {
         super.onAddedToWorld();
@@ -97,7 +97,10 @@ public final class TacticalNpcEntity extends PathfinderMob {
     @Override public void onRemovedFromWorld() {
         // Forge also calls this on temporary tracking loss, before actual entity unload.
         // remove()/dimension removal clear the index; a still-loaded instance keeps its weak handle.
-        if(!level().isClientSide && isRemoved())dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).leave(this);
+        if(!level().isClientSide && isRemoved()){
+            dev.zuma.tacticalnpc.api.MatchNpcRegistry.of(getServer()).leave(this,getRemovalReason());
+            dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).leave(this,getRemovalReason());
+        }
         super.onRemovedFromWorld();
     }
     public AmmoPolicy ammoPolicy() { return ammoPolicy; }
@@ -224,13 +227,14 @@ public final class TacticalNpcEntity extends PathfinderMob {
         if(controller!=null) { goalSelector.removeGoal(controller); controller.stop(); controller=null; }
         RuntimeRegistry.release(this);
     }
-    @Override public void remove(Entity.RemovalReason reason) { if(!level().isClientSide) {dev.zuma.tacticalnpc.api.MatchNpcRegistry.of(getServer()).leave(this);dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).leave(this);release();} super.remove(reason); }
+    @Override public void remove(Entity.RemovalReason reason) { if(!level().isClientSide) {dev.zuma.tacticalnpc.api.MatchNpcRegistry.of(getServer()).leave(this,reason);dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).leave(this,reason);release();} super.remove(reason); }
     @Override protected void removeAfterChangingDimensions() { if(!level().isClientSide) {dev.zuma.tacticalnpc.api.MatchNpcRegistry.of(getServer()).leave(this);dev.zuma.tacticalnpc.command.NpcNames.of(getServer()).leave(this);release();} super.removeAfterChangingDimensions(); }
     @Override public void addAdditionalSaveData(CompoundTag root) {
         super.addAdditionalSaveData(root);
         CompoundTag tag=new CompoundTag(); tag.putInt("schema",7); tag.putUUID("serviceId",serviceId);
         if(ownerMatchId!=null)tag.putUUID("ownerMatchId",ownerMatchId);
         if(groupId!=null)tag.putUUID("groupId",groupId);
+        if(ownerMatchId!=null || invalidMatchBinding)tag.putBoolean("matchOwned",true);
         if(invalidMatchBinding)tag.putBoolean("invalidMatchBinding",true);
         tag.putString("name",npcName);
         tag.putString("standPhase",standPhase.name());
@@ -250,7 +254,8 @@ public final class TacticalNpcEntity extends PathfinderMob {
         CompoundTag tag=root.getCompound("tacticalnpc");
         ownerMatchId=tag.hasUUID("ownerMatchId")?tag.getUUID("ownerMatchId"):null;
         groupId=tag.hasUUID("groupId")?tag.getUUID("groupId"):null;
-        invalidMatchBinding=tag.getBoolean("invalidMatchBinding") || tag.contains("ownerMatchId") && ownerMatchId==null || tag.contains("groupId") && groupId==null || (ownerMatchId==null)!=(groupId==null);
+        invalidMatchBinding=tag.getBoolean("invalidMatchBinding") || tag.contains("matchOwned") && ownerMatchId==null || tag.contains("ownerMatchId") && ownerMatchId==null || tag.contains("groupId") && groupId==null || (ownerMatchId==null)!=(groupId==null);
+        setCustomNameVisible(false); // Legacy entity NBT may still contain CustomNameVisible=true.
         npcName=tag.getString("name"); // Decode only; the server admission callback allocates/migrates names.
         if(tag.isEmpty()) return;
         reactiveAttacker=null;reactiveUntil=0;neutral=false;

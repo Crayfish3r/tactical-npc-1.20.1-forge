@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-24",
+  "branch": "feature",
+  "base_head": "ab6ad7a993210e4a86588a5eb0cbb64ba1e11e18",
+  "java": "Microsoft OpenJDK 17.0.19+10-LTS",
+  "minecraft": "1.20.1",
+  "forge": "47.4.20",
+  "tacz": "1.1.8-hotfix2",
+  "optional_npcs_compile": "2.1.0",
+  "core_checks": 936,
+  "stage_unique_gametests": 161,
+  "stage_assembly": {
+    "unchanged_full_passes": 130,
+    "recovery25_passes_reused": 23,
+    "binding2_passes_reused": 1,
+    "names7_passes": 7
+  },
+  "full_status": "FAIL 160/161; original receipt retained",
+  "source_roots": {
+    "ai-core/src": {
+      "files": 42,
+      "sha256_paths_and_content": "9eb256bc8bf64b220078748fa14b6add73083856157c9d3f091b2b6a86acd45b"
+    },
+    "forge-addon/src/main": {
+      "files": 52,
+      "sha256_paths_and_content": "7c35dfa5c3fbe15c53992f0c9b2ac2de54eea8cbf484c34e01aa0dc190bf74d2"
+    },
+    "forge-addon/src/gametest": {
+      "files": 35,
+      "sha256_paths_and_content": "840e70e4cf5dea641fd01d8d9aee4965195fdef4fbb36b7ab564d96f59019e05"
+    },
+    "forge-addon/src/compat": {
+      "files": 3,
+      "sha256_paths_and_content": "6c9d646da9d488da2eb7bb098e90d74198cba8deba5c16ade3704ee1dd5c8b0b"
+    },
+    "forge-addon/src/compatTest": {
+      "files": 4,
+      "sha256_paths_and_content": "5d30c3b449d893d97a46f1319cfa414207dc34a041ee2e597f6d207d59d0b3b7"
+    },
+    "forge-addon/src/clientSmoke": {
+      "files": 3,
+      "sha256_paths_and_content": "8658d4a635216a1da80f01c6a2cb13c0c000d984557d2a82013f8247d05f9869"
+    },
+    "tools/testing/fixtures/match-api-consumer": {
+      "files": 4,
+      "sha256_paths_and_content": "5bbc27773b00df09976c1557009541503c66598a19b282952ac9f017f8a1e878"
+    }
+  },
+  "changed_and_verification_inputs": {
+    "forge-addon/build.gradle": "78ae8b6df57bb9d81c3cc2fea1d2c4b030a00c468cc1318d5d7b08e6dac5b140",
+    "forge-addon/src/clientSmoke/java/dev/zuma/tacticalnpc/ClientSmokeConnect.java": "23089ff7fa1d078e7d5548709a9c3d33eaa5d76a21b397c0e6da41cfd962cb98",
+    "forge-addon/src/clientSmoke/java/dev/zuma/tacticalnpc/ClientSmokeFixture.java": "3abf8d8a6551625f8215ff37eacc120f9bda720433bf6b68bcb45036576a13b8",
+    "forge-addon/src/clientSmoke/java/dev/zuma/tacticalnpc/ClientSmokeProbe.java": "fe43e6f66e488e820fc8156024f79f5295678234b247a0425b040a5af6a6c0a4",
+    "forge-addon/src/gametest/java/dev/zuma/tacticalnpc/DefendPatrolTests.java": "636c20eb708a142359a5e5661323b12c8d1d6559be355e416318477a13d027b2",
+    "forge-addon/src/gametest/java/dev/zuma/tacticalnpc/MatchNpcApiTests.java": "22f4b8eca2d88d346d3bd69b783f96aa42a86c98849be47f0c6ea9f82b0ae62e",
+    "forge-addon/src/gametest/java/dev/zuma/tacticalnpc/NpcNameTests.java": "d3a9c4ab67aa89cfa2ee4288c8319e4489a7697c4269182f1be98bb754c181d1",
+    "forge-addon/src/gametest/java/dev/zuma/tacticalnpc/api/SavedDataLifecycleTests.java": "a0cb4290c9d99261c950c9798472b2fb080554a7314f0e94ec9b1e8539997a5e",
+    "forge-addon/src/main/java/dev/zuma/tacticalnpc/api/MatchNpcRegistry.java": "35868782123fcba41ffc1c69c689d568fabdc1c1c20276c4f3839abf4edfbd43",
+    "forge-addon/src/main/java/dev/zuma/tacticalnpc/api/TacticalNpcMatchApi.java": "6d904a916321b402c0c4fd792509c2a92b5920bb18d4e9f659ab883158b39176",
+    "forge-addon/src/main/java/dev/zuma/tacticalnpc/api/UsedMatchIds.java": "a557f4100dcb00b6b9eab4178377a747c06918993031f7cf60f41f3fb5ec3ae0",
+    "forge-addon/src/main/java/dev/zuma/tacticalnpc/client/NpcClient.java": "917bbfdc11f2d8902df0584ea569de040ea70e0c0aee70345c7ca67848bcab07",
+    "forge-addon/src/main/java/dev/zuma/tacticalnpc/command/NpcCommands.java": "391c4e566f7056e65d519d377cc1771e19c3984f45d03d32124700c177357ee2",
+    "forge-addon/src/main/java/dev/zuma/tacticalnpc/command/NpcNames.java": "4cd4c5df904ac9cadde1be48bb6a68e6cf81ed11e1e9e437102920b601b46092",
+    "forge-addon/src/main/java/dev/zuma/tacticalnpc/command/StrictSavedData.java": "d1634bc0f5f03c51a9fef07c5d08c1aa6f81164ff65ece85c35fa43a9e0c3c15",
+    "forge-addon/src/main/java/dev/zuma/tacticalnpc/entity/TacticalNpcEntity.java": "5f7b730ebc7f50528ae2d3404f1e6d0128479d9c22cb460b1c29ccb623657bda",
+    "tools/testing/fixtures/match-api-consumer/src/main/java/probe/MatchApiConsumer.java": "6f9356a39f6d88a3355af166464af84e78c26bf6d8b36fbc9a7c3bc372b9ab83",
+    "tools/testing/run-match-api-consumer.py": "5a0dc80a673f8aff41df39f0b6145648400fb1404b34eaad80f6e1366e2fc2c6",
+    "tools/testing/run-name-client-check.py": "ea30543646f01de874462f2c697ce52a85fb9e6666e583cd6d916d0e123f323e",
+    "forge-addon/gradle/testing.gradle": "450e950421505ecb07d83397a10d53a27cf1844c6d58e2737b60aac972080ec4",
+    "ai-core/run-tests.sh": "99bae31fdebab817a2834c20db6521e935bf1cd502df67cb3110896c32eb4be3",
+    "tools/testing/run-gametests.py": "5923a62ddabfaea15f2e3f73155c5a9277f8297e135187505a7c21f072c8d4f5",
+    "tools/testing/run-dedicated-check.py": "9453417b665f15eac651aacb4100fcf8215ec750f4eb76a6ff6d18c6d876f657",
+    "tools/verify-production-artifacts.py": "def3e86560e2d6dd01694a08b4572a0997612e56f5dcb438d4aaca9870c91e50"
+  },
+  "dependencies": {
+    "forge-addon/libs/tacz-1.20.1-1.1.8-hotfix2.jar": "2cbb89f44333d2eb4e825d86d789ff119b272ff75184390b55bafd4f0e7f10c2",
+    "forge-addon/libs/tacznpcs-2.1.0-1.20.1.jar": "2593aa66cd56c08538a91ed3d274c054b043f0c6a4c0ff51a37de310d60734ee"
+  },
+  "main_sha256": "29ca531216d36ecca85c540853b989e3e6274a5b5ae93fd37c13ef690e9bcffc",
+  "published_equals_distribution": true,
+  "client_scope": "10 stages across two connections, source userdev",
+  "consumer_scope": "published distribution JAR fg.deobf, current final artifact; 2 ordinary disk phases",
+  "not_run": [
+    "combined runtime",
+    "human PvP",
+    "TT-specific modpack",
+    "JFR/load/soak",
+    "standalone launcher installation of production JAR"
+  ]
+}

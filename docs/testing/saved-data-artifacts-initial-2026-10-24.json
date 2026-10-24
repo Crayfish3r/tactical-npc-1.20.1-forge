@@ -1,0 +1,32 @@
+{
+  "result": "PASS",
+  "artifacts": [
+    {
+      "file": "forge-addon\\build\\libs\\tacticalnpcai-0.2.0.jar",
+      "bytes": 310569,
+      "sha256": "62AFA66809FF995326510A90FDF586A9EBF718A7EDAACFD86789231C5E5DFB1C",
+      "classes": 141,
+      "java_major": 61,
+      "npc_compat": false
+    },
+    {
+      "file": "forge-addon\\build\\libs\\tacticalnpcai-0.2.0-npcs-compat.jar",
+      "bytes": 7680,
+      "sha256": "D9C3C37DE785BACD28BDB69A57209E9CA22A5A00324875C50774562EC2890C90",
+      "classes": 4,
+      "java_major": 61,
+      "npc_compat": true
+    }
+  ],
+  "build": {
+    "status": "PASS",
+    "command": ".\\gradlew.bat build publishTacticalNpcPublicationToIntegrationRepository --offline --console=plain",
+    "working_directory": "forge-addon",
+    "seconds_reported": 26,
+    "tasks": 15,
+    "executed": 9,
+    "up_to_date": 6,
+    "test_task": "NO-SOURCE; not counted as tests",
+    "exit_code": 0
+  }
+}

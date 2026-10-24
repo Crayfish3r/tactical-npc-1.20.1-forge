@@ -1,0 +1,26 @@
+{
+  "status": "FAIL",
+  "profile": "FAST",
+  "legacy": false,
+  "executed": 0,
+  "selected": 0,
+  "seconds": 0.297,
+  "exit_code": 1,
+  "command": [
+    "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+    "runGameTestServer",
+    "compileCompatJava",
+    "-PcombatTests",
+    "-PtestProfile=FAST",
+    "--console=plain",
+    "--rerun-tasks",
+    "-PtestSelection=SavedDataLifecycleTests,MatchNpcApiTests#nativeAdmissionFailureRollsBackEntitiesAndTeam,NpcNameTests",
+    "--offline",
+    "-PgameTestDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261024T045639.834265Z-runtime",
+    "-PgameTestOutputDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261024T045639.834265Z-compiled"
+  ],
+  "log": "forge-addon\\build\\test-runs\\20261024T045639.834265Z-FAST.log",
+  "runtime": "forge-addon\\build\\test-runs\\20261024T045639.834265Z-runtime",
+  "compiled_output": "forge-addon\\build\\test-runs\\20261024T045639.834265Z-compiled",
+  "tasks": []
+}

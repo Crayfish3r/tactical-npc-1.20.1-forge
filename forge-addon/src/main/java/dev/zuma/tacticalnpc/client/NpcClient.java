@@ -31,6 +31,10 @@ public final class NpcClient {
         private static ResourceLocation skin(String variant) {
             return new ResourceLocation(TacticalNpcAiMod.ID,"textures/entity/npc/military_skin_"+variant+".png");
         }
+        @Override protected boolean shouldShowName(TacticalNpcEntity npc){return false;}
+        // Forge's RenderNameTagEvent can override shouldShowName (ALLOW). Keep the final
+        // renderer boundary hidden as well, without affecting any other entity renderer.
+        @Override protected void renderNameTag(TacticalNpcEntity npc,net.minecraft.network.chat.Component text,com.mojang.blaze3d.vertex.PoseStack pose,net.minecraft.client.renderer.MultiBufferSource buffers,int light){}
         @Override public ResourceLocation getTextureLocation(TacticalNpcEntity npc) {
             // Read the synced vanilla scoreboard every render; no cached skin or extra NBT.
             var team=npc.getTeam();

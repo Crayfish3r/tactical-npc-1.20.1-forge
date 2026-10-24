@@ -1,0 +1,46 @@
+{
+  "status": "FAIL",
+  "output": "forge-addon\\build\\name-client-check\\20261024T052453",
+  "clients": [
+    {
+      "connection": 1,
+      "exit_code": 0,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "--offline",
+        "--console=plain",
+        "-PclientSmoke",
+        "-PclientSmokePort=25597",
+        "runClient",
+        "-PclientDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\name-client-check\\20261024T052453\\client"
+      ],
+      "log": "forge-addon\\build\\name-client-check\\20261024T052453\\client-1.log"
+    },
+    {
+      "connection": 2,
+      "exit_code": 0,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "--offline",
+        "--console=plain",
+        "-PclientSmoke",
+        "-PclientSmokePort=25597",
+        "runClient",
+        "-PclientDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\name-client-check\\20261024T052453\\client"
+      ],
+      "log": "forge-addon\\build\\name-client-check\\20261024T052453\\client-2.log"
+    }
+  ],
+  "scope": "graphical standalone client; aimed NPC at <6 blocks; API team NEVER; team recreation on reconnect; native NBT unload/readmission; forced RenderNameTagEvent ALLOW; vanilla VisibleSheep positive control; five skin stages per connection",
+  "server_command": [
+    "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+    "--offline",
+    "--console=plain",
+    "-PclientSmoke",
+    "-PclientSmokePort=25597",
+    "runServer",
+    "-PdedicatedDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\name-client-check\\20261024T052453\\server"
+  ],
+  "error": "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\name-client-check\\20261024T052453\\client-2.log",
+  "seconds": 338.11
+}

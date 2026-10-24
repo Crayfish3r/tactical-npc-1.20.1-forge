@@ -66,8 +66,12 @@ minecraft {
             }
         }
         client {
-            workingDirectory project.file('run/client-standalone')
-            if(project.hasProperty('clientSmoke')) args '--username','TacticalSmoke','--quickPlayMultiplayer','127.0.0.1:25585'
+            workingDirectory project.file(project.findProperty('clientDir') ?: 'run/client-standalone')
+            if(project.hasProperty('clientSmoke')) {
+                args '--username','TacticalSmoke'
+                if(project.hasProperty('clientSmokeConnect')) property 'tactical.client.smoke.address',"127.0.0.1:${project.findProperty('clientSmokePort') ?: '25585'}"
+                else args '--quickPlayMultiplayer',"127.0.0.1:${project.findProperty('clientSmokePort') ?: '25585'}"
+            }
         }
         gameTestServer {
             workingDirectory project.file(project.findProperty('gameTestDir') ?: (project.hasProperty('legacyCompatibility') ? 'run/gametest-compat' : 'run/gametest-standalone'))

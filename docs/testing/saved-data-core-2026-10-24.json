@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "java": "Microsoft OpenJDK 17.0.19+10-LTS",
+  "scope": "all seven ai-core suites, requested regression; production core unchanged",
+  "command": "$env:JAVA_HOME='C:/Program Files/Microsoft/jdk-17.0.19.10-hotspot'; $env:PATH=$env:JAVA_HOME+'/bin;'+$env:PATH; & 'C:/Program Files/Git/bin/bash.exe' ai-core/run-tests.sh",
+  "checks": {
+    "policy": 72,
+    "temporal": 94,
+    "territory": 38,
+    "patrol": 235,
+    "attack": 353,
+    "combat": 26,
+    "actions": 118
+  },
+  "total": 936,
+  "exit_code": 0,
+  "initial_sandbox_attempt": "MSYS NtCreateDirectoryObject access denied; zero suites executed; escalated invocation passed"
+}

@@ -1,0 +1,42 @@
+{
+  "status": "FAIL",
+  "profile": "FULL",
+  "legacy": false,
+  "executed": 161,
+  "selected": 161,
+  "seconds": 1179.61,
+  "exit_code": 1,
+  "command": [
+    "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+    "runGameTestServer",
+    "compileCompatJava",
+    "-PcombatTests",
+    "-PtestProfile=FULL",
+    "--console=plain",
+    "--rerun-tasks",
+    "--offline",
+    "-PgameTestDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261024T050032.986290Z-runtime",
+    "-PgameTestOutputDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261024T050032.986290Z-compiled"
+  ],
+  "log": "forge-addon\\build\\test-runs\\20261024T050032.986290Z-FULL.log",
+  "runtime": "forge-addon\\build\\test-runs\\20261024T050032.986290Z-runtime",
+  "compiled_output": "forge-addon\\build\\test-runs\\20261024T050032.986290Z-compiled",
+  "tasks": [
+    ":extractTaczLua",
+    ":compileJava",
+    ":processResources",
+    ":classes",
+    ":downloadMcpConfig",
+    ":extractSrg",
+    ":createSrgToMcp",
+    ":downloadMCMeta",
+    ":downloadAssets",
+    ":extractNatives",
+    ":makeSrcDirs",
+    ":prepareRuns",
+    ":prepareRunGameTestServer",
+    ":prepareRunGameTestServerCompile",
+    ":runGameTestServer",
+    ":runGameTestServer FAILED"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "profile": "FAST",
+  "legacy": false,
+  "executed": 7,
+  "selected": 7,
+  "seconds": 93.469,
+  "exit_code": 0,
+  "command": [
+    "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+    "runGameTestServer",
+    "compileCompatJava",
+    "-PcombatTests",
+    "-PtestProfile=FAST",
+    "--console=plain",
+    "--rerun-tasks",
+    "-PtestSelection=NpcNameTests,SavedDataLifecycleTests#unloadKeepsNameThenClosedUnknownBindingCannotRevive",
+    "--offline",
+    "-PgameTestDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261024T055500.402211Z-runtime",
+    "-PgameTestOutputDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261024T055500.402211Z-compiled"
+  ],
+  "log": "forge-addon\\build\\test-runs\\20261024T055500.402211Z-FAST.log",
+  "runtime": "forge-addon\\build\\test-runs\\20261024T055500.402211Z-runtime",
+  "compiled_output": "forge-addon\\build\\test-runs\\20261024T055500.402211Z-compiled",
+  "tasks": [
+    ":extractTaczLua",
+    ":compileJava",
+    ":processResources",
+    ":classes",
+    ":downloadMcpConfig",
+    ":extractSrg",
+    ":createSrgToMcp",
+    ":downloadMCMeta",
+    ":downloadAssets",
+    ":extractNatives",
+    ":makeSrcDirs",
+    ":prepareRuns",
+    ":prepareRunGameTestServer",
+    ":prepareRunGameTestServerCompile",
+    ":runGameTestServer",
+    ":compileCompatJava"
+  ]
+}

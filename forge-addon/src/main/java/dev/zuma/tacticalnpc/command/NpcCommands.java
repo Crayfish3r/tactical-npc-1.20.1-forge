@@ -45,7 +45,7 @@ public final class NpcCommands {
                 .then(Commands.literal("finite").then(Commands.argument("reserve",IntegerArgumentType.integer(0,1000000))
                     .executes(c->NpcOperations.ammo(c,AmmoPolicy.FINITE,IntegerArgumentType.getInteger(c,"reserve")))))))
             .then(Commands.literal("debug")
-                .then(Commands.literal("diagnostics").executes(c->{c.getSource().sendSuccess(()->Component.literal(dev.zuma.tacticalnpc.combat.AiTelemetry.diagnostics(c.getSource().getLevel())),false);return 1;}))
+                .then(Commands.literal("diagnostics").executes(c->{c.getSource().sendSuccess(()->Component.literal(dev.zuma.tacticalnpc.combat.AiTelemetry.diagnostics(c.getSource().getLevel())+" names="+NpcNames.of(c.getSource().getServer()).counts()+" matches="+dev.zuma.tacticalnpc.api.MatchNpcRegistry.of(c.getSource().getServer()).counts()),false);return 1;}))
                 .then(Commands.literal("info").then(targets().executes(c->NpcOperations.info(c,true))))
                 .then(Commands.literal("legacy")
                     .then(Commands.literal("spawn").executes(c->NpcSpawning.spawnLegacy(c.getSource())))

@@ -45,6 +45,8 @@ def main():
             content = log.read_text(encoding="utf-8", errors="replace")
             receipt["phases"].append({"phase": phase, "exit_code": process.returncode, "command": command, "log": str(log.relative_to(ROOT))})
             assert process.returncode == 0 and marker in content and "BUILD SUCCESSFUL" in content and "MATCH_API_PROBE_FAIL" not in content, str(log)
+            if phase == "save":
+                assert "MATCH_API_PROBE_LEGACY_DISK names=1 matches=1 entity=7" in content, "Legacy disk fixture not written"
             assert "All dimensions are saved" in content and "TACTICAL_TEST_SELECTION" not in content
         receipt["status"] = "PASS"
     except Exception as error:
@@ -52,7 +54,7 @@ def main():
         raise
     finally:
         receipt.update(seconds=round(time.monotonic() - started, 3), output=str(output.relative_to(ROOT)),
-                       scope="external ForgeGradle fg.deobf consumer compile; ordinary dedicated without NPCs; API group4+remote1; real remote chunk unload; disk save/restart; orphan admission; teams and manual state; no GameTest/profile source flags; test-only chunk tickets")
+                       scope="external ForgeGradle fg.deobf consumer compile; ordinary dedicated without NPCs; API group4+remote1; real remote chunk unload; actual disk schema1 registries/entity7 -> schema2 save/restart; orphan admission; no temporary names/match records; teams and manual state; no GameTest/profile source flags; test-only chunk tickets")
         (output / "receipt.json").write_text(json.dumps(receipt, indent=2), encoding="utf-8")
         print(json.dumps(receipt, indent=2))
 

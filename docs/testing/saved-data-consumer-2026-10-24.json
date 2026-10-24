@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "artifact_sha256": "29ca531216d36ecca85c540853b989e3e6274a5b5ae93fd37c13ef690e9bcffc",
+  "phases": [
+    {
+      "phase": "save",
+      "exit_code": 0,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "-p",
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\match-api-consumer\\20261024T055851\\consumer",
+        "runServer",
+        "--offline",
+        "--console=plain",
+        "-Dorg.gradle.jvmargs=-Xmx3G",
+        "-PtacticalNpcProject=C:\\MCDev\\[TACZ] Military NPC\\forge-addon",
+        "-PprobeRuntime=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\match-api-consumer\\20261024T055851\\runtime",
+        "-PprobePhase=save"
+      ],
+      "log": "forge-addon\\build\\match-api-consumer\\20261024T055851\\save.log"
+    },
+    {
+      "phase": "restart",
+      "exit_code": 0,
+      "command": [
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+        "-p",
+        "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\match-api-consumer\\20261024T055851\\consumer",
+        "runServer",
+        "--offline",
+        "--console=plain",
+        "-Dorg.gradle.jvmargs=-Xmx3G",
+        "-PtacticalNpcProject=C:\\MCDev\\[TACZ] Military NPC\\forge-addon",
+        "-PprobeRuntime=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\match-api-consumer\\20261024T055851\\runtime",
+        "-PprobePhase=restart"
+      ],
+      "log": "forge-addon\\build\\match-api-consumer\\20261024T055851\\restart.log"
+    }
+  ],
+  "seconds": 99.828,
+  "output": "forge-addon\\build\\match-api-consumer\\20261024T055851",
+  "scope": "external ForgeGradle fg.deobf consumer compile; ordinary dedicated without NPCs; API group4+remote1; real remote chunk unload; actual disk schema1 registries/entity7 -> schema2 save/restart; orphan admission; no temporary names/match records; teams and manual state; no GameTest/profile source flags; test-only chunk tickets"
+}
