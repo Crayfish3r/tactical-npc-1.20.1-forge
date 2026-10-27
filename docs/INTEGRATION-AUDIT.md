@@ -1,5 +1,29 @@
 # Compatibility audit: independent NPC / optional NPCs 2.1.0
 
+## NPC transparent-barrier observation/fire policy, 2026-10-27
+
+Independent shared Forge perception layer, Minecraft1.20.1 / Forge47.4.20 / Java17.0.19.
+Both dependency SHA256 values below were rechecked unchanged. `javap -p` against
+`forge-addon/build/fg_cache/net/minecraftforge/forge/1.20.1-47.4.20_mapped_official_1.20.1/forge-1.20.1-47.4.20_mapped_official_1.20.1.jar`
+confirmed `BlockGetter.traverseBlocks(Vec3,Vec3,C,BiFunction,Function)`,
+`ClipContext.getBlockShape(BlockState,BlockGetter,BlockPos)`,
+`BlockGetter.clipWithInteractionOverride(Vec3,Vec3,BlockPos,VoxelShape,BlockState)`,
+`LevelChunk.getBlockState/getFluidState/getBlockEntity(BlockPos,EntityCreationType)`,
+and `LevelHeightAccessor.getHeight/getMinBuildHeight`. Existing audited
+`ServerChunkCache.getChunkNow(int,int)` supplies only available chunks.
+`javap -c -p BlockGetter` confirmed the vanilla per-cell collider/interaction-override
+sequence reused by the new bounded view; `ClipContext.Fluid.NONE` is preserved.
+
+JAR resources contain Forge glass/glass_panes tags; Minecraft block tags and the
+mod's own four tags provide explicit defaults and datapack extension. Oak windowed
+doors/trapdoors are explicitly listed; `DoorBlock.OPEN`, `TrapDoorBlock.OPEN` and
+the associated typed states exist in the pinned binary. No texture inspection,
+new NPCs signature, native weapon API, Mixin or projectile hook was added.
+
+GO for the shared Forge API surface. This grants AI observation/fire permission;
+penetration, projectile travel, destruction and damage remain owned by the installed
+mods. Execution scope and remaining limitations: [transparent-sight validation](TRANSPARENT-SIGHT-2026-10-27.md).
+
 ## SavedData lifecycle / names audit, 2026-10-24
 
 Independent Forge layer, same pinned dependencies and hashes below. `javap -c -p`

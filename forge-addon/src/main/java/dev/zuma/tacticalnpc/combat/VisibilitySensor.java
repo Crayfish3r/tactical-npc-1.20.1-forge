@@ -11,10 +11,8 @@ import net.minecraft.world.entity.PathfinderMob;
 import dev.zuma.tacticalnpc.runtime.RuntimeRegistry;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 public final class VisibilitySensor {
@@ -54,14 +52,11 @@ public final class VisibilitySensor {
     public boolean clear(PathfinderMob npc, Vec3 point) {
         return los(npc,point,false)==Los.CLEAR;
     }
+    private NpcSightRay.Result lastLos;
+    public String losDiagnostics(){return lastLos==null?"NOT_CHECKED":lastLos.toString();}
     public Los los(PathfinderMob npc,Vec3 point,boolean active) {
-        if(!(npc.level() instanceof net.minecraft.server.level.ServerLevel level)) return Los.DEFERRED;
-        // ClipContext may ask for chunks. Preflight its entire bounded segment without tickets/I/O.
-        if(!loadedSegment(level,npc.getEyePosition(),point))return Los.DEFERRED;
-        var budget=AiWorkBudget.of(level);
-        if(!(active?budget.activeRay(npc.getUUID()):budget.ray(npc.getUUID()))) return Los.DEFERRED;
-        return npc.level().clip(new ClipContext(npc.getEyePosition(), point,
-                ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, npc)).getType() == HitResult.Type.MISS?Los.CLEAR:Los.BLOCKED;
+        lastLos=NpcSightRay.trace(npc,npc.getEyePosition(),point,active);
+        return lastLos.los();
     }
     /** Chunk-grid DDA, including corner neighbours: fixed-distance samples can miss a thin corner. */
     public static boolean loadedSegment(ServerLevel level,Vec3 start,Vec3 end){

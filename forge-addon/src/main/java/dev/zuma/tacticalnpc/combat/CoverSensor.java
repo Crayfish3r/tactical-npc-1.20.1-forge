@@ -5,7 +5,6 @@ import dev.zuma.tacticalnpc.runtime.NpcRuntimeAdapter;
 import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.*;
 
@@ -138,9 +137,9 @@ public final class CoverSensor {
         return true;
     }
     private Boolean clear(Vec3 start,Vec3 end) {
-        if(!VisibilitySensor.loadedSegment((ServerLevel)runtime.entity().level(),start,end))return null;
-        var npc=runtime.entity();if(!AiWorkBudget.of((ServerLevel)npc.level()).ray(npc.getUUID())) return null;
-        return npc.level().clip(new ClipContext(start,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,npc)).getType()==HitResult.Type.MISS;
+        var result=NpcSightRay.trace(runtime.entity(),start,end,false);
+        if(result.los()==VisibilitySensor.Los.DEFERRED){deferred=true;return null;}
+        return result.los()==VisibilitySensor.Los.CLEAR;
     }
     public boolean withinOrder(Vec3 point) {
         var order=runtime.orderState();

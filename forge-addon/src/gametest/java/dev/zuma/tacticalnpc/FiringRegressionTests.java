@@ -22,6 +22,7 @@ public final class FiringRegressionTests {
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="firing-01-stand",timeoutTicks=240)
     public static void emptyStandReloadsWithSelectedCoverBeforeFirstRound(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=npc(h,0,OrderState.Kind.HOLD_POSITION);var p=player(h,n.position().add(10,0,0));var origin=n.position();
+        int[] firstRound={-1};TacticalNpcEntity.StandPhase[] phase={TacticalNpcEntity.StandPhase.WAIT};
         // A real protected, reachable position, away from the open current line of fire.
         for(int y=2;y<=5;y++)for(int z=33;z<=38;z++)h.setBlock(new BlockPos(37,y,z),Blocks.STONE);
         h.runAtTickTime(12,()->{
@@ -33,13 +34,22 @@ public final class FiringRegressionTests {
             h.assertTrue(!covers.sample(n.controller().observation(),h.getLevel().getGameTime(),false).isEmpty(),"seeded cover passes actual world and order validation");
             var gun=IGun.getIGunOrNull(n.getMainHandItem());gun.setDummyAmmoAmount(n.getMainHandItem(),30);gun.setMaxDummyAmmoAmount(n.getMainHandItem(),30);
         });
-        h.onEachTick(()->{if(ProjectileProbe.count(n.getUUID())==0) {
-            h.assertTrue(n.standPhase()==TacticalNpcEntity.StandPhase.WAIT,"maintenance never fakes a first shot");
-            h.assertTrue(n.position().subtract(origin).horizontalDistance()<.1,"WAIT stays physically at anchor while reloading");
-        }});
+        h.onEachTick(()->{
+            if(ProjectileProbe.count(n.getUUID())==0) {
+                h.assertTrue(n.standPhase()==TacticalNpcEntity.StandPhase.WAIT,"maintenance never fakes a first shot");
+                h.assertTrue(n.position().subtract(origin).horizontalDistance()<.1,"WAIT stays physically at anchor while reloading");
+            } else if(firstRound[0]<0) {
+                firstRound[0]=(int)h.getTick();
+                h.assertTrue(n.standPhase()==TacticalNpcEntity.StandPhase.COMBAT,"actual first round releases WAIT immediately");
+            }
+            if(phase[0]!=n.standPhase()) {
+                System.out.println("FIRING_STAND_PHASE tick="+h.getTick()+" from="+phase[0]+" to="+n.standPhase()+" firstRound="+firstRound[0]+" targetAlive="+p.isAlive()+" observation="+n.controller().observation());
+                phase[0]=n.standPhase();
+            }
+        });
         h.runAtTickTime(210,()->{
             h.assertTrue(n.controller().reloads()==1 && ProjectileProbe.count(n.getUUID())>0,"one accepted native reload then actual native round; reloads="+n.controller().reloads()+" rounds="+ProjectileProbe.count(n.getUUID())+" decision="+n.controller().decision());
-            h.assertTrue(n.standPhase()==TacticalNpcEntity.StandPhase.COMBAT,"actual first round releases WAIT");n.discard();p.discard();h.succeed();
+            h.assertTrue(firstRound[0]>=0,"first real projectile must have exercised the immediate WAIT -> COMBAT transition");n.discard();p.discard();h.succeed();
         });
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="firing-02-edge",timeoutTicks=130)

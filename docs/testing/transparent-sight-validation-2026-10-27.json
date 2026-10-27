@@ -1,0 +1,713 @@
+{
+  "date": "2026-10-27",
+  "branch": "feature",
+  "baseline": "ca8665f9bb4bf7fc3cda8feb6b97b989c12df955",
+  "state": "local patch; no push or production JAR",
+  "versions": {
+    "minecraft": "1.20.1",
+    "forge": "47.4.20",
+    "java": "17.0.19",
+    "tacz": "1.1.8-hotfix2",
+    "optional_npcs": "2.1.0"
+  },
+  "dependencies": [
+    {
+      "file": "tacz-1.20.1-1.1.8-hotfix2.jar",
+      "sha256": "2CBB89F44333D2EB4E825D86D789FF119B272FF75184390B55BAFD4F0E7F10C2"
+    },
+    {
+      "file": "tacznpcs-2.1.0-1.20.1.jar",
+      "sha256": "2593AA66CD56C08538A91ED3D274C054B043F0C6A4C0FF51A37DE310D60734EE"
+    }
+  ],
+  "native_evidence": {
+    "first_visual_and_projectile_tick": 9,
+    "actual_projectiles_at_opaque_stop": 1,
+    "hit_through_barrier": "NOT TESTED; no penetration addon in selected fixture"
+  },
+  "receipts": [
+    "docs/testing/transparent-sight-fast-2026-10-27.json",
+    "docs/testing/transparent-sight-stage-initial-2026-10-27.json",
+    "docs/testing/transparent-sight-stand-recovery-2026-10-27.json",
+    "docs/testing/transparent-sight-optional-2026-10-27.json"
+  ],
+  "sources_and_fixtures": [
+    {
+      "path": ".agents/skills/tacz-weapon-control/SKILL.md",
+      "sha256": "5686543B491A3A4F66AC02F48D5480ED5C71B014508934343144F95109C5A080"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "69FC1B0B19F9B5D4EC8D328A43C11745336A908C74658682C69F730F80AF2486"
+    },
+    {
+      "path": "ai-core/run-tests.sh",
+      "sha256": "99BAE31FDEBAB817A2834C20DB6521E935BF1CD502DF67CB3110896C32EB4BE3"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/ActionArbiter.java",
+      "sha256": "C862E30C1BC190E6E1C5AD586985AD4EBE253FD22B3107109EADF1D5FA22D4DB"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/ActionRoute.java",
+      "sha256": "0F5D986FBB5C8D14C0471E2344EC23A51E98EC7EA857115E5247ECC766845AB5"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/AimCommand.java",
+      "sha256": "3F41545F87037806FE866A2C55F5700EAA42D4E7C11B0BB6A6B7C34106EB1C4A"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/AimLead.java",
+      "sha256": "BEBEB4261E577319E6589B9B6078885BC35889A9BBA66ABCC09D1D7A1DACEE51"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/AttackRoute.java",
+      "sha256": "4F34AAD9C3E9407C02E7FE1E4B5E708EEACFDB36BA1874614C2B0A089D3AC946"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/Ballistics.java",
+      "sha256": "BBEC42A6E52DF87DDF83C9092162D2D75A44626B52FC879CB2D401EA7E30D7F4"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/CombatBrain.java",
+      "sha256": "950B91E08CEA315CC1FA5A44E6B74216DD7990A19595F7AC207BA15557F96AA9"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/CombatDecision.java",
+      "sha256": "64ABE4DAE5A2A786CCAF9277405346AF5B39D45C829B034A517E4BC10578832B"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/CombatSnapshot.java",
+      "sha256": "463AC3E05E81988DD63D4A48C50621469D9FB7F22B518D76349D18BFB371859D"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/ContactReadiness.java",
+      "sha256": "F90A19FE413DBEFDAAF8377C7602AE8280713FCB6D07892224C166C4A74B12DE"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/CoverOption.java",
+      "sha256": "17FA8B78F55753C6C8CCCA28EDB30613E9AA4F56AC519AEA80F555E0B44F6B1C"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/DefendPatrol.java",
+      "sha256": "DD57BD5535481C4CD4C74D37ACB474C4F526DF99FCC42EC5EA89ED4CD33E1962"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/DefendTerritory.java",
+      "sha256": "BA2F5726403FC62034074746BC0B57B6186CBEC04A1EB067C3F48766065C246C"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/Frame.java",
+      "sha256": "7BCCAB0A2DC09579BAAC01FF816451F910F6F079DA116188A3695002FBA97D75"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/MovementCommand.java",
+      "sha256": "72995C78BF17E287AA0FE60898D55FCAEDDC9C4E86D7924648545134954BC8E6"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/MovementPlanner.java",
+      "sha256": "644AA789FE9817DAC4C13A26F19E6704C57E7055D8D66D04D80755630EAC90B7"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/Observation.java",
+      "sha256": "C6D8FBB4D408FD2A01C71018018EFDB4DE25F8E0E1A227FB4380EC229C6884CD"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/ObservationMemory.java",
+      "sha256": "B2F1174DECF1F4772273030FD449EF9B071173E048D58E9FA7039E5D79C6BA1B"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/OrderPlanner.java",
+      "sha256": "6438109BA71BBECF3EB0BC7BC490D665A158F1DABB66F93E2F022117AF185EAF"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/OrderState.java",
+      "sha256": "2F992426C61C934DE6755AFF827DBBECF669AD32042B41946BD108996B2A0297"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/RouteRecovery.java",
+      "sha256": "CB270F42FF21AD195258A2460E169B05DF6F095220470DB7E8257969797898CC"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/SelfState.java",
+      "sha256": "E92E03EF8FAA6558C24C9E4538C12FFD95B44E23901AA1F513C8A67F48DE9000"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/SquadBlackboard.java",
+      "sha256": "F51B59FA178B1F020DC3142A357AC5B85181EAE10F4716DF5F6B80E174966569"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/SquadPlanner.java",
+      "sha256": "870C057E5A6B36D4A49AEEC2AFCFE10C7970D58A155C6F8CDB24FFB19180FCC6"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/SuppressionCycle.java",
+      "sha256": "A72AD608D206A5120D80DDB9F1C601654EDECE2FEFC43B71D49CBD5CCDE03942"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/SuppressionPermit.java",
+      "sha256": "61E205E3AB202C3999D268DCF4899B722D8E1CE7CB92A928F5AD7D3F9E3E92A2"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/SuppressionPlanner.java",
+      "sha256": "3E72AA82C98D2A5E08F7BDE1F0CEF699A27559FA9498936F5107A1F10F2E93EB"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/TacticalIntent.java",
+      "sha256": "4AFBA7365862640D37D57A7F0F44E812BCFDA4EBCE2F6133C9E17ABC326DE526"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/TacticalState.java",
+      "sha256": "A3B9F85265529547992FEC461701F9CEE4BDE32CE56A4D80ACE6B09626D6F36E"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/TacticalUtility.java",
+      "sha256": "500D41548B1F8A71BDDA11BAD1DA7E96185FB749527F5F929CC26D97A66B20DB"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/TerrainState.java",
+      "sha256": "393E65428514BE718D9E779249A268615968A112E933CD256C3E58AE7780A2BA"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/TransitionReservations.java",
+      "sha256": "8F3F86747BEB6E9870EB3357EB7C1F30930949680090A557AC4AC4ACE1D46D8D"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/Vector3.java",
+      "sha256": "97D2D35D73593443E5DCBFBDDCB0C2AF352F2C90B5CCC156EF914A0FE3F5950E"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/WeaponProfile.java",
+      "sha256": "9050139045638E4DD27BEAB0283E668EE7C9C542A9B62530112E3D337E182E83"
+    },
+    {
+      "path": "ai-core/src/main/java/dev/zuma/tacticalnpc/core/WeaponState.java",
+      "sha256": "166AB32765670D13C23437725EFF1E1CC060A57DE4757E7567F6C58C4D276FF2"
+    },
+    {
+      "path": "ai-core/src/test/java/dev/zuma/tacticalnpc/core/ActionRouteTest.java",
+      "sha256": "AF4D11C20CC4F46BCACEDA990683B15F137F7C49BB59B850A202DD8DE698F2F2"
+    },
+    {
+      "path": "ai-core/src/test/java/dev/zuma/tacticalnpc/core/AlphaRegressionTest.java",
+      "sha256": "98968A069E53BBA67AC2CAE60F1096265918F8A8477D85CF421A54E05D667CFA"
+    },
+    {
+      "path": "ai-core/src/test/java/dev/zuma/tacticalnpc/core/AttackRouteTest.java",
+      "sha256": "04A9B4A7B2E9C72BA16574AE6F92C9BEBE1EEADB2530B158CAA696BBA38D3B87"
+    },
+    {
+      "path": "ai-core/src/test/java/dev/zuma/tacticalnpc/core/CombatUpgradeTest.java",
+      "sha256": "9BD1F214F915FACFAC3174B6406C7995FB2ED8748AC8B9AF3B4D9D6844EF7D39"
+    },
+    {
+      "path": "ai-core/src/test/java/dev/zuma/tacticalnpc/core/CoreSmokeTest.java",
+      "sha256": "A1DE15655DAE655E16D7B9E780D4FEF9C43EE425D09894D0C5B1368E848A0A28"
+    },
+    {
+      "path": "ai-core/src/test/java/dev/zuma/tacticalnpc/core/DefendPatrolTest.java",
+      "sha256": "6A408F677FA4920C62E14CA3097D2AEEA5E14FAC54497C6AD48CA946EB452365"
+    },
+    {
+      "path": "ai-core/src/test/java/dev/zuma/tacticalnpc/core/DefendTerritoryTest.java",
+      "sha256": "0EDBC546F627908570AD7F0DA10C1B654CEB4D1BB47F5FC96405B4E109324796"
+    },
+    {
+      "path": "forge-addon/build.gradle",
+      "sha256": "78AE8B6DF57BB9D81C3CC2FEA1D2C4B030A00C468CC1318D5D7B08E6DAC5B140"
+    },
+    {
+      "path": "forge-addon/gradle.properties",
+      "sha256": "58A820524B1197F432CC0720F670689FA7F634B2FB68554C581B8685A7AE50FC"
+    },
+    {
+      "path": "forge-addon/gradle/testing.gradle",
+      "sha256": "450E950421505ECB07D83397A10D53A27CF1844C6D58E2737B60AAC972080EC4"
+    },
+    {
+      "path": "forge-addon/gradle/wrapper/gradle-wrapper.jar",
+      "sha256": "ED2C26EBA7CFB93CC2B7785D05E534F07B5B48B5E7FC941921CD098628ABCA58"
+    },
+    {
+      "path": "forge-addon/gradle/wrapper/gradle-wrapper.properties",
+      "sha256": "0C0C22CCB8E653A13A7DF19493B11FE5CE0F5FAE7EE4835223D2D2AD028799DA"
+    },
+    {
+      "path": "forge-addon/settings.gradle",
+      "sha256": "28873D2160A1EF7CFA0242D5FC5C939E9135AF90B131414134899129AFC8C0FC"
+    },
+    {
+      "path": "forge-addon/src\\clientSmoke\\java\\dev\\zuma\\tacticalnpc\\ClientSmokeConnect.java",
+      "sha256": "23089FF7FA1D078E7D5548709A9C3D33EAA5D76A21B397C0E6DA41CFD962CB98"
+    },
+    {
+      "path": "forge-addon/src\\clientSmoke\\java\\dev\\zuma\\tacticalnpc\\ClientSmokeFixture.java",
+      "sha256": "3ABF8D8A6551625F8215FF37EACC120F9BDA720433BF6B68BCB45036576A13B8"
+    },
+    {
+      "path": "forge-addon/src\\clientSmoke\\java\\dev\\zuma\\tacticalnpc\\ClientSmokeProbe.java",
+      "sha256": "FE43E6F66E488E820FC8156024F79F5295678234B247A0425B040A5AF6A6C0A4"
+    },
+    {
+      "path": "forge-addon/src\\compat\\java\\dev\\zuma\\tacticalnpc\\npcs\\Npc210Adapter.java",
+      "sha256": "C9200A80B7F88D8276D77B615EF4A0B2D5A9F4B8F37C709D40A55EDA6EC7B3E1"
+    },
+    {
+      "path": "forge-addon/src\\compat\\java\\dev\\zuma\\tacticalnpc\\npcs\\NpcsCompatibilityMod.java",
+      "sha256": "85022213613AD08C41BCBA4960631AD966891E467596933E7832F3ECCFBE77DA"
+    },
+    {
+      "path": "forge-addon/src\\compat\\resources\\META-INF\\mods.toml",
+      "sha256": "1EE95F834A1A41DDDB9BE92DC43EEE92B24758F779B6142645A8F3FA2B6A3F08"
+    },
+    {
+      "path": "forge-addon/src\\compatTest\\java\\dev\\zuma\\tacticalnpc\\CombatGameTests.java",
+      "sha256": "DA2B7DC246E90F1419A514081011CF9296CC0263FF4A5891ED17AB9ABCF6A50C"
+    },
+    {
+      "path": "forge-addon/src\\compatTest\\java\\dev\\zuma\\tacticalnpc\\NeutralOptionalTests.java",
+      "sha256": "77182E5A64F3C17AADC6F4AB692633069537012089FA189FD931B67B7D8CCD7D"
+    },
+    {
+      "path": "forge-addon/src\\compatTest\\java\\dev\\zuma\\tacticalnpc\\OptionalTargetTests.java",
+      "sha256": "44C7736BC2D067BB7E1163AE148A33E4E210F7D8BDEAA5B3070AB2B3E96037A2"
+    },
+    {
+      "path": "forge-addon/src\\compatTest\\java\\dev\\zuma\\tacticalnpc\\WeaponScenarioTests.java",
+      "sha256": "28A23711117C246BE2C05A972F5D1BA9F315D65D971DEEBB0244998260C4CDDB"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\ActionRouteTests.java",
+      "sha256": "8093177E31AEF682AED44FE2A2D75D9C900694DD1D53CC3F5B8AFECDFBFD188F"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\ActivationTests.java",
+      "sha256": "4757F103E3593F8BB9779999FB06B2F89F6328A2EAFECFA8C788D54FA0D68092"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\AlphaLocomotionTests.java",
+      "sha256": "34B735242617F2345F57A311C13E2FEC0ABCFBA4AAB3D1B034A7C2D6E2C96E9C"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\AlphaResponsivenessTests.java",
+      "sha256": "2E92F5A67C1706C979121865979DBA2206A8D3D6F7894E3AAC1ECD063110880F"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\api\\SavedDataLifecycleTests.java",
+      "sha256": "A0CB4290C9D99261C950C9798472B2FB080554A7314F0E94EC9B1E8539997A5E"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\AttackTests.java",
+      "sha256": "9C574D1DC4B5A88E4A40A38CACBB211F256F4AD77827D2AB2DD2E938BF0B4AB5"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\CombatUpgradeTests.java",
+      "sha256": "03CDE246C2AB47BD438411C915C40E55C91C6783161C85BA6296640CA6C60E17"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\CoverTests.java",
+      "sha256": "582CF4B4B4BF79F9DA42914EB368230D86C80C1E58989A700B6B0F497EB8F4E2"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\DefendPatrolTests.java",
+      "sha256": "636C20EB708A142359A5E5661323B12C8D1D6559BE355E416318477A13D027B2"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\DefendTerritoryTests.java",
+      "sha256": "CB032DC4ADA882D7A97F855D62A75A6EDFBFF7C41D3FBE48BA60E2771A63E60A"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\FiringRegressionTests.java",
+      "sha256": "ADEC6066722D2124BC89FFCF9C3F29C51B4B8F0A96CCAED466D3040C74B94830"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\HearingTests.java",
+      "sha256": "B72C9D344D1A96B21F4EED2D614D36CF126AFDF5F03707EBC1E7EF9992AF7B53"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\IndependentNpcTests.java",
+      "sha256": "AF14E4872D8DFB23C988B3392C8D3CEE1A51D326B5F30F76F0FF56705BAE7FFF"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\LookControlTests.java",
+      "sha256": "E8BD76E19BA40B2C69E23A0C5BC0CA69C47DB0BFE2F06EB5750AB1EBCD895515"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\MatchNpcApiTests.java",
+      "sha256": "22F4B8ECA2D88D346D3BD69B783F96AA42A86C98849BE47F0C6EA9F82B0AE62E"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\ModeCommandTests.java",
+      "sha256": "099A47C312FC6A8FCF8384EABAED5159BC80FB1F19F73288C60E0DC3B6079BD6"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\NeutralTests.java",
+      "sha256": "B0B338C0A1601D56CF6EF5B83A9EE37F42BFAB9218849B95AF0A14EA0AC464B2"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\NpcNameTests.java",
+      "sha256": "D3A9C4AB67AA89CFA2EE4288C8319E4489A7697C4269182F1BE98BB754C181D1"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\PeekRevalidationTests.java",
+      "sha256": "901F31E6C8BF1B2800915D38A6D6E3E959B7C5E6D5E4CAD2A303E3745B7DC343"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\PerceptionTests.java",
+      "sha256": "79D5E484A7C95922DAA257312D3697064EC0A10324D5CB6B34E6E0633C6FACA5"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\ProjectileProbe.java",
+      "sha256": "6EE53C4D3A0D13FEE2D16EAAE37F88DBF82951A6DBFFB3D4F1EE12D3CC9B7D6D"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\QueryBudgetTests.java",
+      "sha256": "2CCA93DB7167733FD92E65D46DA6703E7E40A94F33413B6F4E3651C7E073B4C1"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\RealTimeGameTestClock.java",
+      "sha256": "49E54FAE5D7960208895EA9DF8A153C42A9E20EA43326349ECE9773AF7513B8F"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\ScenarioIsolation.java",
+      "sha256": "28E50CEF6DE2F62A009A248A12EF9017E4D3D7EBA7AA97BFA11CA5837E0E12D4"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\SectorTests.java",
+      "sha256": "5E1897D524A0A7AB532AB0B96C52477920509921B0BD19FF6F7CE48A1635AF68"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\SelectedGameTests.java",
+      "sha256": "01C7712BDC2D5298D86496A57BD6D3D67C162B756420EF6ACCDE795A81A317EA"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\SquadTests.java",
+      "sha256": "3894ECAFA9039DA8E4C00D01CFAC480899BB57CCBC647A40895C97E6A8BEE21D"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\StandTests.java",
+      "sha256": "A4A581FFC71BA188B853AF973C045011A3173F867891D019E83C5F8889E05080"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\SuppressionTests.java",
+      "sha256": "842B1E82DDAE3AB62F8B0B4D01ABF1D56B1C46BC6F37DBCFB939B8E1480562C4"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\TargetTypeTests.java",
+      "sha256": "18F684A0278F645D8CA5F5B99EBCF07D10F85624ECEA334AA797EF17AD81AC9F"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\TeamCommandTests.java",
+      "sha256": "2619267213E50945ACF207419296A538C437435F290FD03D0927D48B5F176368"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\TeamTests.java",
+      "sha256": "74A25D11B1D8C6CF96087304CEAF7DF9764715380AF68BD8694072736598CFB9"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\TransparentSightTests.java",
+      "sha256": "45D999248428B3E1D3C7462CA96715FEE186F519D9100F47A971F4692E7DC392"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\WeaponProfileTests.java",
+      "sha256": "70421560317A94ABCF8BBF6EA6D88594C36D5142FCC93C53BBD4FE0E9D1B7D31"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\java\\dev\\zuma\\tacticalnpc\\WeaponSnapshotTests.java",
+      "sha256": "614DA2472F5FB6B9B03D240C68A4AFC428BE2B9FBD8D48004FEC7DADB768A653"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\resources\\data\\tacticalnpcai\\structures\\arena.nbt",
+      "sha256": "C616F28D34D5ABB889F10A7CDDDA106013FCE95C3EE58BA45DD5D53969A4D8B3"
+    },
+    {
+      "path": "forge-addon/src\\gametest\\resources\\data\\tacticalnpcai\\structures\\wide_arena.nbt",
+      "sha256": "D62AA8B6257896F151BE396D6F92CC03C6D98B1B7EAF9959531C6CC62A7B528F"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\api\\MatchNpcPolicy.java",
+      "sha256": "16986DE24EACC6EF25BFAC95891A9AA849452CD9C64578514C1CEC2AB2D7DD4B"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\api\\MatchNpcRegistry.java",
+      "sha256": "35868782123FCBA41FFC1C69C689D568FABDC1C1C20276C4F3839ABF4EDFBD43"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\api\\NpcSpawnService.java",
+      "sha256": "471DA346C6A78381475AE6AC228AAC7B0EF02013C7AA30C9D01096A1132CBE32"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\api\\SpawnGroupRequest.java",
+      "sha256": "B87F5C16C3ECA02B37D918847F8DF2B5D92CAA7C03F988FD5CCCD5E7F1EA9AC0"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\api\\SpawnMemberSpec.java",
+      "sha256": "BAB55BE83D66B53FB57C6160BBD89769D6B52A425D33248DA1907B6CA4B1F7F9"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\api\\SpawnResult.java",
+      "sha256": "0FCC8479026B799BD6173D58D6259D727BC915030EF6574F00C71B41836C2831"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\api\\TacticalNpcMatchApi.java",
+      "sha256": "6D904A916321B402C0C4FD792509C2A92B5920BB18D4E9F659AB883158B39176"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\api\\UsedMatchIds.java",
+      "sha256": "A557F4100DCB00B6B9EAB4178377A747C06918993031F7CF60F41F3FB5EC3AE0"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\client\\NpcClient.java",
+      "sha256": "917BBFDC11F2D8902DF0584EA569DE040EA70E0C0AEE70345C7CA67848BCAB07"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\ActionGeometry.java",
+      "sha256": "7780BF9917B10CB512111A1D508EFA715A08BC445DB5312F139CC437B7BE7EB7"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\ActionRouteExecutor.java",
+      "sha256": "2C1750B53E0EC476EEBE16FA16DDBCFBDD6F5B6A6953A3E8BA1CBFE624290CE5"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\ActionRoutePlanner.java",
+      "sha256": "3D7AA1D186FADEE2FC6D0BFA392057EEEA5D5A5E36829FAB9A3F1206552991B9"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\AiTelemetry.java",
+      "sha256": "6F9FFEE870DF76B596B0D3E4AD9B28D2889275C92DD4BB231D35EEABB7DA4B16"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\AiWorkBudget.java",
+      "sha256": "7DACB0EBC197B5D7ADF1F36B949F6006A3D806E5349D21BD455D2A6792434378"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\CombatTargets.java",
+      "sha256": "7FD6DB180E87BE8794D5429BB81BA69069C7485A35321E13EB4D3688D26B9B06"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\CoverSensor.java",
+      "sha256": "2C824FCF8F1C7342978EB5DCC67A1143E596F0AD217D7FD3540A5D1D13841C3C"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\FlankRoute.java",
+      "sha256": "8F1AF3A1AB7814F94B2D9857DACC761757AD3807500B5F0F29EB66596C566A8C"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\GunHearing.java",
+      "sha256": "04342EEDF1E9615B5338F246F3655B9B1F89EB8C63B3FF6F2880197EF8133ED2"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\MovementExecutor.java",
+      "sha256": "E37960C869E814FCF354043EBE20457244326915A7A1A40162C432BD010E2CFC"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\NpcSightBlocks.java",
+      "sha256": "BF1DBE1B5B16E9A1F8FF21E247D7C2F5D4839117DE15E8005B7E4B1969B50CDA"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\NpcSightRay.java",
+      "sha256": "0E3D54A94B57C32436B04C8167D96B9C4F078C8F58FB3FCB97730A1F4E290065"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\RouteInteractions.java",
+      "sha256": "585CC9A188CAB4F4C788587092F64F6E32E5E3941FDDF492FA9443B92CEEEB69"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\SquadRuntime.java",
+      "sha256": "31F758A3365F219B47C7E91C49827F3D0C899BDB1F4307406A758F979497C96F"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\SuppressionSectors.java",
+      "sha256": "709AF74841D77C77F63440F394CF1B0FE239B38217BFEE17A4762BAD970236A3"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\TacticalBodyControl.java",
+      "sha256": "57B3D0101136141A13D7E273AFE16F67648668E47710AA1258E19DE465A8C8BF"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\TacticalCombatGoal.java",
+      "sha256": "92072A675F91055D2E794769D339A83DF5EB628AD896941A9EF807C1CCB0E247"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\TacticalLookControl.java",
+      "sha256": "C24EEEB007FFB4401AFC2868D470AC11EBFC8F281763671B45F0688775C7DE8D"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\TransitionResources.java",
+      "sha256": "9753CAF25C87FDC30BAAC485859E6BB23ADB79EAAD4FF021A729FB01DF2A8A4D"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\UnfairHints.java",
+      "sha256": "6CECDE01F6F3083811038F267F0EBD2A8AB9757FFC34EEA3AC13EF25B2FAF7E1"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\combat\\VisibilitySensor.java",
+      "sha256": "BF37510F322DEA7E627C46BC1D1FB1E5940ADD1A22A5BFCD8203B2097179770C"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\command\\NpcCommands.java",
+      "sha256": "391C4E566F7056E65D519D377CC1771E19C3984F45D03D32124700C177357EE2"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\command\\NpcNames.java",
+      "sha256": "4CD4C5DF904AC9CADDE1BE48BB6A68E6CF81ED11E1E9E437102920B601B46092"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\command\\NpcOperations.java",
+      "sha256": "197E47BC6DDA716876A77B032BBA0FD4F74D47214CD595E49171D883EBD15068"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\command\\NpcSpawning.java",
+      "sha256": "3029DCEE2065154AAC82D066CF819DE781EA6E9F86B90036F9FC0DAE3C0AAE6E"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\command\\NpcTargetArgument.java",
+      "sha256": "7B5E98B6E350C6AD489DC64B575034B1404C98D3068A98C3BD81077A272C36C0"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\command\\StrictSavedData.java",
+      "sha256": "D1634BC0F5F03C51A9FEF07C5D08C1AA6F81164FF65ECE85C35FA43A9E0C3C15"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\compat\\GunSupport.java",
+      "sha256": "E6EE3EFC17AF50134678973B92930C05B3142419B1898A5F6D1520A90FCBC747"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\compat\\ShotSafetyEvents.java",
+      "sha256": "735BDBC5CC2FE66735C960CD9CC86CC1C5A77894B045814FC76A8B71BDBB855C"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\compat\\TaczGunController.java",
+      "sha256": "80FF98D12C0F24BDC5DFDB8BCF29E920B92949623A25BCC7815024A923534E04"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\compat\\WeaponProfiles.java",
+      "sha256": "DD08B1A7028843B45B5EB8E4F81EBCF66C56C597D61122784A44D1C29ED2D6F9"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\config\\ServerConfig.java",
+      "sha256": "1937D0BE04506735E844CF67F6F2076008835C1CBAAAAE182D3C612F3E2D1C54"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\entity\\NpcEntities.java",
+      "sha256": "25312DB9F9FB12716B5E50F3101CA3FC5D417B83A3667A130082BE5FEFC63ABC"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\entity\\TacticalNpcEntity.java",
+      "sha256": "5F7B730EBC7F50528AE2D3404F1E6D0128479D9C22CB460B1C29CCB623657BDA"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\runtime\\GunController.java",
+      "sha256": "2969E113501A03BAB74E5F7B79AF73F5C63FC77C8B15859CD2451B5A9882A88F"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\runtime\\NpcRuntimeAdapter.java",
+      "sha256": "43CD2DE09B056D868F5356788234B876BFE133A2387BC699E8693B2CA15A03F7"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\runtime\\NpcTeams.java",
+      "sha256": "D94B786882D69BC271CCCC84363FC3673D041E5989FA86073B828BA987848D7E"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\runtime\\RuntimeRegistry.java",
+      "sha256": "90C1C7030B4D9C0FC9B9B3857D002E8FC0DAAD72946EF09F381162247CD55A20"
+    },
+    {
+      "path": "forge-addon/src\\main\\java\\dev\\zuma\\tacticalnpc\\TacticalNpcAiMod.java",
+      "sha256": "871C3C84E6E1647472CC50687FEE4609712404CBDFD2410CECF60CD30FF22744"
+    },
+    {
+      "path": "forge-addon/src\\main\\resources\\assets\\tacticalnpcai\\textures\\entity\\npc\\military_skin_blue.png",
+      "sha256": "2EE1A728E638029876475DC20606BF855FB059D14AD7557BC4018E88B693A383"
+    },
+    {
+      "path": "forge-addon/src\\main\\resources\\assets\\tacticalnpcai\\textures\\entity\\npc\\military_skin_default.png",
+      "sha256": "1B4F5F2398DCE975BF1EA56E1043BA6065AFDBE5F1530518F7AEA45E0B1983DA"
+    },
+    {
+      "path": "forge-addon/src\\main\\resources\\assets\\tacticalnpcai\\textures\\entity\\npc\\military_skin_red.png",
+      "sha256": "EB2FF56DA25B93AEF812A37265CFFC46D1FA502ED069641933C3BE6500BE9C89"
+    },
+    {
+      "path": "forge-addon/src\\main\\resources\\data\\tacticalnpcai\\tags\\blocks\\npc_sight_leaves.json",
+      "sha256": "A94B4D3CF5DEE9AF1C3A5014316CF908BAC8112F39D1C7815E50BE692748C307"
+    },
+    {
+      "path": "forge-addon/src\\main\\resources\\data\\tacticalnpcai\\tags\\blocks\\npc_sight_transparent.json",
+      "sha256": "6F678B5ED3AA083EBC0F8349C5088E4F0B23216C74BC59E79CE78CEA010FDDDD"
+    },
+    {
+      "path": "forge-addon/src\\main\\resources\\data\\tacticalnpcai\\tags\\blocks\\npc_sight_windowed_doors.json",
+      "sha256": "50660BA35B07B10C4EB112A32A9D03042AB1E600A85F649B837116F47FC1D5A5"
+    },
+    {
+      "path": "forge-addon/src\\main\\resources\\data\\tacticalnpcai\\tags\\blocks\\npc_sight_windowed_trapdoors.json",
+      "sha256": "7A0FCCEB4437BC68613A800D707502EAC2FA51F5B5B2F733A1A11A372E25B603"
+    },
+    {
+      "path": "forge-addon/src\\main\\resources\\META-INF\\accesstransformer.cfg",
+      "sha256": "5F8A04D9B775E5BEBAFBE91B199341C9B35E0D6D43A75148F5149E08003D0FCB"
+    },
+    {
+      "path": "forge-addon/src\\main\\resources\\META-INF\\mods.toml",
+      "sha256": "D8E246C21D9DA75EF1B18DA3DD383640EE89A04ECE3E000049E4622A3CDBB932"
+    },
+    {
+      "path": "forge-addon/src\\main\\resources\\pack.mcmeta",
+      "sha256": "F998203037C94C130363B17929D183FA35ECB4697FEF05B4B8F3A07A09751C6F"
+    },
+    {
+      "path": "forge-addon/src\\profile\\fixtures\\tacznpc_factions.json",
+      "sha256": "D46F9563AAE3DF772F5414A0B7903B488764C7038A1CB643CC48748B66FDC757"
+    },
+    {
+      "path": "forge-addon/src\\profile\\fixtures\\tacznpc_loadouts.json",
+      "sha256": "7FB4D43FD38BAF77B1A171D8CE638605EA25DEC2B3EA38F4BD51E0551D79607F"
+    },
+    {
+      "path": "forge-addon/src\\profile\\java\\dev\\zuma\\tacticalnpc\\ActionRouteProfile.java",
+      "sha256": "2902D50FA697540D7366114F3741C9FC4089D3C13266A46B9564F3103D1B365E"
+    },
+    {
+      "path": "forge-addon/src\\profile\\java\\dev\\zuma\\tacticalnpc\\BatchProfile.java",
+      "sha256": "57C1D79774953D988F32D3B157FD7868927DC891B8E8F4D66E8F6A116B3CC8F4"
+    },
+    {
+      "path": "forge-addon/src\\profile\\java\\dev\\zuma\\tacticalnpc\\CombatUpgradeProfile.java",
+      "sha256": "B77A179443982E8A06B42688E781B2A625ACAA802F9062C254CEC58518782E8D"
+    },
+    {
+      "path": "forge-addon/src\\profile\\java\\dev\\zuma\\tacticalnpc\\ServerProfile.java",
+      "sha256": "3704BC1DD490C3D8C1948C642830AD0FD65DB942CFBFDA93AA8937B302686E09"
+    },
+    {
+      "path": "forge-addon/src\\profile\\java\\dev\\zuma\\tacticalnpc\\TeamCommandProfile.java",
+      "sha256": "EDA020C05650AE74642D3B3525A8D67869D9762BE3079D4774617FD3EEA23245"
+    },
+    {
+      "path": "tools/testing/run-gametests.py",
+      "sha256": "5923A62DDABFAEA15F2E3F73155C5A9277F8297E135187505A7C21F072C8D4F5"
+    }
+  ],
+  "input_changes": [
+    {
+      "file": "forge-addon/src/gametest/java/dev/zuma/tacticalnpc/FiringRegressionTests.java",
+      "scope": "only emptyStandReloadsWithSelectedCoverBeforeFirstRound event assertion and phase logging",
+      "production_changed": false,
+      "shared_helpers_changed": false,
+      "initial_snapshot": "docs/testing/transparent-sight-inputs-initial-2026-10-27.json"
+    }
+  ],
+  "final_stage": {
+    "status": "PASS for selected coverage, assembled across runs",
+    "standalone_unique_passed": 18,
+    "optional_passed": 2,
+    "initial_stage_status": "FAIL, 10/11 passed; retained",
+    "coverage": "new FAST6 + applicable 10 passes from initial STAGE + fixed STAND and related lifecycle FAST2 + optional STAGE2",
+    "core": "NOT RERUN: sources and contracts unchanged",
+    "full": "NOT RUN",
+    "penetration_hits": "NOT TESTED",
+    "performance": "NOT MEASURED",
+    "production_jar": "NOT BUILT/DELIVERED"
+  }
+}

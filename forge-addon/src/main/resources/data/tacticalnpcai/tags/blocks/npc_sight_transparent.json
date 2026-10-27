@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "#forge:glass",
+    "#forge:glass_panes",
+    "minecraft:tinted_glass",
+    "#minecraft:fences",
+    "minecraft:ladder",
+    "#minecraft:rails",
+    "#minecraft:all_signs"
+  ]
+}

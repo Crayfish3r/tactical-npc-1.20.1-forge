@@ -61,7 +61,7 @@ public final class TacticalCombatGoal extends Goal {
             boolean clear,boolean occupied,VisibilitySensor.Sector sector,UUID blocker,boolean allied,
             boolean aligned,boolean busy,boolean ready,RouteRecovery.Status route) {}
     private FireStatus fireStatus;
-    public String fireDiagnostics(){return fireStatus==null?"not evaluated":fireStatus.toString();}
+    public String fireDiagnostics(){return fireStatus==null?"not evaluated":fireStatus+" los="+sensor.losDiagnostics();}
     private AiTelemetry.Gate sectorGate(){
         return switch(sensor.lastSector()) {
             case OCCUPIED -> sensor.lastBlockerAllied()?AiTelemetry.Gate.ALLY:AiTelemetry.Gate.NON_HOSTILE;
