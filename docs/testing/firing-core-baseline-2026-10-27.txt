@@ -1,0 +1,3 @@
+Exception in thread "main" java.lang.AssertionError: safe return fire independent of health/route; hp=0.25 blocked=false visible=true clear=true ally=false
+	at dev.zuma.tacticalnpc.core.CombatUpgradeTest.check(CombatUpgradeTest.java:9)
+	at dev.zuma.tacticalnpc.core.CombatUpgradeTest.main(CombatUpgradeTest.java:79)

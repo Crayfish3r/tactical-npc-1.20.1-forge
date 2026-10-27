@@ -12,10 +12,10 @@ public final class CoreSmokeTest {
         assertDecision(brain.decide(snapshot(true,false, 10,20,1,25,true,false,false,false,false,false,false,false,true)), TacticalIntent.SEARCH, false);
         assertDecision(brain.decide(snapshot(true,true, 10,20,1,0,true,false,false,false,false,true,false,false,true)), TacticalIntent.ENGAGE, false);
         assertDecision(brain.decide(snapshot(true,true, 10,20,1,25,true,false,false,false,false,true,true,false,true)), TacticalIntent.ENGAGE, false);
-        assertDecision(brain.decide(snapshot(true,true, 10,20,0.2,25,true,true,true,false,false,true,false,false,true)), TacticalIntent.RETREAT, false);
+        assertDecision(brain.decide(snapshot(true,true, 10,20,0.2,25,true,true,true,false,false,true,false,false,true)), TacticalIntent.RETREAT, true);
         assertDecision(brain.decide(snapshot(true,true, 10,20,1,25,true,true,true,false,false,true,false,false,true)), TacticalIntent.TAKE_COVER, false);
         assertDecision(brain.decide(snapshot(true,true, 10,20,1,25,true,false,false,true,false,true,false,false,true)), TacticalIntent.FLANK, false);
-        assertDecision(brain.decide(snapshot(true,true, 10,20,1,25,true,false,false,false,true,true,false,false,true)), TacticalIntent.REPOSITION, false);
+        assertDecision(brain.decide(snapshot(true,true, 10,20,1,25,true,false,false,false,true,true,false,false,true)), TacticalIntent.REPOSITION, true);
         assertDecision(brain.decide(snapshot(true,true, 10,20,1,25,true,false,false,false,false,true,false,true,true)), TacticalIntent.ENGAGE, false);
         assertDecision(brain.decide(snapshot(true,true, 10,20,1,25,true,false,false,false,false,true,false,false,false)), TacticalIntent.ENGAGE, true);
         Vector3 lead = AimLead.predict(new Vector3(0,0,0),new Vector3(10,0,0),new Vector3(0,0,1), 2,10);
@@ -62,6 +62,12 @@ public final class CoreSmokeTest {
         var sheltered=new CombatSnapshot(empty.self(),empty.observation(),empty.weapon(),new TerrainState(java.util.List.of(option.position()),java.util.List.of(),false,true,false,java.util.List.of(option)),TacticalState.idle());
         var coverPlan=new MovementPlanner().plan(sheltered,brain.decide(sheltered));
         check(coverPlan.intent()==TacticalIntent.TAKE_COVER && coverPlan.movement().destination().equals(option.position()) && coverPlan.weaponAction()==ActionArbiter.WeaponAction.NONE,"visible threat delays new reload until checked cover");
+        var stationary=new MovementPlanner().plan(sheltered,brain.decide(sheltered),false);
+        check(stationary.movement().mode()==MovementCommand.Mode.HOLD && stationary.weaponAction()==ActionArbiter.WeaponAction.RELOAD,"WAIT reloads at anchor despite a selected remote cover");
+        check(arbiter.commands(stationary,sheltered.self().frame(),safe).weapon()==ActionArbiter.WeaponAction.RELOAD,"stationary native reload reaches arbitration");
+        var loaded=new CombatSnapshot(sheltered.self(),sheltered.observation(),normal.weapon(),sheltered.terrain(),new TacticalState(TacticalIntent.TAKE_COVER,950,980,1));
+        var stationaryLoaded=new MovementPlanner().plan(loaded,brain.decide(loaded),false);
+        check(stationaryLoaded.firePermitted() && stationaryLoaded.movement().mode()==MovementCommand.Mode.HOLD,"completed WAIT reload does not inherit an unfulfilled cover commitment");
         var atCover=new CombatSnapshot(new SelfState(empty.self().frame(),option.position(),1,true,false),empty.observation(),empty.weapon(),sheltered.terrain(),new TacticalState(TacticalIntent.TAKE_COVER,950,980,1));
         check(new MovementPlanner().plan(atCover,brain.decide(atCover)).intent()==TacticalIntent.HOLD,"arrival in cover holds position through reload");
         var hiddenSnapshot=snapshot(true,false,10,20,1,25,true,false,false,false,false,true,false,false,true);

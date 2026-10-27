@@ -20,7 +20,7 @@ public final class AlphaRegressionTest {
         for(var prior:List.of(TacticalIntent.PEEK,TacticalIntent.HOLD,TacticalIntent.TAKE_COVER,TacticalIntent.REPOSITION)) {
             var healthy=sample(999,1,false,true,prior,990,cover);planner.plan(healthy,BRAIN.decide(healthy));
             var critical=sample(1000,.1,false,true,prior,990,cover);var d=planner.plan(critical,BRAIN.decide(critical));
-            check(d.intent()==TacticalIntent.RETREAT && d.movement().destination().equals(cover.position()) && !d.firePermitted(),"R1 emergency interrupts "+prior);
+            check(d.intent()==TacticalIntent.RETREAT && d.movement().destination().equals(cover.position()) && d.firePermitted(),"R1 emergency interrupts "+prior+" while permitting safe covering fire");
         }
         var peek=sample(1100,1,false,true,TacticalIntent.PEEK,1098,cover);planner.plan(peek,BRAIN.decide(peek));
         for(var weapon:List.of(new WeaponState("test",0,true,false,false,true,true,36,"AUTO"),new WeaponState("test",25,true,true,false,true,true,36,"AUTO"))) {

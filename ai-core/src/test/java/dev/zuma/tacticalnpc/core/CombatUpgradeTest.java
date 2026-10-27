@@ -67,6 +67,34 @@ public final class CombatUpgradeTest {
         var hint=new Observation(o.subject(),o.position(),ZERO,20,80,Observation.Source.UNFAIR_HINT,.7,5,false);
         board.report(group,sender,hint,20,2);
         check(board.receive(group,receiver,ZERO,22,128).source()==Observation.Source.SQUAD && board.receive(group,receiver,ZERO,22,128).tick()==10,"hint never relayed as visual report");
+        // Movement emergencies must not turn a visible, safely shootable contact into immunity.
+        for(boolean blocked:List.of(false,true))for(double hp:List.of(.25,1.0)) {
+            if(!blocked && hp==1.0)continue;
+            for(boolean visible:List.of(false,true))for(boolean clear:List.of(false,true))for(boolean ally:List.of(false,true)) {
+                var threat=new Observation(o.subject(),new Vector3(2,0,0),ZERO,10,330,Observation.Source.VISION,1,0,visible);
+                var emergency=new CombatSnapshot(new SelfState(frame,ZERO,hp,true,false),threat,weapon,
+                    new TerrainState(List.of(),List.of(),blocked,clear,ally),TacticalState.idle());
+                var response=new CombatBrain(320,weapon.effectiveRange()).decide(emergency);
+                check(response.intent()==(hp<=.25?TacticalIntent.RETREAT:TacticalIntent.REPOSITION),"emergency movement intent retained");
+                check(response.firePermitted()==(visible && clear && !ally),"safe return fire independent of health/route; hp="+hp+" blocked="+blocked+" visible="+visible+" clear="+clear+" ally="+ally);
+                var empty=new CombatSnapshot(emergency.self(),threat,new WeaponState("test",0,true,false,false,true,true,36,"AUTO"),emergency.terrain(),emergency.tactical());
+                check(!new CombatBrain(320,36).decide(empty).firePermitted() && new CombatBrain(320,36).decide(empty).weaponAction()==ActionArbiter.WeaponAction.RELOAD,"emergency still requests native reload with no fire permit");
+            }
+            for(var kind:List.of(OrderState.Kind.DEFEND_AREA,OrderState.Kind.PATROL)) {
+                var self=new Vector3(2.7,0,0);
+                var edge=new CombatSnapshot(new SelfState(frame,self,hp,true,false),
+                    new Observation(o.subject(),self.plus(new Vector3(2,0,0)),ZERO,10,330,Observation.Source.VISION,1,0,true),weapon,
+                    new TerrainState(List.of(),List.of(),true,true,false),TacticalState.idle());
+                var constrained=new OrderPlanner().plan(edge,new CombatBrain(320,weapon.effectiveRange()).decide(edge),new OrderState(kind,ZERO,4));
+                check(constrained.firePermitted(),"order boundary does not revoke safe emergency fire: "+kind);
+                if(hp==1)check(constrained.movement().mode()==MovementCommand.Mode.HOLD,"edge repro really cancels lateral reposition: "+kind);
+            }
+        }
+        var approachPlanner=new OrderPlanner();var assault=new OrderState(OrderState.Kind.ASSAULT,ZERO,24);
+        var distant=new CombatSnapshot(snapshot.self(),new Observation(o.subject(),new Vector3(600,0,0),ZERO,10,330,Observation.Source.VISION,1,0,true),weapon,snapshot.terrain(),snapshot.tactical());
+        check(approachPlanner.plan(distant,new CombatBrain(320,weapon.effectiveRange()).decide(distant),assault).intent()==TacticalIntent.ADVANCE,"real approach commitment exists before close blocked contact");
+        var blockedClose=new CombatSnapshot(closeSnapshot.self(),closeSnapshot.observation(),weapon,new TerrainState(List.of(),List.of(),true,true,false),TacticalState.idle());
+        check(approachPlanner.plan(blockedClose,new CombatBrain(320,weapon.effectiveRange()).decide(blockedClose),assault,.6,RouteRecovery.Status.EXHAUSTED).firePermitted(),"old assault approach cannot swallow safe close return fire");
         System.out.println("PASS: "+checks+" combat upgrade checks");
     }
 }

@@ -3,6 +3,12 @@ package dev.zuma.tacticalnpc.core;
 /** Pure local cover cycle. Navigation/reachability belongs to the server adapter. */
 public final class MovementPlanner {
     public CombatDecision plan(CombatSnapshot s,CombatDecision combat) {
+        return plan(s,combat,true);
+    }
+    /** A stationary order cannot defer native maintenance until an unreachable cover arrival. */
+    public CombatDecision plan(CombatSnapshot s,CombatDecision combat,boolean movementAllowed) {
+        if(!movementAllowed)return new CombatDecision(combat.intent(),combat.firePermitted(),combat.reason(),
+                combat.weaponAction(),MovementCommand.hold(),combat.aim(),combat.frame(),combat.expires());
         long tick=s.self().frame().tick(), age=tick-s.tactical().since();
         // Emergency decisions precede every old cover commitment, including a previous PEEK.
         if(combat.intent()==TacticalIntent.RETREAT || s.self().damaged() && combat.intent()==TacticalIntent.TAKE_COVER)

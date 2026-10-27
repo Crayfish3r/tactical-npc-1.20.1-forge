@@ -6,7 +6,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 /** Bounded in-memory samples. Timing includes goal and native fire safety without nested double counting. */
 public final class AiTelemetry {
     public enum Component { GOAL, NATIVE_MAINTENANCE, HEARING, NATIVE_SAFETY }
-    public enum Gate { NO_CONTACT, LOS_BLOCKED, LOS_DEFERRED, REACTION, TURN, WEAPON_BUSY, COOLDOWN, ALLY, POLICY, NATIVE_DECLINED }
+    public enum Gate { NO_CONTACT, LOS_BLOCKED, LOS_DEFERRED, REACTION, TURN, WEAPON_BUSY, COOLDOWN, ALLY, NON_HOSTILE, SECTOR_SATURATED, SECTOR_DEFERRED, SECTOR_UNSUPPORTED, POLICY, NATIVE_DECLINED }
     public enum Route { FAILED, ALTERNATIVE, ARRIVED, EXHAUSTED }
     private static final class Counters {
         long unfairHints;

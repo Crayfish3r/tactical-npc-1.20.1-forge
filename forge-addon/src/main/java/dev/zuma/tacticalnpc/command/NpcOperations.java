@@ -72,7 +72,8 @@ public final class NpcOperations {
                 (npc.order().equals("ASSAULT")?" movement=free":" behaviorRadius="+npc.runtime().orderState().radius())+
                 " gun="+(gun==null?"none":gun.getGunId(stack))+" ammo="+npc.ammoPolicy()+" magazine="+(gun==null?0:gun.getCurrentAmmoCount(stack))+
                 " chamber="+(gun!=null && gun.hasBulletInBarrel(stack))+" reserve="+(npc.ammoPolicy()==TacticalNpcEntity.AmmoPolicy.INFINITE?"infinite":gun==null?0:gun.getDummyAmmoAmount(stack))+" profile=HARD";
-            if(debug)detail+=" uuid="+npc.getUUID()+" serviceId="+npc.serviceId()+" standPhase="+npc.standPhase()+" knowledge="+(npc.controller()==null || npc.controller().observation()==null?"none":npc.controller().observation().source());
+            if(debug)detail+=" uuid="+npc.getUUID()+" serviceId="+npc.serviceId()+" standPhase="+npc.standPhase()+" knowledge="+(npc.controller()==null || npc.controller().observation()==null?"none":npc.controller().observation().source())+
+                " fire={"+(npc.controller()==null?"inactive":npc.controller().fireDiagnostics())+"}";
             final String message=detail;c.getSource().sendSuccess(()->Component.literal(message),false);
         }
         return targets.size();

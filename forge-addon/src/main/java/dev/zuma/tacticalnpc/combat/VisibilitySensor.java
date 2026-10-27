@@ -29,6 +29,11 @@ public final class VisibilitySensor {
     private boolean acquisitionDeferred;
     public enum Sector { CLEAR, OCCUPIED, SATURATED, DEFERRED, UNSUPPORTED }
     private Sector lastSector=Sector.UNSUPPORTED;
+    private UUID lastBlocker;
+    private boolean lastBlockerAllied;
+    public UUID lastBlocker(){return lastBlocker;}
+    public boolean lastBlockerAllied(){return lastBlockerAllied;}
+    public String sectorDiagnostics(){return lastSector+" blocker="+lastBlocker+" relation="+(lastBlocker==null?"none":lastBlockerAllied?"ALLY":"NON_HOSTILE");}
     private int sectorCursor;
     public Sector lastSector(){return lastSector;}
     private boolean sector(PathfinderMob npc,Sector result){lastSector=result;AiTelemetry.sector((ServerLevel)npc.level(),result);return result!=Sector.CLEAR;}
@@ -148,13 +153,14 @@ public final class VisibilitySensor {
         return result;
     }
 
-    /** Conservative: any other living entity in the corridor blocks a shot, including non-allies. */
+    /** Protect ineligible living bodies in the local firing corridor, including non-allies. */
     public boolean occupied(PathfinderMob npc, LivingEntity target, Vec3 end) {
         var controller=RuntimeRegistry.active(npc);
         if(controller==null) return true;
         return occupied(npc,target,end,controller.weaponState());
     }
     public boolean occupied(PathfinderMob npc,LivingEntity target,Vec3 end,dev.zuma.tacticalnpc.core.WeaponState weapon) {
+        lastBlocker=null;lastBlockerAllied=false;
         Vec3 start=npc.getEyePosition();
         if(!weapon.supported()) return sector(npc,Sector.UNSUPPORTED);
         double spread=weapon.spreadDegrees();
@@ -164,7 +170,7 @@ public final class VisibilitySensor {
         Vec3 direction = end.subtract(start).normalize();
         // Cover the requested firing depth plus continuation, not the bullet's entire lifetime.
         // The native damage guard protects allies further downrange even after the owner unloads.
-        double safetyRange=Math.max(128,Math.min(512,end.distanceTo(start)+8));
+        double safetyRange=Math.min(512,end.distanceTo(start)+8);
         end = start.add(direction.scale(safetyRange));
         double slope = Math.tan(Math.toRadians(Math.min(75, spread * 3 + 1)));
         var level=(ServerLevel)npc.level();var budget=AiWorkBudget.of(level);int first=sectorCursor;
@@ -178,11 +184,15 @@ public final class VisibilitySensor {
                 if(e==npc || e==target || !e.isAlive())return false;
                 // Bound predicate work too: after 64 checks, fill at most 32 sentinels then stop.
                 if(++scanned[0]>64){saturated[0]=true;return true;}
-                return coneIntersects(e.getBoundingBox(),start,direction,low,high,slope);
+                return coneIntersects(e.getBoundingBox(),start,direction,low,high,slope) && !CombatTargets.eligible(npc,e);
             },nearby,32);
             sectorCursor=(index+1)%4;
             if(saturated[0] || nearby.size()==32)return sector(npc,Sector.SATURATED);
-            if(!nearby.isEmpty())return sector(npc,Sector.OCCUPIED);
+            if(!nearby.isEmpty()) {
+                var blocker=nearby.get(0);lastBlocker=blocker.getUUID();
+                var runtime=RuntimeRegistry.adapt(npc);lastBlockerAllied=runtime==null?npc.isAlliedTo(blocker):runtime.allied(blocker);
+                return sector(npc,Sector.OCCUPIED);
+            }
         }
         // Every section above was checked now; no CLEAR geometry carries across ticks/rounds.
         return sector(npc,Sector.CLEAR);

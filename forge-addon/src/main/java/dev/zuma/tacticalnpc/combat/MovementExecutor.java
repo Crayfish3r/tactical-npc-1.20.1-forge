@@ -71,6 +71,11 @@ public final class MovementExecutor {
         if(mode!=command.mode()) {
             npc.getNavigation().stop();npc.getMoveControl().strafe(0,0);mode=command.mode();destination=null;checkpoint=npc.position();checkpointTick=tick;
         }
+        if(mode==MovementCommand.Mode.HOLD) {
+            // Policy canceled the destination (e.g. a defend boundary). End only the episode;
+            // destination-specific failure backoff and global path budgets remain in force.
+            recovery.cancelEpisode();alternative=null;halt();return;
+        }
         if(mode==MovementCommand.Mode.STRAFE) {
             forward=command.forward();sideways=command.sideways()*dev.zuma.tacticalnpc.config.ServerConfig.STRAFE.get();
             if(safeStrafe())npc.getMoveControl().strafe((float)forward,(float)sideways);

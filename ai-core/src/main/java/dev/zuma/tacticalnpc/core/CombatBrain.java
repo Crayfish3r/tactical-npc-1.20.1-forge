@@ -22,9 +22,12 @@ public final class CombatBrain {
         var operation = s.magazineRounds() == 0 && s.reserveAmmoAvailable() ? ActionArbiter.WeaponAction.RELOAD :
                 s.boltNeeded() ? ActionArbiter.WeaponAction.BOLT : ActionArbiter.WeaponAction.NONE;
         if (!s.targetKnown()) return new CombatDecision(TacticalIntent.PATROL, false, "no observed target", operation);
+        boolean returnFire=s.targetVisible() && s.magazineRounds()>0 && !s.boltNeeded() &&
+                s.targetDistanceBlocks()<=effectiveRange && s.lineOfFireClear() && !s.allyInFireLine();
+        var emergencyWeapon=returnFire?ActionArbiter.WeaponAction.SHOOT:operation;
         if (s.healthRatio() <= 0.25)
-            return new CombatDecision(TacticalIntent.RETREAT, false, "critical health", operation);
-        if (s.pathBlocked()) return new CombatDecision(TacticalIntent.REPOSITION, false, "blocked route", operation);
+            return new CombatDecision(TacticalIntent.RETREAT, returnFire, "critical health", emergencyWeapon);
+        if (s.pathBlocked()) return new CombatDecision(TacticalIntent.REPOSITION, returnFire, "blocked route", emergencyWeapon);
         if (!s.targetVisible()) {
             return s.lastSeenTicksAgo() <= memoryTicks
                 ? new CombatDecision(TacticalIntent.SEARCH, false, "search last-known location", operation)

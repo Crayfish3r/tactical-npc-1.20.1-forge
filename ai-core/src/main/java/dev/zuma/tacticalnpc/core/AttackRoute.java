@@ -18,8 +18,8 @@ public final class AttackRoute {
     public CombatDecision plan(CombatSnapshot s,CombatDecision combat,RouteRecovery.Status route) {
         int next=!s.targetKnown()?0:!s.targetVisible() && combat.intent()==TacticalIntent.SEARCH?2:combat.intent()==TacticalIntent.ADVANCE?1:-1;
         // Preserve emergency retreat, cover, weapon maintenance and in-range combat policy.
-        if(s.targetKnown() && (combat.intent()==TacticalIntent.RETREAT || combat.intent()==TacticalIntent.TAKE_COVER || combat.intent()==TacticalIntent.BOLT || combat.intent()==TacticalIntent.RELOAD))next=-1;
-        if(combat.intent()==TacticalIntent.REPOSITION && (phase==1 || phase==2) && route!=RouteRecovery.Status.IDLE)next=s.targetVisible()?1:2;
+        if(s.targetKnown() && (combat.firePermitted() || combat.intent()==TacticalIntent.RETREAT || combat.intent()==TacticalIntent.TAKE_COVER || combat.intent()==TacticalIntent.BOLT || combat.intent()==TacticalIntent.RELOAD))next=-1;
+        if(!combat.firePermitted() && combat.intent()==TacticalIntent.REPOSITION && (phase==1 || phase==2) && route!=RouteRecovery.Status.IDLE)next=s.targetVisible()?1:2;
         if(next<0){reset();return combat;}
         long tick=s.self().frame().tick();Vector3 self=s.self().position();
         if(!s.self().frame().owner().equals(owner)) {

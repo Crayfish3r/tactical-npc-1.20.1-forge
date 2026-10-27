@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "profile": "STAGE",
+  "legacy": false,
+  "executed": 20,
+  "selected": 20,
+  "seconds": 208.984,
+  "exit_code": 0,
+  "command": [
+    "C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\gradlew.bat",
+    "runGameTestServer",
+    "compileCompatJava",
+    "-PcombatTests",
+    "-PtestProfile=STAGE",
+    "--console=plain",
+    "--rerun-tasks",
+    "-PtestSelection=StandTests,SectorTests,IndependentNpcTests#finiteReserveAndBolt,IndependentNpcTests#finiteReloadConsumesReserve,IndependentNpcTests#alliedDamageEventGuard,NeutralTests#returningNeutralCancelsUncreatedNativeBurstRounds,SuppressionTests,AlphaResponsivenessTests#failedDestinationRecoversLocally,AlphaResponsivenessTests#emergencyStopsPeekWhilePathDeferred,DefendTerritoryTests#interiorEndpointRejectsExteriorDetourAndRecovery,DefendTerritoryTests#strafeAndRetreatCannotLeaveEdge,WeaponProfileTests#shotgunNativePellets,ActionRouteTests#orderCancellationFinishesCurrentLadderExit,QueryBudgetTests#deniedBeforeAcquireActivationAndSafetyThenResumes",
+    "--offline",
+    "-PgameTestDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261027T032148.689533Z-runtime",
+    "-PgameTestOutputDir=C:\\MCDev\\[TACZ] Military NPC\\forge-addon\\build\\test-runs\\20261027T032148.689533Z-compiled"
+  ],
+  "log": "forge-addon\\build\\test-runs\\20261027T032148.689533Z-STAGE.log",
+  "runtime": "forge-addon\\build\\test-runs\\20261027T032148.689533Z-runtime",
+  "compiled_output": "forge-addon\\build\\test-runs\\20261027T032148.689533Z-compiled",
+  "tasks": [
+    ":extractTaczLua",
+    ":compileJava",
+    ":processResources",
+    ":classes",
+    ":downloadMcpConfig",
+    ":extractSrg",
+    ":createSrgToMcp",
+    ":downloadMCMeta",
+    ":downloadAssets",
+    ":extractNatives",
+    ":makeSrcDirs",
+    ":prepareRuns",
+    ":prepareRunGameTestServer",
+    ":prepareRunGameTestServerCompile",
+    ":runGameTestServer",
+    ":compileCompatJava"
+  ]
+}
