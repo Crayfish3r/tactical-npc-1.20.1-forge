@@ -1,5 +1,39 @@
 # Compatibility audit: independent NPC / optional NPCs 2.1.0
 
+## Native RPG / accuracy API audit, 2026-10-28
+
+Minecraft 1.20.1, Forge 47.4.20, Microsoft Java 17.0.19, TaCZ 1.1.8-hotfix2.
+TaCZ SHA256 rechecked: `2CBB89F44333D2EB4E825D86D789FF119B272FF75184390B55BAFD4F0E7F10C2`.
+Inspected installed `run/standalone/tacz/tacz_default_gun/data/tacz/index/guns/rpg7.json`
+and `data/guns/rpg7_data.json`: loaded ID `tacz:rpg7`, ammo `tacz:rpg_rocket`,
+type rpg, SEMI, OPEN_BOLT, one rocket, native magazine reload feed 2.63s / cooldown 3.2s.
+Bullet speed 80 blocks/s, life 3s, gravity .015, friction .005; explosion radius 3,
+damage 120, knockback and block destruction requested by pack, subject to native server config.
+The existing predictor uses live attachment speed / 20 and the indexed discrete drag/gravity.
+
+`javap -c -p` against the pinned JAR confirms `ExplodeUtil.createExplosion(Entity,Entity,float,float,boolean,boolean,Vec3)`
+constructs `util.block.ProjectileExplosion` and calls Forge explosion Start. Its constructor passes
+the second entity (native bullet) to the vanilla Explosion constructor. Native Detonate receives
+the mutable victim list before the per-victim hurt call AND the independent velocity/player impulse
+writes. Canceling hurt alone would not stop knockback. `Explosion.getDirectSourceEntity()` therefore
+identifies the tagged native projectile even when its living owner cannot resolve. The vanilla
+explosion DamageSource is used; this path does not post EntityHurtByGunEvent.Pre for splash damage.
+No reflection, Mixin, new dependency, projectile implementation or production explosion factory added.
+Local bytecode receipts: `build/rpg-explosion-audit.txt`, `build/rpg-projectile-explosion.txt`,
+existing `build/upgrade-bullet-bytecode.txt`.
+
+The event guard only filters explosions whose direct source is a native bullet with the existing
+`tactical_projectile` ownership tag. Owner absence/death/removal, stale match binding and current
+CombatTargets eligibility fail closed. Player weapons use their unchanged native path.
+Compatibility still rejects charge, arbitrary Lua/property hooks, inventory feed, ignition, heat,
+unaudited item classes and incompatible RPG mechanisms. The explosive family additionally requires
+native rpg_rocket ammo and bounded live explosion metadata. Other compatible packs require validation.
+
+Accuracy is an independent core enum, serialized by name. The original five-argument
+`SpawnMemberSpec(ResourceLocation,AmmoPolicy,int,OrderState.Kind,double)` descriptor is retained;
+the new six-argument constructor adds NpcDifficulty. No TacticalTablet source or dependency changed.
+Execution evidence and outstanding scenarios: [RPG / accuracy validation](RPG-ACCURACY-2026-10-28.md).
+
 ## NPC transparent-barrier observation/fire policy, 2026-10-27
 
 Independent shared Forge perception layer, Minecraft1.20.1 / Forge47.4.20 / Java17.0.19.

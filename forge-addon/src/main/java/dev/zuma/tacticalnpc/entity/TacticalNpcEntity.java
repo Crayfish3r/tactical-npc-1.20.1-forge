@@ -27,6 +27,9 @@ public final class TacticalNpcEntity extends PathfinderMob {
     private UUID standDamageSource;
     private long standDamageUntil;
     private AmmoPolicy ammoPolicy=AmmoPolicy.INFINITE;
+    private dev.zuma.tacticalnpc.core.NpcDifficulty difficulty=dev.zuma.tacticalnpc.core.NpcDifficulty.HARD;
+    public dev.zuma.tacticalnpc.core.NpcDifficulty difficulty(){return difficulty;}
+    public void setDifficulty(dev.zuma.tacticalnpc.core.NpcDifficulty value){runtime.requireServer();difficulty=java.util.Objects.requireNonNull(value);}
     private String loadout="tacz:ak47", order="HOLD_POSITION";
     private String legacyFaction;
     private UUID legacySquad;
@@ -237,6 +240,7 @@ public final class TacticalNpcEntity extends PathfinderMob {
         if(ownerMatchId!=null || invalidMatchBinding)tag.putBoolean("matchOwned",true);
         if(invalidMatchBinding)tag.putBoolean("invalidMatchBinding",true);
         tag.putString("name",npcName);
+        tag.putString("difficulty",difficulty.name());
         tag.putString("standPhase",standPhase.name());
         tag.putBoolean("neutral",neutral);
         tag.putString("loadout",loadout); tag.putString("order",order);
@@ -252,6 +256,9 @@ public final class TacticalNpcEntity extends PathfinderMob {
     @Override public void readAdditionalSaveData(CompoundTag root) {
         super.readAdditionalSaveData(root);
         CompoundTag tag=root.getCompound("tacticalnpc");
+        difficulty=dev.zuma.tacticalnpc.core.NpcDifficulty.HARD;
+        if(tag.contains("difficulty"))try{difficulty=dev.zuma.tacticalnpc.core.NpcDifficulty.valueOf(tag.getString("difficulty"));}
+        catch(IllegalArgumentException ex){dev.zuma.tacticalnpc.TacticalNpcAiMod.LOGGER.warn("NPC {} unknown accuracy difficulty {}; using HARD",getUUID(),tag.getString("difficulty"));}
         ownerMatchId=tag.hasUUID("ownerMatchId")?tag.getUUID("ownerMatchId"):null;
         groupId=tag.hasUUID("groupId")?tag.getUUID("groupId"):null;
         invalidMatchBinding=tag.getBoolean("invalidMatchBinding") || tag.contains("matchOwned") && ownerMatchId==null || tag.contains("ownerMatchId") && ownerMatchId==null || tag.contains("groupId") && groupId==null || (ownerMatchId==null)!=(groupId==null);

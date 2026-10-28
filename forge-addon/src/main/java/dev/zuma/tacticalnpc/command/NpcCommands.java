@@ -39,6 +39,9 @@ public final class NpcCommands {
                 .then(Commands.literal("clear").executes(c->NpcOperations.team(c,null)))
                 .then(Commands.argument("team",StringArgumentType.string()).suggests((c,b)->SharedSuggestionProvider.suggest(c.getSource().getServer().getScoreboard().getTeamNames().stream().map(StringArgumentType::escapeIfRequired),b))
                     .executes(c->NpcOperations.team(c,StringArgumentType.getString(c,"team"))))))
+            .then(Commands.literal("difficulty").then(targets()
+                .then(Commands.literal("hard").executes(c->NpcOperations.difficulty(c,dev.zuma.tacticalnpc.core.NpcDifficulty.HARD)))
+                .then(Commands.literal("default").executes(c->NpcOperations.difficulty(c,dev.zuma.tacticalnpc.core.NpcDifficulty.DEFAULT)))))
             .then(Commands.literal("equip").then(targets().then(gun(false))))
             .then(Commands.literal("ammo").then(targets()
                 .then(Commands.literal("infinite").executes(c->NpcOperations.ammo(c,AmmoPolicy.INFINITE,0)))
@@ -76,10 +79,11 @@ public final class NpcCommands {
     }
     private static int help(CommandSourceStack source){
         for(String line:new String[]{"/npc spawn [team <team>] [count <1..16>] | /npc list [page] | /npc info <target>",
+            "/npc difficulty <target> hard|default",
             "/npc mode <target> assault | defend <4..128> | patrol <4..64> | stand",
             "/npc team <target> <team|clear> | /npc equip <target> <gun> | /npc ammo <target> infinite|finite <reserve>",
             "target = NPC name, selection radius 1..128 from player, or vanilla selector. No aim required. Names work from console and across dimensions; unloaded NPCs are never queued.",
-            "/npc debug info <target> | diagnostics | legacy spawn | legacy equip <selector> <gun>. Combat profile: HARD."})
+            "/npc debug info <target> | diagnostics | legacy spawn | legacy equip <selector> <gun>. Accuracy: HARD or DEFAULT."})
             source.sendSuccess(()->Component.literal(line),false);
         return 1;
     }

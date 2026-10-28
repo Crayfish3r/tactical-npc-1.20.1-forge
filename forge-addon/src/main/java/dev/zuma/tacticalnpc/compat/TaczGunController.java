@@ -34,7 +34,7 @@ public final class TaczGunController implements GunController {
     private java.util.Optional<com.tacz.guns.resource.index.CommonGunIndex> index(net.minecraft.resources.ResourceLocation id){lookups++;return TimelessAPI.getCommonGunIndex(id);}
     private WeaponProfile profile(com.tacz.guns.resource.index.CommonGunIndex index){profiles++;return WeaponProfiles.from(index);}
     private record Metadata(ItemStack stack,net.minecraft.resources.ResourceLocation id,com.tacz.guns.api.item.gun.FireMode mode,long generation,
-                            Object properties,com.tacz.guns.resource.index.CommonGunIndex index,WeaponProfile profile){}
+                            Object properties,com.tacz.guns.resource.index.CommonGunIndex index,WeaponProfile profile,String rejection){}
     private Metadata metadata;
     private long maintained=Long.MIN_VALUE,drawnGeneration=-1;
     private Metadata metadata(ItemStack stack,IGun gun) {
@@ -42,7 +42,7 @@ public final class TaczGunController implements GunController {
         var id=gun.getGunId(stack);var mode=gun.getFireMode(stack);long generation=GunSupport.resourceGeneration();
         if(metadata==null || metadata.stack()!=stack || !metadata.id().equals(id) || metadata.mode()!=mode || metadata.generation()!=generation || metadata.properties()!=operator.getCacheProperty()) {
             var index=index(id).orElse(null);
-            metadata=new Metadata(stack,id,mode,generation,operator.getCacheProperty(),index,index==null?WeaponProfile.of(WeaponProfile.Kind.CONSERVATIVE):profile(index));
+            metadata=new Metadata(stack,id,mode,generation,operator.getCacheProperty(),index,index==null?WeaponProfile.of(WeaponProfile.Kind.CONSERVATIVE):profile(index),index==null?"missing gun index":GunSupport.rejection(stack,index));
         }
         return metadata;
     }
@@ -54,7 +54,7 @@ public final class TaczGunController implements GunController {
     private void maintainTick(long tick) {
         runtime.requireServer();if(maintained==tick)return;maintained=tick;
         var stack=npc.getMainHandItem();var gun=IGun.getIGunOrNull(stack);var data=metadata(stack,gun);
-        if(data==null || data.index()==null || !GunSupport.rejection(stack,data.index()).isEmpty())return;
+        if(data==null || !data.rejection().isEmpty())return;
         if(stack!=drawnStack || !data.id().equals(drawnId) || drawnGeneration!=data.generation()) {
             draws++;operator.draw(npc::getMainHandItem);drawnStack=stack;drawnId=data.id();drawnGeneration=data.generation();
             nextVolley=0;volleyRequests=0;
@@ -70,6 +70,10 @@ public final class TaczGunController implements GunController {
         var state=observe(); var gun=IGun.getIGunOrNull(npc.getMainHandItem());
         var data=metadata(npc.getMainHandItem(),gun);
         WeaponProfile profile=data==null?WeaponProfile.of(WeaponProfile.Kind.CONSERVATIVE):data.profile();
+        if(profile.kind()==WeaponProfile.Kind.RPG) {
+            double minimum=ExplosiveSafety.minimum(npc);
+            if(Double.isFinite(minimum))profile=new WeaponProfile(profile.kind(),minimum,profile.maximum(),1,profile.pauseTicks(),false);
+        }
         var bullet=data==null || data.index()==null?null:data.index().getBulletData();
         Float nativeSpeed=operator.getCacheProperty()==null?null:operator.getCacheProperty().getCache(GunProperties.AMMO_SPEED);
         var ballistics=bullet==null || nativeSpeed==null?dev.zuma.tacticalnpc.core.Ballistics.UNKNOWN:
@@ -92,8 +96,9 @@ public final class TaczGunController implements GunController {
         IGun gun = IGun.getIGunOrNull(stack);
         if (gun == null) return new GunSnapshot(false, 0, false, false, true, false);
         var data=metadata(stack,gun);var index=data.index();
-        // Inventory-fed and charge/explosive weapons are outside the MVP weapon contract.
-        String rejection = index==null ? "missing gun index" : GunSupport.rejection(stack, index);
+        // Metadata compatibility is cached; mutable native ammo and attachment properties stay live.
+        String rejection = data.rejection();
+        if(gun.useInventoryAmmo(stack))rejection="inventory-fed weapon unsupported";
         if(rejection.isEmpty() && operator.needCheckAmmo() && index.getGunData().getReloadData().isInfinite()) rejection="native infinite reload conflicts with FINITE ammo policy";
         if (!rejection.isEmpty()) return blocked(rejection,gun.getGunId(stack).toString());
         if(stack!=drawnStack || !data.id().equals(drawnId) || drawnGeneration!=data.generation())return new GunSnapshot(false,0,false,false,true,false);
@@ -101,9 +106,8 @@ public final class TaczGunController implements GunController {
         if(cache==null) return new GunSnapshot(false,0,false,false,true,false);
         com.tacz.guns.resource.pojo.data.gun.ExplosionData explosion=cache.getCache(com.tacz.guns.api.GunProperties.EXPLOSION);
         com.tacz.guns.resource.pojo.data.gun.Ignite ignite=cache.getCache(com.tacz.guns.api.GunProperties.IGNITE);
-        if(explosion!=null && explosion.isExplode() || ignite!=null && (ignite.isIgniteBlock() || ignite.isIgniteEntity())) {
-            return blocked("explosive/incendiary attachment projectile",gun.getGunId(stack).toString());
-        }
+        rejection=GunSupport.projectileRejection(index,explosion,ignite);
+        if(!rejection.isEmpty())return blocked(rejection,gun.getGunId(stack).toString());
         lastRejection="";
         Bolt bolt = index.getGunData().getBolt();
         boolean chamber = bolt != Bolt.OPEN_BOLT && gun.hasBulletInBarrel(stack);

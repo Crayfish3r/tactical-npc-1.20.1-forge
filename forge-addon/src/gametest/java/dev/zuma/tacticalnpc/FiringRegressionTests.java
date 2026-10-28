@@ -57,7 +57,9 @@ public final class FiringRegressionTests {
         ScenarioIsolation.begin(h);var n=npc(h,30,OrderState.Kind.DEFEND_AREA);n.setOrder(OrderState.Kind.DEFEND_AREA,4);
         n.setPos(n.getX()+2.7,n.getY(),n.getZ());var p=player(h,n.position().add(2,0,0));int[] before={0};
         n.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(0);
-        h.runAtTickTime(12,()->{
+        boolean[] injected={false};
+        h.onEachTick(()->{if(!injected[0] && n.controller()!=null && n.controller().observation()!=null && n.controller().observation().visible()){
+            injected[0]=true;
             var movement=(MovementExecutor)field(n.controller(),"movement");var recovery=(RouteRecovery)field(movement,"recovery");
             long tick=h.getLevel().getGameTime();var bad=vector(n.position().add(0,0,3));
             recovery.fail(bad,tick);for(int i=0;i<4;i++)recovery.alternative(vector(n.position()),bad,tick);
@@ -68,8 +70,8 @@ public final class FiringRegressionTests {
             h.assertTrue(d.movement().mode()==MovementCommand.Mode.HOLD && d.firePermitted(),"order clips reposition but retains safe fire: "+d);
             h.assertTrue(movement.recoveryStatus()==RouteRecovery.Status.IDLE,"HOLD cancels obsolete recovery instead of sticking EXHAUSTED");
             h.assertTrue(recovery.rejected(bad,tick),"canceling the episode retains destination-specific backoff");
-        });
-        h.runAtTickTime(100,()->{h.assertTrue(ProjectileProbe.count(n.getUUID())>before[0],"boundary NPC creates actual native rounds after exhausted recovery");n.discard();p.discard();h.succeed();});
+        }});
+        h.runAtTickTime(100,()->{h.assertTrue(injected[0] && ProjectileProbe.count(n.getUUID())>before[0],"boundary NPC creates actual native rounds after exhausted recovery");n.discard();p.discard();h.succeed();});
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="firing-03-health",timeoutTicks=130)
     public static void criticalHealthAllowsActualReturnFire(GameTestHelper h) {

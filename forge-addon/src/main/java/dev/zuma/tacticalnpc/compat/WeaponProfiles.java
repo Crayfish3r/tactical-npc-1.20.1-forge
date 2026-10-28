@@ -5,6 +5,7 @@ import com.tacz.guns.resource.index.CommonGunIndex;
 public final class WeaponProfiles {
     public static WeaponProfile from(CommonGunIndex index) {
         var kind=switch(index.getType()==null?"":index.getType()) {
+            case "rpg" -> WeaponProfile.Kind.RPG;
             case "pistol" -> WeaponProfile.Kind.PISTOL;
             case "smg" -> WeaponProfile.Kind.SMG;
             case "rifle" -> WeaponProfile.Kind.AR;

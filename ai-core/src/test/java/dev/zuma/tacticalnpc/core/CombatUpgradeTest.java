@@ -33,6 +33,11 @@ public final class CombatUpgradeTest {
         check(decision.firePermitted() && decision.intent()==TacticalIntent.ENGAGE,"96-block shot independent of 36-block preference and 40-block falloff");
         var close=new Observation(o.subject(),new Vector3(5,0,0),ZERO,10,330,Observation.Source.VISION,1,0,true);
         var closeSnapshot=new CombatSnapshot(snapshot.self(),close,weapon,snapshot.terrain(),snapshot.tactical());
+        var rocket=new WeaponState("rpg",1,true,false,false,true,true,160,"SEMI",WeaponProfile.of(WeaponProfile.Kind.RPG),.25);
+        var rocketClose=new CombatSnapshot(snapshot.self(),close,rocket,snapshot.terrain(),snapshot.tactical());
+        var rocketDecision=new CombatBrain(320,160).decide(rocketClose);
+        check(rocketDecision.intent()==TacticalIntent.RETREAT && !rocketDecision.firePermitted() && rocketDecision.weaponAction()!=ActionArbiter.WeaponAction.SHOOT,"RPG minimum is a hard safety constraint while retreating");
+        check(NpcDifficulty.HARD.errorMultiplier(3)==1 && NpcDifficulty.DEFAULT.errorMultiplier(3)==3,"accuracy profiles independent from weapon policy");
         var retreat=new CombatBrain(320,weapon.effectiveRange()).decide(closeSnapshot);
         check(retreat.intent()==TacticalIntent.RETREAT && retreat.movement().destination().x()<0 && !retreat.movement().sprint(),"weapon standoff retreats along a bounded native path away from known contact while retaining native fire arbitration");
         var cycle=new SuppressionCycle();cycle.observe(o,10);cycle.observe(seen(10,false),11);

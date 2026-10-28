@@ -143,7 +143,7 @@ public final class TacticalCombatGoal extends Goal {
     private SuppressionPermit suppressionPermit(Observation known,long tick) {
         var neutral=neutralOwner();
         boolean eligible=known!=null && CombatTargets.eligible(npc,CombatTargets.resolve((ServerLevel)npc.level(),known.subject()));
-        return new SuppressionPermit(known,eligible && (neutral==null || neutral.reactiveTo(known.subject())) && ServerConfig.SUPPRESSION.get() && suppressionCycle.ready(tick,ServerConfig.SUPPRESSION_DURATION.get(),ServerConfig.SUPPRESSION_ROUNDS.get()),known!=null && tick-known.tick()>=ServerConfig.reaction(),suppressionPoint,ServerConfig.SUPPRESSION_DURATION.get());
+        return new SuppressionPermit(known,guns.snapshot().profile().kind()!=WeaponProfile.Kind.RPG && eligible && (neutral==null || neutral.reactiveTo(known.subject())) && ServerConfig.SUPPRESSION.get() && suppressionCycle.ready(tick,ServerConfig.SUPPRESSION_DURATION.get(),ServerConfig.SUPPRESSION_ROUNDS.get()),known!=null && tick-known.tick()>=ServerConfig.reaction(),suppressionPoint,ServerConfig.SUPPRESSION_DURATION.get());
     }
 
     public boolean allowNativeFire() {
@@ -161,7 +161,7 @@ public final class TacticalCombatGoal extends Goal {
         if(npc.isSprinting() || runtime.operator().getSynSprintTime()>0) return false;
         if(decision!=null && decision.aim().mode()==AimCommand.Mode.SUPPRESS_AREA) {
             WeaponState current=guns.snapshot();
-            if(failed || !npc.isAlive() || !decision.firePermitted() || !current.supported() || current.busy() || decision.frame().generation()!=generation || tick>decision.expires() ||
+            if(current.profile().kind()==WeaponProfile.Kind.RPG || failed || !npc.isAlive() || !decision.firePermitted() || !current.supported() || current.busy() || decision.frame().generation()!=generation || tick>decision.expires() ||
                     !suppressionPermit(known,tick).valid(tick) || !decision.aim().point().equals(suppressionPoint) || suppressionPoint.minus(vector(npc.position())).length()>current.effectiveRange()) return false;
             Vec3 point=vec(suppressionPoint),end=npc.getEyePosition().add(Vec3.directionFromRotation(npc.getXRot(),npc.getYHeadRot()).scale(point.distanceTo(npc.getEyePosition())));
             // Identity exemption for the intended hostile only; no hidden coordinates are read.
@@ -176,6 +176,7 @@ public final class TacticalCombatGoal extends Goal {
         Vec3 point=sensor.aimPoint(target);
         if(npc.position().distanceTo(point)>current.effectiveRange()) return false;
         Vec3 end=npc.getEyePosition().add(Vec3.directionFromRotation(npc.getXRot(),npc.getYHeadRot()).scale(point.distanceTo(npc.getEyePosition())));
+        if(current.profile().kind()==WeaponProfile.Kind.RPG && !dev.zuma.tacticalnpc.compat.ExplosiveSafety.safe(npc,point,end))return false;
         return sensor.los(npc,point,true)==VisibilitySensor.Los.CLEAR && sensor.los(npc,end,true)==VisibilitySensor.Los.CLEAR && !sensor.occupied(npc,target,point,current) && !sensor.occupied(npc,target,end,current);
     }
     @Override public void tick() {
@@ -349,6 +350,8 @@ public final class TacticalCombatGoal extends Goal {
         if(coverDeferred && usesCover)decision=new CombatDecision(decision.intent(),false,"cover validation deferred",decision.weaponAction()==ActionArbiter.WeaponAction.SHOOT?ActionArbiter.WeaponAction.NONE:decision.weaponAction(),MovementCommand.hold(),decision.aim(),decision.frame(),decision.expires());
         if(standWaiting)
             decision=new CombatDecision(decision.intent(),decision.firePermitted(),decision.reason(),decision.weaponAction(),MovementCommand.hold(),decision.aim(),decision.frame(),decision.expires());
+        if(gun.profile().kind()==WeaponProfile.Kind.RPG && (decision.aim().mode()==AimCommand.Mode.SUPPRESS_AREA || visible && snapshot.targetDistanceBlocks()<gun.profile().minimum()))
+            decision=new CombatDecision(decision.intent(),false,"RPG safety distance / no suppression",decision.weaponAction()==ActionArbiter.WeaponAction.SHOOT?ActionArbiter.WeaponAction.NONE:decision.weaponAction(),decision.movement(),decision.aim(),decision.frame(),decision.expires());
         // Final policy after squad/order/suppression overlays, before action arbitration.
         if(neutral!=null && (observation==null || !neutral.reactiveTo(observation.subject())))
             decision=new CombatDecision(decision.intent(),false,"neutral",decision.weaponAction()==ActionArbiter.WeaponAction.SHOOT?ActionArbiter.WeaponAction.NONE:decision.weaponAction(),MovementCommand.hold(),AimCommand.none(),decision.frame(),decision.expires());
@@ -392,7 +395,7 @@ public final class TacticalCombatGoal extends Goal {
         float yaw=(float)(Mth.atan2(d.z,d.x)*180/Math.PI-90);
         float pitch=(float)(-Mth.atan2(d.y,d.horizontalDistance())*180/Math.PI);
         double phase=(npc.getUUID().getLeastSignificantBits()&255)+tick*.13;
-        float error=ServerConfig.ERROR.get().floatValue(), turn=ServerConfig.TURN.get().floatValue();
+        float error=(float)(ServerConfig.ERROR.get()*(npc instanceof dev.zuma.tacticalnpc.entity.TacticalNpcEntity own?own.difficulty().errorMultiplier(ServerConfig.DEFAULT_ERROR_MULTIPLIER.get()):1)), turn=ServerConfig.TURN.get().floatValue();
         float noisyYaw=yaw+(float)Math.sin(phase)*error, noisyPitch=pitch+(float)Math.cos(phase*.73)*error;
         npc.setYRot(Mth.approachDegrees(npc.getYRot(),noisyYaw,turn)); npc.setYBodyRot(npc.getYRot());
         Vec3 look=npc.getEyePosition().add(Vec3.directionFromRotation(noisyPitch,noisyYaw).scale(20));

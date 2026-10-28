@@ -10,6 +10,16 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 
 public final class ShotSafetyEvents {
+    @SubscribeEvent(priority=EventPriority.LOWEST)
+    public void detonate(net.minecraftforge.event.level.ExplosionEvent.Detonate event) {
+        var source=event.getExplosion().getDirectSourceEntity();
+        if(!(source instanceof com.tacz.guns.entity.EntityKineticBullet bullet) || !bullet.getTags().contains("tactical_projectile"))return;
+        var owner=bullet.getOwner();
+        // Filtering this native list precedes BOTH hurt() and velocity/player impulse writes.
+        event.getAffectedEntities().removeIf(victim->!(owner instanceof LivingEntity living) || !living.isAlive() || living.isRemoved() ||
+            RuntimeRegistry.adapt(living)==null || !matchDamageAllowed(owner,bullet,victim) || !(victim instanceof LivingEntity target) ||
+            !dev.zuma.tacticalnpc.combat.CombatTargets.eligible(RuntimeRegistry.adapt(living).entity(),target));
+    }
     @SubscribeEvent public void death(net.minecraftforge.event.entity.living.LivingDeathEvent event) {
         if(event.getEntity().level() instanceof net.minecraft.server.level.ServerLevel level){
             dev.zuma.tacticalnpc.combat.TransitionResources.forget(level,event.getEntity().getUUID());

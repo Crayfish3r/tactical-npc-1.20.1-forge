@@ -80,7 +80,7 @@ public final class NpcSpawnService {
         }
         if(pos==null){npc.discard();return new Prepared(null,SpawnResult.Status.NO_SPACE,"No safe loaded space nearby");}
         npc.moveTo(pos.x,pos.y,pos.z,yaw,pitch);npc.setYHeadRot(yaw);
-        npc.setOrder(spec.order(),spec.radius());npc.setAmmoPolicy(spec.ammoPolicy(),spec.reserve());
+        npc.setDifficulty(spec.difficulty());npc.setOrder(spec.order(),spec.radius());npc.setAmmoPolicy(spec.ammoPolicy(),spec.reserve());
         npc.setItemSlot(EquipmentSlot.MAINHAND,weapon);npc.runtime().onEquip(weapon);npc.addTag(RuntimeRegistry.TAG);
         return new Prepared(npc,SpawnResult.Status.SUCCESS,"");
     }

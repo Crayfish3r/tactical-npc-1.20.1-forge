@@ -6,6 +6,7 @@ public final class ServerConfig {
     public enum Difficulty { HARD, UNFAIR }
     public static final ForgeConfigSpec.EnumValue<Difficulty> DIFFICULTY;
     public static final ForgeConfigSpec.IntValue SUPPRESSION_DURATION,SUPPRESSION_ROUNDS,SUPPRESSION_BURST,SUPPRESSION_PAUSE,HINT_INTERVAL;
+    public static final ForgeConfigSpec.DoubleValue DEFAULT_ERROR_MULTIPLIER;
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.BooleanValue ENABLED, DEBUG, SUPPRESSION, TELEMETRY;
     public static final ForgeConfigSpec.DoubleValue RANGE, TURN, ERROR, STRAFE, FOV, MEMORY_RANGE, HEARING_RANGE, ACTIVATION_RANGE;
@@ -35,6 +36,7 @@ public final class ServerConfig {
         ERROR = b.comment("Correlated aim error amplitude in degrees, plus native TaCZ spread.").defineInRange("aimError", 0.35, 0.1, 5.0);
         REACTION = b.comment("First-contact reaction; same visual UUID within 60 ticks uses reacquireTicks. Geometry is always fresh.").defineInRange("reactionTicks", 3, 2, 20);
         STRAFE = b.defineInRange("strafeSpeed", 0.55, 0.0, 1.0);
+        DEFAULT_ERROR_MULTIPLIER = b.comment("Accuracy only: DEFAULT amplitude relative to HARD; preserved by legacy migration.").defineInRange("defaultAimErrorMultiplier",3.0,1.0,10.0);
         SPEC = b.build();
     }
     public static boolean unfair(){return false;}

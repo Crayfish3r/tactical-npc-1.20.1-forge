@@ -23,7 +23,7 @@ public final class CombatBrain {
                 s.boltNeeded() ? ActionArbiter.WeaponAction.BOLT : ActionArbiter.WeaponAction.NONE;
         if (!s.targetKnown()) return new CombatDecision(TacticalIntent.PATROL, false, "no observed target", operation);
         boolean returnFire=s.targetVisible() && s.magazineRounds()>0 && !s.boltNeeded() &&
-                s.targetDistanceBlocks()<=effectiveRange && s.lineOfFireClear() && !s.allyInFireLine();
+                (s.weapon().profile().kind()!=WeaponProfile.Kind.RPG || s.targetDistanceBlocks()>=s.weapon().profile().minimum()) && s.targetDistanceBlocks()<=effectiveRange && s.lineOfFireClear() && !s.allyInFireLine();
         var emergencyWeapon=returnFire?ActionArbiter.WeaponAction.SHOOT:operation;
         if (s.healthRatio() <= 0.25)
             return new CombatDecision(TacticalIntent.RETREAT, returnFire, "critical health", emergencyWeapon);
@@ -43,7 +43,7 @@ public final class CombatBrain {
         if (s.incomingFire() && s.coverAvailable())
             return new CombatDecision(TacticalIntent.TAKE_COVER, false, "incoming fire");
         if(s.targetDistanceBlocks()<s.weapon().profile().minimum()) {
-            boolean safe=s.targetDistanceBlocks()<=effectiveRange && s.lineOfFireClear() && !s.allyInFireLine();
+            boolean safe=(s.weapon().profile().kind()!=WeaponProfile.Kind.RPG || s.targetDistanceBlocks()>=s.weapon().profile().minimum()) && s.targetDistanceBlocks()<=effectiveRange && s.lineOfFireClear() && !s.allyInFireLine();
             return new CombatDecision(TacticalIntent.RETREAT,safe,"below preferred weapon distance");
         }
         if (s.flankRouteAvailable() && s.targetDistanceBlocks() > 12.0 &&

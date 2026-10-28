@@ -12,6 +12,24 @@ import org.luaj.vm2.LuaValue;
 
 /** Conservative contract: native kinetic shooting, no arbitrary Lua shooting/property hooks. */
 public final class GunSupport {
+    public enum Support { KINETIC, EXPLOSIVE, UNSUPPORTED }
+    public static Support support(ItemStack stack, CommonGunIndex index) {
+        if(!rejection(stack,index).isEmpty())return Support.UNSUPPORTED;
+        return "rpg".equals(index.getType())?Support.EXPLOSIVE:Support.KINETIC;
+    }
+    /** Explicitly audited family; IDs alone never grant support. */
+    public static boolean explosive(CommonGunIndex index) {
+        return "rpg".equals(index.getType()) && index.getGunData().getAmmoId().equals(new ResourceLocation("tacz:rpg_rocket"));
+    }
+    public static String projectileRejection(CommonGunIndex index, com.tacz.guns.resource.pojo.data.gun.ExplosionData explosion,
+                                               com.tacz.guns.resource.pojo.data.gun.Ignite ignite) {
+        if(ignite!=null && (ignite.isIgniteBlock() || ignite.isIgniteEntity()))return "incendiary projectile unsupported";
+        if(explosion!=null && explosion.isExplode()) {
+            if(!explosive(index))return "unaudited explosive projectile family";
+            if(!Float.isFinite(explosion.getRadius()) || explosion.getRadius()<=0 || explosion.getRadius()>8)return "explosion radius outside audited safety bound";
+        } else if(explosive(index))return "RPG requires native explosion metadata";
+        return "";
+    }
     private static volatile boolean auditedReloadScript;
     private static long resourceGeneration;
     public static long resourceGeneration(){return resourceGeneration;}
@@ -21,8 +39,10 @@ public final class GunSupport {
         if(stack.getItem().getClass()!=com.tacz.guns.item.ModernKineticGunItem.class) return "unaudited gun item implementation";
         var data = index.getGunData();
         if (gun == null || gun.useInventoryAmmo(stack)) return "inventory-fed or non-TaCZ weapon";
-        if ("rpg".equals(index.getType()) || data.getChargeData(gun.getFireMode(stack)) != null) return "RPG/charge unsupported";
-        if (index.getBulletData().getExplosionData() != null && index.getBulletData().getExplosionData().isExplode()) return "explosive projectile unsupported";
+        if (data.getChargeData(gun.getFireMode(stack)) != null) return "charge unsupported";
+        if ("rpg".equals(index.getType()) && (!explosive(index) || gun.getFireMode(stack)!=FireMode.SEMI || index.getBulletData().getBulletAmount()!=1 || data.getBolt()!=com.tacz.guns.resource.pojo.data.gun.Bolt.OPEN_BOLT))return "unaudited RPG mechanism";
+        String projectile=projectileRejection(index,index.getBulletData().getExplosionData(),index.getBulletData().getIgnite());
+        if(!projectile.isEmpty())return projectile;
         if (index.getBulletData().getIgnite().isIgniteEntity() || index.getBulletData().getIgnite().isIgniteBlock()) return "incendiary projectile unsupported";
         if (!data.getFireModeSet().contains(gun.getFireMode(stack))) return "fire mode absent from GunData.fireModeSet";
         var script = index.getScript();

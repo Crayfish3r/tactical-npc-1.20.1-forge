@@ -52,7 +52,10 @@ public interface MatchNpcPolicy {
 public record SpawnGroupRequest(ServerLevel level, UUID matchId, UUID groupId,
     Vec3 origin, float yaw, float pitch, List<SpawnMemberSpec> members) {}
 public record SpawnMemberSpec(ResourceLocation weapon, TacticalNpcEntity.AmmoPolicy ammoPolicy,
-    int reserve, OrderState.Kind order, double radius) {}
+    int reserve, OrderState.Kind order, double radius, NpcDifficulty difficulty) {
+    public SpawnMemberSpec(ResourceLocation weapon, TacticalNpcEntity.AmmoPolicy ammoPolicy,
+        int reserve, OrderState.Kind order, double radius); // preserved: defaults HARD
+}
 public record SpawnResult(SpawnResult.Status status, List<UUID> entityIds, String diagnostic) {
     boolean success();
 }
@@ -182,3 +185,25 @@ Schema2 хранит фиксированный Bloom-фильтр исполь�
 
 Проверки lifecycle/миграции/скрытия имён: [2026-10-24](SAVED-DATA-VALIDATION-2026-10-24.md).
 Исторический срез первоначального API: [2026-10-23](MATCH-NPC-VALIDATION-2026-10-23.md).
+# Per-member accuracy (2026-10-28)
+
+`SpawnMemberSpec` additionally accepts `dev.zuma.tacticalnpc.core.NpcDifficulty` as its sixth
+argument. `HARD` retains the original correlated error; `DEFAULT` scales that error by
+`ServerConfig.DEFAULT_ERROR_MULTIPLIER` (initially 3). Information, reactions, native spread,
+damage, ammo and orders are identical. The five-argument constructor remains available with
+its original JVM descriptor and defaults to HARD for already compiled consumers.
+
+```java
+var rifle = new SpawnMemberSpec(new ResourceLocation("tacz:ak47"), AmmoPolicy.FINITE,
+    90, OrderState.Kind.ASSAULT, 24); // existing call: HARD
+var rocket = new SpawnMemberSpec(new ResourceLocation("tacz:rpg7"), AmmoPolicy.FINITE,
+    3, OrderState.Kind.HOLD_POSITION, 24, NpcDifficulty.DEFAULT);
+// Pass List.of(rifle, rocket) to SpawnGroupRequest.members.
+```
+
+Each member retains its own loadout, ammo, order and named NBT accuracy value. Existing
+groups receive no random RPG loadout. Administrators can change only accuracy with
+`/npc difficulty <target> hard|default`; the existing name/radius/selector resolution applies.
+Both `/npc info` and `/npc debug info` show the actual value. Changing it does not invalidate
+the controller, knowledge, order, STAND phase or native reload. Missing/unknown saved values
+use HARD; unknown values emit a diagnostic. Legacy UNFAIR remains migration-only and inactive.

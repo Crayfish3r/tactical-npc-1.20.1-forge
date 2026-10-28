@@ -36,6 +36,11 @@ public final class NpcOperations {
         reply(c.getSource(),"Team "+(team==null?"none":team)+" assigned to "+count+" NPC(s), "+(targets.size()-count)+" player(s); coordination=automatic.");
         return targets.size();
     }
+    public static int difficulty(CommandContext<CommandSourceStack> c,dev.zuma.tacticalnpc.core.NpcDifficulty value) throws CommandSyntaxException {
+        var targets=NpcTargetArgument.resolve(c,false);
+        for(var entity:targets)((TacticalNpcEntity)entity).setDifficulty(value);
+        reply(c.getSource(),"Accuracy "+value+" assigned to "+targets.size()+" NPC(s).");return targets.size();
+    }
     public static int ammo(CommandContext<CommandSourceStack> c,TacticalNpcEntity.AmmoPolicy policy,int reserve) throws CommandSyntaxException {
         var targets=NpcTargetArgument.resolve(c,false);
         for(var entity:targets)((TacticalNpcEntity)entity).setAmmoPolicy(policy,reserve);
@@ -71,7 +76,7 @@ public final class NpcOperations {
             String detail=npc.npcName()+" team="+teamName(npc)+" mode="+modeName(npc.order())+" availability=loaded dimension="+npc.level().dimension().location()+
                 (npc.order().equals("ASSAULT")?" movement=free":" behaviorRadius="+npc.runtime().orderState().radius())+
                 " gun="+(gun==null?"none":gun.getGunId(stack))+" ammo="+npc.ammoPolicy()+" magazine="+(gun==null?0:gun.getCurrentAmmoCount(stack))+
-                " chamber="+(gun!=null && gun.hasBulletInBarrel(stack))+" reserve="+(npc.ammoPolicy()==TacticalNpcEntity.AmmoPolicy.INFINITE?"infinite":gun==null?0:gun.getDummyAmmoAmount(stack))+" profile=HARD";
+                " chamber="+(gun!=null && gun.hasBulletInBarrel(stack))+" reserve="+(npc.ammoPolicy()==TacticalNpcEntity.AmmoPolicy.INFINITE?"infinite":gun==null?0:gun.getDummyAmmoAmount(stack))+" difficulty="+npc.difficulty();
             if(debug)detail+=" uuid="+npc.getUUID()+" serviceId="+npc.serviceId()+" standPhase="+npc.standPhase()+" knowledge="+(npc.controller()==null || npc.controller().observation()==null?"none":npc.controller().observation().source())+
                 " fire={"+(npc.controller()==null?"inactive":npc.controller().fireDiagnostics())+"}";
             final String message=detail;c.getSource().sendSuccess(()->Component.literal(message),false);
