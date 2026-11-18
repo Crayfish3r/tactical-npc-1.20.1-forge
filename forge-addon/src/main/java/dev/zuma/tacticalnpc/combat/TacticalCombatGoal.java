@@ -4,6 +4,7 @@ import dev.zuma.tacticalnpc.TacticalNpcAiMod;
 import dev.zuma.tacticalnpc.compat.TaczGunController;
 import dev.zuma.tacticalnpc.config.ServerConfig;
 import dev.zuma.tacticalnpc.core.*;
+import dev.zuma.tacticalnpc.entity.TacticalNpcEntity;
 import dev.zuma.tacticalnpc.runtime.*;
 import java.util.EnumSet;
 import java.util.List;
@@ -26,6 +27,8 @@ public final class TacticalCombatGoal extends Goal {
     private final GunController guns;
     private final ActionArbiter arbiter = new ActionArbiter();
     private final MovementExecutor movement;
+    private final ContactSearch contactSearch;
+    private final BuildingDefense buildingDefense;
     private final CoverSensor covers;
     private final MovementPlanner movementPlanner=new MovementPlanner();
     private final OrderPlanner orderPlanner=new OrderPlanner();
@@ -75,6 +78,8 @@ public final class TacticalCombatGoal extends Goal {
         this.runtime=runtime; npc=runtime.entity(); ownershipLifetime=lifetime;
         runtime.requireServer();npc.setYBodyRot(npc.getYRot());
         guns=new TaczGunController(runtime); movement=new MovementExecutor(runtime);covers=new CoverSensor(runtime);flankRoute=new FlankRoute(runtime);
+        contactSearch=npc instanceof TacticalNpcEntity?new ContactSearch(runtime,movement):null;
+        buildingDefense=npc instanceof TacticalNpcEntity?new BuildingDefense(runtime,movement):null;
         nextScan=npc.level().getGameTime()+Math.floorMod(npc.getUUID().hashCode(),ServerConfig.ACQUISITION.get());
         setFlags(EnumSet.of(Flag.MOVE,Flag.LOOK,Flag.TARGET));
     }
@@ -114,6 +119,7 @@ public final class TacticalCombatGoal extends Goal {
         var known=memory.sample(npc.level().getGameTime(),false,vector(npc.position()),ServerConfig.memoryRange());
         boolean matched=subject.equals(targetId) || subject.equals(candidateId) || subject.equals(contact.subject()) || known!=null && subject.equals(known.subject());
         memory.forget(subject);
+        if(matched && contactSearch!=null)contactSearch.clear();
         if(matched){SquadRuntime.of((ServerLevel)npc.level()).releaseClaims(npc.getUUID());targetId=null;candidateId=null;contact.clear();freshVisible=false;decision=null;generation=GENERATIONS.incrementAndGet();nextPlan=0;movement.contactRestored();movement.subject(null);}
     }
     public Observation observation() {
@@ -205,10 +211,13 @@ public final class TacticalCombatGoal extends Goal {
         if(hint!=null && !subjectAlive(hint.subject()))hint=null;
         var stored=memory.sample(tick,false,vector(npc.position()),ServerConfig.memoryRange());
         stored=knowledge(stored,tick);
+        if(contactSearch!=null && contactSearch.invalidateUnless(stored)) {
+            movement.tacticalLegChanged();nextPlan=0;
+        }
         // Expired knowledge cancels its route before activation/cadence can defer this tick.
         movement.subject(stored==null?null:stored.subject());movement.guardTerritory();
         if(neutral!=null && targetId!=null && stored==null) {neutral.clearRetaliation();stop();}
-        if(targetId==null && stored==null && (neutral==null || neutral.reactiveAttacker()==null)) {
+        if(targetId==null && stored==null && (buildingDefense==null || !buildingDefense.active()) && (neutral==null || neutral.reactiveAttacker()==null)) {
             if(tick>=nextActivation) {
                 nextActivation=tick+20;
                 double activation=Math.max(ServerConfig.ACTIVATION_RANGE.get(),Math.max(range,ServerConfig.hearingRange()));
@@ -284,7 +293,12 @@ public final class TacticalCombatGoal extends Goal {
                 velocity=point.minus(old.position()).times(1.0/(tick-old.tick()));
                 if(velocity.length()>.5) velocity=velocity.times(.5/velocity.length());
             }
-            memory.record(new Observation(targetId,point,velocity,tick,tick+ServerConfig.MEMORY.get(),Observation.Source.VISION,1,0,true));
+            var sighting=new Observation(targetId,point,velocity,tick,tick+ServerConfig.MEMORY.get(),Observation.Source.VISION,1,0,true);
+            memory.record(sighting);
+            if(contactSearch!=null && neutral==null && runtime.orderState().kind()!=OrderState.Kind.HOLD_POSITION) {
+                if(contactSearch.active())movement.tacticalLegChanged();
+                contactSearch.seen(sighting,target.position());
+            }
             if(runtime.squadId()!=null) squad.report(runtime.squadId(),npc.getUUID(),observation(),tick,ServerConfig.unfair()?2:8);
         } else if(neutral==null && runtime.squadId()!=null) {
             var received=squad.receive(runtime.squadId(),npc.getUUID(),vector(npc.position()),tick,ServerConfig.unfair()?128:96);
@@ -294,6 +308,9 @@ public final class TacticalCombatGoal extends Goal {
             }
         }
         Observation observation=knowledge(memory.sample(tick,visible,vector(npc.position()),ServerConfig.memoryRange()),tick);
+        if(contactSearch!=null && contactSearch.invalidateUnless(observation)) {
+            movement.tacticalLegChanged();nextPlan=0;
+        }
         // Finish only after all perception inputs, including this tick's delayed squad delivery.
         if(npc instanceof dev.zuma.tacticalnpc.entity.TacticalNpcEntity own && own.standPhase()==dev.zuma.tacticalnpc.entity.TacticalNpcEntity.StandPhase.COMBAT &&
                 !visible && activeLos==VisibilitySensor.Los.BLOCKED && observation==null && !own.standDamageContact()){
@@ -311,17 +328,23 @@ public final class TacticalCombatGoal extends Goal {
         boolean occupied=canRequestFire && safetyPoint!=null && sensor.occupied(npc,safetySubject,vec(safetyPoint),gun);
         blockedFireTicks=visible && occupied && sensor.lastSector()==VisibilitySensor.Sector.OCCUPIED?Math.min(200,blockedFireTicks+1):0;
         SuppressionPermit suppression=suppressionPermit(observation,tick);
+        boolean buildingAllowed=buildingDefense!=null && neutral==null &&
+                npc instanceof TacticalNpcEntity own && own.standPhase()==TacticalNpcEntity.StandPhase.NONE;
+        if(buildingAllowed && gun.supported() && npc.getHealth()/npc.getMaxHealth()>.25 && !movement.blocked(tick) &&
+                buildingDefense.consider(observation,tick)) nextPlan=0;
+        boolean buildingActive=buildingDefense!=null && buildingDefense.active();
         Vector3 failure=movement.failedDestination(tick);if(failure!=null) covers.reject(failure,tick);
         long coverRevision=covers.revision();
-        var coverOptions=movement.blocked(tick)?List.<CoverOption>of():covers.sample(observation,tick,previous==TacticalIntent.REPOSITION && tick-stateSince==4);
-        boolean coverDeferred=!movement.blocked(tick) && covers.deferred();
+        var coverOptions=buildingActive || movement.blocked(tick)?List.<CoverOption>of():covers.sample(observation,tick,previous==TacticalIntent.REPOSITION && tick-stateSince==4);
+        boolean coverDeferred=!buildingActive && !movement.blocked(tick) && covers.deferred();
         boolean standWaiting=npc instanceof dev.zuma.tacticalnpc.entity.TacticalNpcEntity own && !own.neutral() &&
                 own.standPhase()==dev.zuma.tacticalnpc.entity.TacticalNpcEntity.StandPhase.WAIT;
         if(covers.revision()!=coverRevision || coverDeferred)nextPlan=0;
         CombatSnapshot snapshot=new CombatSnapshot(new SelfState(frame,vector(npc.position()),Math.max(0,Math.min(1,npc.getHealth()/npc.getMaxHealth())),npc.isAlive(),npc.hurtTime>0),
                 observation,gun,new TerrainState(coverOptions.stream().map(CoverOption::position).toList(),List.of(),movement.blocked(tick),clear,occupied,coverOptions),new TacticalState(previous==null?TacticalIntent.PATROL:previous,stateSince,stateSince+20,strafe));
         if(decision==null || tick>=nextPlan || gun.rounds()!=previousRounds || gun.busy()!=previousBusy || npc.hurtTime>0 && previous!=TacticalIntent.TAKE_COVER && previous!=TacticalIntent.RETREAT || npc.getHealth()/npc.getMaxHealth()<=.25 && previous!=TacticalIntent.RETREAT) {
-            decision=movementPlanner.plan(snapshot,new CombatBrain(ServerConfig.MEMORY.get(),gun.effectiveRange()).decide(snapshot),!standWaiting); nextPlan=tick+4;
+            var combat=new CombatBrain(ServerConfig.MEMORY.get(),gun.effectiveRange()).decide(snapshot);
+            decision=movementPlanner.plan(snapshot,combat,!standWaiting); nextPlan=tick+4;
             if(runtime.squadId()!=null)decision=squadPlanner.plan(snapshot,decision,squad.role(runtime.squadId(),npc.getUUID()));
             var role=runtime.squadId()==null?SquadBlackboard.Role.SUPPRESSOR:squad.role(runtime.squadId(),npc.getUUID());
             Vector3 flank=standWaiting?null:flankRoute.sample(runtime,snapshot,role==SquadBlackboard.Role.FLANKER,movement.blocked(tick));
@@ -333,11 +356,16 @@ public final class TacticalCombatGoal extends Goal {
                 decision=new CombatDecision(decision.intent(),decision.firePermitted(),"covering squad advance",decision.weaponAction(),MovementCommand.hold(),decision.aim(),decision.frame(),decision.expires());
             long patrolRevision=orderPlanner.patrolRevision();
             decision=orderPlanner.plan(snapshot,decision,runtime.orderState(),npc.getBbWidth(),movement.recoveryStatus());
-            if(orderPlanner.patrolRevision()!=patrolRevision)movement.patrolLegChanged();
-            if(ServerConfig.SUPPRESSION.get() && !visible && suppression.knowledgeValid(tick) && gun.supported() && (gun.rounds()>0 || gun.reserve()) && decision.intent()==TacticalIntent.SEARCH &&
-                    suppressionCycle.active(tick,ServerConfig.SUPPRESSION_DURATION.get(),ServerConfig.SUPPRESSION_ROUNDS.get()))
-                decision=new CombatDecision(decision.intent(),false,"pressure burst pause",decision.weaponAction()==ActionArbiter.WeaponAction.SHOOT?ActionArbiter.WeaponAction.NONE:decision.weaponAction(),MovementCommand.hold(),decision.aim(),decision.frame(),decision.expires());
-            decision=suppressionPlanner.plan(snapshot,decision,suppression);
+            CombatDecision specialized=buildingActive ? buildingDefense.plan(snapshot,decision,combat,buildingAllowed) : decision;
+            if(specialized==decision && contactSearch!=null && !visible && !standWaiting)
+                specialized=contactSearch.plan(decision,activeLos==VisibilitySensor.Los.BLOCKED);
+            if(specialized==decision) {
+                if(orderPlanner.patrolRevision()!=patrolRevision)movement.patrolLegChanged();
+                if(ServerConfig.SUPPRESSION.get() && !visible && suppression.knowledgeValid(tick) && gun.supported() && (gun.rounds()>0 || gun.reserve()) && decision.intent()==TacticalIntent.SEARCH &&
+                        suppressionCycle.active(tick,ServerConfig.SUPPRESSION_DURATION.get(),ServerConfig.SUPPRESSION_ROUNDS.get()))
+                    decision=new CombatDecision(decision.intent(),false,"pressure burst pause",decision.weaponAction()==ActionArbiter.WeaponAction.SHOOT?ActionArbiter.WeaponAction.NONE:decision.weaponAction(),MovementCommand.hold(),decision.aim(),decision.frame(),decision.expires());
+                decision=suppressionPlanner.plan(snapshot,decision,suppression);
+            } else decision=specialized;
             if(decision.reason().equals("unusable peek timeout") && !coverOptions.isEmpty() && !covers.deferred()) covers.reject(coverOptions.get(0).position(),tick);
             previousRounds=gun.rounds(); previousBusy=gun.busy();
         }
@@ -373,7 +401,7 @@ public final class TacticalCombatGoal extends Goal {
         boolean relocating=decision.intent()==TacticalIntent.RETREAT || decision.intent()==TacticalIntent.ADVANCE || decision.intent()==TacticalIntent.TAKE_COVER || decision.intent()==TacticalIntent.REPOSITION;
         guns.aim(commands.valid() && !relocating && !commands.movement().sprint() && (visible || decision.aim().mode()==AimCommand.Mode.SUPPRESS_AREA)); npc.setAggressive(observation!=null);
         movement.subject(observation==null?null:observation.subject());
-        movement.apply(commands.movement(),tick);
+        movement.apply(commands.movement(),tick,buildingDefense!=null && buildingDefense.precisePeek());
         long shots=guns.shots();
         guns.apply(commands.weapon(),tick);
         var level=(ServerLevel)npc.level();
@@ -410,6 +438,8 @@ public final class TacticalCombatGoal extends Goal {
     private void stop(boolean orderChange) {
         fireStatus=null;
         orderPlanner.resetPatrol();
+        if(contactSearch!=null)contactSearch.clear();
+        if(buildingDefense!=null)buildingDefense.clear();
         generation=GENERATIONS.incrementAndGet(); targetId=null; candidateId=null; contact.clear();freshVisible=false;memory.clear();covers.reset(); decision=null;
         sensor.resetAcquisition();
         previous=null;stateSince=npc.level().getGameTime();nextPlan=0;previousRounds=-1;suppressionCycle.reset();suppressionSectors.reset();suppressionPoint=null;flankRoute.reset();utility.reset();unfairHints.reset();hint=null;

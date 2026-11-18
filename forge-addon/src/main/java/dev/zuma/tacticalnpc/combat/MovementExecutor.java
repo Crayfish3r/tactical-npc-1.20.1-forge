@@ -7,6 +7,7 @@ import net.minecraft.world.phys.Vec3;
 
 /** Sole navigation owner. One primary and at most three alternatives per 60-tick recovery. */
 public final class MovementExecutor {
+    static final double PRECISE_ARRIVAL_SQUARED = .0625;
     private final NpcRuntimeAdapter runtime;
     private final CoverSensor terrain;
     private final ActionRouteExecutor actions;
@@ -36,7 +37,15 @@ public final class MovementExecutor {
     }
     /** A patrol leg/contact transition cancels the episode, retaining failed-point backoff and budgets. */
     public void patrolLegChanged(){contactRestored();}
+    void tacticalLegChanged() {
+        runtime.requireServer();
+        actions.cancelSafely();
+        contactRestored();
+    }
     public void apply(MovementCommand command,long tick) {
+        apply(command,tick,false);
+    }
+    void apply(MovementCommand command,long tick,boolean preciseArrival) {
         runtime.requireServer();var npc=runtime.entity();var level=(ServerLevel)npc.level();
         // An intentionally immobile entity is not a failed path. Keep weapon/aim authority alive.
         if(npc.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)<=0){
@@ -100,6 +109,14 @@ public final class MovementExecutor {
         }
         if(boundary==null?!terrain.withinOrder(point):!boundary.permitsStep(vector(npc.position()),vector(point))) {fail(requested,tick);return;}
         if(npc.position().distanceToSqr(point)<.5) {
+            if(preciseArrival && alternative==null && npc.position().distanceToSqr(point)>=PRECISE_ARRIVAL_SQUARED) {
+                // Finish the last fraction of a block after vanilla navigation reaches its wider tolerance.
+                var sweep=npc.getBoundingBox().expandTowards(point.subtract(npc.position()));
+                if(!level.noCollision(npc,sweep)) {fail(requested,tick);return;}
+                npc.getNavigation().stop();
+                npc.getMoveControl().setWantedPosition(point.x,point.y,point.z,command.speed());
+                return;
+            }
             if(alternative!=null) {AiTelemetry.route(level,AiTelemetry.Route.ARRIVED);recovery.accepted();alternative=null;failedPoint=null;}
             // A completed leg must release the previous native move/strafe input.
             // Keep external velocity intact: halt stops control, not knockback.

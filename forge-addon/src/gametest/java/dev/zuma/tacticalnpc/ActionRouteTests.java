@@ -111,6 +111,190 @@ public final class ActionRouteTests {
         for(int t:new int[]{100,200,300,450})h.runAtTickTime(t,()->TacticalNpcAiMod.LOGGER.info("ACTION_COMBAT_PROGRESS tick={} npc={} target={} alive={} arrived={} actualBullets={} observation={} {}",h.getTick(),n.position(),player.position(),player.isAlive(),arrived[0],ProjectileProbe.count(n.getUUID()),n.controller()==null?null:n.controller().observation(),n.controller()==null?"no controller":n.controller().movementDiagnostics()));
         h.runAtTickTime(600,()->h.assertTrue(arrived[0] && n.isRemoved(),"arrival and actual native shot: pos="+n.position()+" decision="+n.controller().decision()+" "+n.controller().movementDiagnostics()));
     }
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="actions-15-contact-search",timeoutTicks=400)
+    public static void fleeingPlayerAroundCornerAndOverBlock(GameTestHelper h){
+        contactSearch(h,true);
+    }
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="actions-16-contact-search-limit",timeoutTicks=400)
+    public static void lostContactChecksOnlyTwoPassages(GameTestHelper h){
+        contactSearch(h,false);
+    }
+    private static void contactSearch(GameTestHelper h,boolean findPlayer){
+        begin(h);
+        if(!findPlayer) {
+            // Two passages include two full scans. Use the production memory window for this scene.
+            var memory=dev.zuma.tacticalnpc.config.ServerConfig.MEMORY;
+            memory.set(memory.getDefault());
+        }
+        for(int x=0;x<16;x++)for(int z=0;z<16;z++) {
+            boolean corridor=z==5 && x>=2 && x<=8 || x==8 && z>=6 && z<=9 || z==8 && x>=9 && x<=10;
+            if(!findPlayer) corridor |= z==5 && x>=9 && x<=11 || x==8 && z>=2 && z<=4 || x==12 && z==8;
+            if(!corridor)for(int y=2;y<=5;y++)block(h,new BlockPos(x,y,z),Blocks.STONE);
+        }
+        block(h,new BlockPos(8,2,7),Blocks.STONE);
+        var hunter=npc(h,3.5,2,5.5);
+        var speed=hunter.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
+        speed.setBaseValue(0);
+        var stack=dev.zuma.tacticalnpc.compat.GunSupport.create(new net.minecraft.resources.ResourceLocation("tacz:glock_17"));
+        var gun=com.tacz.guns.api.item.IGun.getIGunOrNull(stack);
+        gun.setCurrentAmmoCount(stack,17);
+        gun.setBulletInBarrel(stack,true);
+        hunter.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND,stack);
+        hunter.runtime().onEquip(stack);
+        hunter.setYRot(-90);
+        hunter.setYHeadRot(-90);
+        hunter.addTag(dev.zuma.tacticalnpc.runtime.RuntimeRegistry.TAG);
+
+        var player=new net.minecraftforge.common.util.FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"pursuit-target")) {
+            @Override public boolean hurt(net.minecraft.world.damagesource.DamageSource source,float amount){return false;}
+        };
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        var start=absolute(h,new Vec3(7.5,2,5.5));
+        var hidden=absolute(h,new Vec3(findPlayer?10.5:12.5,2,8.5));
+        var firstPassage=absolute(h,new Vec3(11.5,2,5.5));
+        var secondPassage=absolute(h,new Vec3(8.5,2,8.5));
+        player.moveTo(start.x,start.y,start.z);
+        h.getLevel().addNewPlayer(player);
+
+        class Scene {
+            int steps, shotsAtLoss;
+            boolean lostContact, inspected, climbed, reachedFirst, reachedSecond;
+            int exhaustedTicks;
+        }
+        var scene=new Scene();
+        h.onEachTick(()->{
+            var controller=hunter.controller();
+            if(controller==null)return;
+            var observation=controller.observation();
+            if(scene.steps<4 && observation!=null && observation.visible()) {
+                if(++scene.steps<4) {
+                    player.moveTo(start.x+.25*scene.steps,start.y,start.z);
+                } else {
+                    player.moveTo(hidden.x,hidden.y,hidden.z);
+                    scene.shotsAtLoss=ProjectileProbe.count(hunter.getUUID());
+                    speed.setBaseValue(.25);
+                }
+                return;
+            }
+            if(scene.steps<4 || controller.decision()==null)return;
+            if(observation!=null && !observation.visible()) {
+                scene.lostContact=true;
+                h.assertTrue(controller.decision().aim().mode()!=AimCommand.Mode.DIRECT,"no direct aim through the corner");
+                h.assertTrue(ProjectileProbe.count(hunter.getUUID())==scene.shotsAtLoss,"no shot while checking the corner");
+                scene.inspected|=controller.decision().reason().equals("inspect passage 1");
+            }
+            String reason=controller.decision().reason();
+            scene.climbed|=hunter.onGround() && hunter.getY()>=start.y+.99 && hunter.getZ()>start.z+1.7;
+            scene.reachedFirst|=hunter.onGround() && hunter.position().distanceToSqr(firstPassage)<.5;
+            scene.reachedSecond|=hunter.onGround() && hunter.position().distanceToSqr(secondPassage)<.5;
+            if(reason.equals("contact search exhausted"))scene.exhaustedTicks++;
+            h.assertTrue(!reason.equals("inspect passage 3"),"search must not try the third available passage");
+            boolean engaged=observation!=null && observation.visible() && ProjectileProbe.count(hunter.getUUID())>scene.shotsAtLoss;
+            boolean exhausted=scene.reachedFirst && scene.reachedSecond && scene.exhaustedTicks>=12;
+            if(scene.lostContact && scene.inspected && scene.climbed && (findPlayer?engaged:exhausted)) {
+                hunter.discard();player.discard();success(h);
+            }
+        });
+        h.runAtTickTime(380,()->{
+            var controller=hunter.controller();
+            h.assertTrue(hunter.isRemoved(),"corner pursuit: steps="+scene.steps+" lost="+scene.lostContact+
+                    " passage="+scene.inspected+" climbed="+scene.climbed+" first="+scene.reachedFirst+
+                    " second="+scene.reachedSecond+" exhausted="+scene.exhaustedTicks+" position="+hunter.position()+
+                    " decision="+(controller==null?"none":controller.decision())+
+                    " route="+(controller==null?"none":controller.movementDiagnostics()));
+        });
+    }
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="actions-17-building-defense",timeoutTicks=500)
+    public static void occupiesBuildingAndResumesFireFromInside(GameTestHelper h){
+        buildingDefense(h,false);
+    }
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="actions-18-building-boundary",timeoutTicks=350)
+    public static void buildingDefenseRespectsTerritory(GameTestHelper h){
+        buildingDefense(h,true);
+    }
+    private static void buildingDefense(GameTestHelper h,boolean outsideTerritory){
+        begin(h);
+        // A one-story room with a single closed door on the courtyard side.
+        for(int x=7;x<=12;x++)for(int z=5;z<=10;z++) {
+            block(h,new BlockPos(x,5,z),Blocks.STONE);
+            if(x==7 || x==12 || z==5 || z==10)
+                for(int y=2;y<=4;y++)block(h,new BlockPos(x,y,z),Blocks.STONE);
+        }
+        block(h,new BlockPos(3,2,5),Blocks.STONE);
+        var door=new BlockPos(7,2,7);
+        putDoor(h,door,false);
+        var hunter=npc(h,outsideTerritory?4.5:5.5,2,7.5);
+        if(outsideTerritory)hunter.setOrder(OrderState.Kind.DEFEND_AREA,4);
+        hunter.setYRot(90);
+        hunter.setYHeadRot(90);
+        hunter.addTag(dev.zuma.tacticalnpc.runtime.RuntimeRegistry.TAG);
+        if(outsideTerritory)hunter.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(0);
+        var stack=dev.zuma.tacticalnpc.compat.GunSupport.create(new net.minecraft.resources.ResourceLocation("tacz:glock_17"));
+        var gun=com.tacz.guns.api.item.IGun.getIGunOrNull(stack);
+        gun.setCurrentAmmoCount(stack,17);
+        gun.setBulletInBarrel(stack,true);
+        hunter.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND,stack);
+        hunter.runtime().onEquip(stack);
+        var player=new net.minecraftforge.common.util.FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"house-target")) {
+            @Override public boolean hurt(net.minecraft.world.damagesource.DamageSource source,float amount){return false;}
+        };
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        var courtyard=absolute(h,new Vec3(1.5,2,7.5));
+        var hidden=absolute(h,new Vec3(1.5,2,13.5));
+        player.moveTo(courtyard.x,courtyard.y,courtyard.z);
+        h.getLevel().addNewPlayer(player);
+        double interiorX=position(h,door).getX()+1;
+
+        class Scene {
+            int visibleTicks, hiddenTicks, shotsBeforeReturn;
+            boolean choseEntry, entered, returned;
+            String previousReason="";
+        }
+        var scene=new Scene();
+        h.onEachTick(()->{
+            var controller=hunter.controller();
+            if(controller==null || controller.decision()==null)return;
+            var observation=controller.observation();
+            boolean visible=observation!=null && observation.visible();
+            if(visible)scene.visibleTicks++;
+            String reason=controller.decision().reason();
+            if(outsideTerritory) {
+                h.assertTrue(!reason.equals("enter building") && !state(h,door).getValue(DoorBlock.OPEN),"the candidate is outside DEFEND territory");
+                if(scene.visibleTicks>=80){hunter.discard();player.discard();success(h);}
+                return;
+            }
+            if(!reason.equals(scene.previousReason)) {
+                TacticalNpcAiMod.LOGGER.info("BUILDING_DEFENSE tick={} reason={} position={} visible={} {}",
+                        h.getTick(),reason,hunter.position(),visible,controller.movementDiagnostics());
+                scene.previousReason=reason;
+            }
+            scene.choseEntry|=reason.equals("enter building");
+            if(!scene.entered && reason.equals("hold inside building") && hunter.onGround() && hunter.getX()>interiorX) {
+                h.assertTrue(state(h,door).getValue(DoorBlock.OPEN) && state(h,door.above()).getValue(DoorBlock.OPEN),"native door had to open before indoor arrival");
+                scene.entered=true;
+                player.moveTo(hidden.x,hidden.y,hidden.z);
+                return;
+            }
+            if(!scene.entered)return;
+            h.assertTrue(hunter.getX()>interiorX,"NPC must stay inside the room during defense, returned="+scene.returned+
+                    " hiddenTicks="+scene.hiddenTicks+" at="+hunter.position()+" decision="+controller.decision()+" route="+controller.movementDiagnostics());
+            if(!scene.returned && !visible && ++scene.hiddenTicks>=32) {
+                scene.returned=true;
+                scene.shotsBeforeReturn=ProjectileProbe.count(hunter.getUUID());
+                player.moveTo(courtyard.x,courtyard.y,courtyard.z);
+                return;
+            }
+            if(scene.returned && visible && reason.equals("watch building entrance") && ProjectileProbe.count(hunter.getUUID())>scene.shotsBeforeReturn) {
+                hunter.discard();player.discard();success(h);
+            }
+        });
+        h.runAtTickTime(outsideTerritory?330:480,()->{
+            var controller=hunter.controller();
+            h.assertTrue(hunter.isRemoved(),"building defense: visibleTicks="+scene.visibleTicks+" entry="+scene.choseEntry+
+                    " entered="+scene.entered+" hiddenTicks="+scene.hiddenTicks+" returned="+scene.returned+" pos="+hunter.position()+
+                    " decision="+(controller==null?"none":controller.decision())+" route="+(controller==null?"none":controller.movementDiagnostics()));
+        });
+    }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="actions-01-door-east",timeoutTicks=240)
     public static void woodenDoorFromWest(GameTestHelper h){doorRun(h,false,false);}
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="actions-02-door-west",timeoutTicks=240)
