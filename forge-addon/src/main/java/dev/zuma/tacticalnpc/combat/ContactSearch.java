@@ -9,7 +9,10 @@ import dev.zuma.tacticalnpc.core.Observation;
 import dev.zuma.tacticalnpc.core.TacticalIntent;
 import dev.zuma.tacticalnpc.core.Vector3;
 import dev.zuma.tacticalnpc.runtime.NpcRuntimeAdapter;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.phys.Vec3;
 
 import static dev.zuma.tacticalnpc.combat.ActionGeometry.vec;
@@ -19,6 +22,7 @@ import static dev.zuma.tacticalnpc.combat.ActionGeometry.vector;
 final class ContactSearch {
     private static final int MAX_PASSAGES = 2;
     private static final int PROBE_DISTANCE = 3;
+    private static final int GUARD_AFTER_SEARCH = 16;
     private final ActionGeometry geometry;
     private final MovementExecutor movement;
     private Observation sighting;
@@ -28,6 +32,7 @@ final class ContactSearch {
     private boolean searching, inspecting;
     private int nextDirection, passages;
     private long scanSince = -1;
+    private long exhaustedAt = -1;
 
     ContactSearch(NpcRuntimeAdapter runtime, MovementExecutor movement) {
         geometry = new ActionGeometry(runtime);
@@ -35,24 +40,27 @@ final class ContactSearch {
     }
 
     void seen(Observation observation, Vec3 feet) {
+        Direction previousHeading=sighting!=null && sighting.subject().equals(observation.subject())?directions[0]:null;
         clear();
         Vector3 velocity = observation.velocity();
-        if (velocity.x() == 0 && velocity.z() == 0) return;
-
-        Direction heading;
-        if (Math.abs(velocity.x()) >= Math.abs(velocity.z())) {
-            heading = velocity.x() > 0 ? Direction.EAST : Direction.WEST;
-        } else {
-            heading = velocity.z() > 0 ? Direction.SOUTH : Direction.NORTH;
+        Direction heading=previousHeading;
+        if (velocity.x()!=0 || velocity.z()!=0) heading=horizontal(velocity.x(),velocity.z());
+        if (heading==null) {
+            Vec3 ahead=feet.subtract(geometry.runtime.entity().position());
+            heading=horizontal(ahead.x,ahead.z);
         }
         sighting = observation;
         origin = feet;
         directions = new Direction[]{heading, heading.getClockWise(), heading.getCounterClockWise()};
     }
 
+    private static Direction horizontal(double x,double z){
+        return Math.abs(x)>=Math.abs(z)?(x>=0?Direction.EAST:Direction.WEST):(z>=0?Direction.SOUTH:Direction.NORTH);
+    }
+
     boolean invalidateUnless(Observation observation) {
-        if (sighting == null || observation != null && observation.source() == Observation.Source.VISION &&
-                observation.tick() == sighting.tick() && observation.subject().equals(sighting.subject())) return false;
+        if (sighting == null || observation != null && observation.subject().equals(sighting.subject()) &&
+                geometry.level.getGameTime()<=sighting.expires()) return false;
         boolean interrupted = searching;
         clear();
         return interrupted;
@@ -63,10 +71,12 @@ final class ContactSearch {
         if (base.intent() != TacticalIntent.SEARCH && !(searching && base.intent() == TacticalIntent.REPOSITION)) return base;
 
         var npc = geometry.runtime.entity();
+        if(npc.getAttributeValue(Attributes.MOVEMENT_SPEED)<=0)return base;
         long tick = geometry.level.getGameTime();
         if (!searching) {
             if (!AiWorkBudget.of(geometry.level).candidate(npc.getUUID())) return base;
             waypoint = geometry.terrain.safeStanding(origin);
+            if(waypoint==null)waypoint=geometry.terrain.safeStanding(origin.subtract(0,2,0));
             if (waypoint == null || !geometry.terrain.withinOrder(waypoint)) {
                 clear();
                 return base;
@@ -100,6 +110,7 @@ final class ContactSearch {
 
         if (waypoint == null) {
             boolean exhausted = passages == MAX_PASSAGES || nextDirection == directions.length;
+            if(exhausted && exhaustedAt<0)exhaustedAt=tick;
             return search(base, MovementCommand.hold(), look, exhausted ? "contact search exhausted" : "contact search deferred");
         }
         var move = MovementCommand.navigate(vector(waypoint), inspecting ? MovementCommand.Locomotion.WALK : MovementCommand.Locomotion.RUN);
@@ -130,15 +141,28 @@ final class ContactSearch {
 
     private Vec3 passageEnd(Direction direction) {
         Vec3 previous = origin;
+        Vec3 lastStanding=null;
         for (int step = 0; step < PROBE_DISTANCE; step++) {
-            var next = geometry.terrain.safeStanding(previous.add(direction.getStepX(), 0, direction.getStepZ()));
-            if (next == null || Math.abs(next.y - previous.y) > 1 || !geometry.permits(previous, next)) return null;
+            Vec3 guess=previous.add(direction.getStepX(),0,direction.getStepZ());
+            var next = geometry.terrain.safeStanding(guess);
+            if(next==null){
+                BlockPos door=BlockPos.containing(guess);
+                if(!RouteInteractions.VANILLA.supports(geometry.level,door) ||
+                        geometry.level.getBlockState(door).getValue(DoorBlock.FACING).getAxis()!=direction.getAxis())break;
+                next=ActionGeometry.center(door);
+                if(!geometry.permits(previous,next))break;
+                previous=next;
+                continue;
+            }
+            if (Math.abs(next.y - previous.y) > 1 || !geometry.permits(previous, next)) break;
             previous = next;
+            lastStanding=next;
         }
-        return previous;
+        return lastStanding;
     }
 
     boolean active() { return searching; }
+    boolean finished(long tick){return exhaustedAt>=0 && tick-exhaustedAt>=GUARD_AFTER_SEARCH;}
 
     void clear() {
         sighting = null;
@@ -147,6 +171,7 @@ final class ContactSearch {
         passageHeading = null;
         nextDirection = passages = 0;
         scanSince = -1;
+        exhaustedAt = -1;
         searching = inspecting = false;
     }
 }

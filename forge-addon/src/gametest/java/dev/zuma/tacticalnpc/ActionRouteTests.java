@@ -119,7 +119,14 @@ public final class ActionRouteTests {
     public static void lostContactChecksOnlyTwoPassages(GameTestHelper h){
         contactSearch(h,false);
     }
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="actions-19-stationary-sighting",timeoutTicks=400)
+    public static void searchesFromStationarySightingThroughClosedDoor(GameTestHelper h){
+        contactSearch(h,true,true);
+    }
     private static void contactSearch(GameTestHelper h,boolean findPlayer){
+        contactSearch(h,findPlayer,false);
+    }
+    private static void contactSearch(GameTestHelper h,boolean findPlayer,boolean stationaryTarget){
         begin(h);
         if(!findPlayer) {
             // Two passages include two full scans. Use the production memory window for this scene.
@@ -131,7 +138,9 @@ public final class ActionRouteTests {
             if(!findPlayer) corridor |= z==5 && x>=9 && x<=11 || x==8 && z>=2 && z<=4 || x==12 && z==8;
             if(!corridor)for(int y=2;y<=5;y++)block(h,new BlockPos(x,y,z),Blocks.STONE);
         }
-        block(h,new BlockPos(8,2,7),Blocks.STONE);
+        block(h,new BlockPos(8,2,stationaryTarget?8:7),Blocks.STONE);
+        var passageDoor=new BlockPos(8,2,6);
+        if(stationaryTarget)putDoor(h,passageDoor,Direction.SOUTH,false);
         var hunter=npc(h,3.5,2,5.5);
         var speed=hunter.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
         speed.setBaseValue(0);
@@ -149,7 +158,7 @@ public final class ActionRouteTests {
             @Override public boolean hurt(net.minecraft.world.damagesource.DamageSource source,float amount){return false;}
         };
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-        var start=absolute(h,new Vec3(7.5,2,5.5));
+        var start=absolute(h,new Vec3(stationaryTarget?8.25:7.5,2,5.5));
         var hidden=absolute(h,new Vec3(findPlayer?10.5:12.5,2,8.5));
         var firstPassage=absolute(h,new Vec3(11.5,2,5.5));
         var secondPassage=absolute(h,new Vec3(8.5,2,8.5));
@@ -168,7 +177,7 @@ public final class ActionRouteTests {
             var observation=controller.observation();
             if(scene.steps<4 && observation!=null && observation.visible()) {
                 if(++scene.steps<4) {
-                    player.moveTo(start.x+.25*scene.steps,start.y,start.z);
+                    if(!stationaryTarget)player.moveTo(start.x+.25*scene.steps,start.y,start.z);
                 } else {
                     player.moveTo(hidden.x,hidden.y,hidden.z);
                     scene.shotsAtLoss=ProjectileProbe.count(hunter.getUUID());
@@ -190,8 +199,10 @@ public final class ActionRouteTests {
             if(reason.equals("contact search exhausted"))scene.exhaustedTicks++;
             h.assertTrue(!reason.equals("inspect passage 3"),"search must not try the third available passage");
             boolean engaged=observation!=null && observation.visible() && ProjectileProbe.count(hunter.getUUID())>scene.shotsAtLoss;
-            boolean exhausted=scene.reachedFirst && scene.reachedSecond && scene.exhaustedTicks>=12;
+            boolean exhausted=scene.reachedFirst && scene.reachedSecond && scene.exhaustedTicks>=12 &&
+                    controller.decision().intent()==TacticalIntent.PATROL && observation!=null;
             if(scene.lostContact && scene.inspected && scene.climbed && (findPlayer?engaged:exhausted)) {
+                if(stationaryTarget)h.assertTrue(state(h,passageDoor).getValue(DoorBlock.OPEN),"search executes native door opening");
                 hunter.discard();player.discard();success(h);
             }
         });
@@ -212,7 +223,14 @@ public final class ActionRouteTests {
     public static void buildingDefenseRespectsTerritory(GameTestHelper h){
         buildingDefense(h,true);
     }
+    @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="arena",batch="actions-20-open-building",timeoutTicks=500)
+    public static void occupiesBuildingThroughOpenArchAndAbandonsBreachedCover(GameTestHelper h){
+        buildingDefense(h,false,true);
+    }
     private static void buildingDefense(GameTestHelper h,boolean outsideTerritory){
+        buildingDefense(h,outsideTerritory,false);
+    }
+    private static void buildingDefense(GameTestHelper h,boolean outsideTerritory,boolean openArch){
         begin(h);
         // A one-story room with a single closed door on the courtyard side.
         for(int x=7;x<=12;x++)for(int z=5;z<=10;z++) {
@@ -222,13 +240,12 @@ public final class ActionRouteTests {
         }
         block(h,new BlockPos(3,2,5),Blocks.STONE);
         var door=new BlockPos(7,2,7);
-        putDoor(h,door,false);
+        if(openArch){block(h,door,Blocks.AIR);block(h,door.above(),Blocks.AIR);}else putDoor(h,door,false);
         var hunter=npc(h,outsideTerritory?4.5:5.5,2,7.5);
         if(outsideTerritory)hunter.setOrder(OrderState.Kind.DEFEND_AREA,4);
         hunter.setYRot(90);
         hunter.setYHeadRot(90);
         hunter.addTag(dev.zuma.tacticalnpc.runtime.RuntimeRegistry.TAG);
-        if(outsideTerritory)hunter.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(0);
         var stack=dev.zuma.tacticalnpc.compat.GunSupport.create(new net.minecraft.resources.ResourceLocation("tacz:glock_17"));
         var gun=com.tacz.guns.api.item.IGun.getIGunOrNull(stack);
         gun.setCurrentAmmoCount(stack,17);
@@ -247,7 +264,7 @@ public final class ActionRouteTests {
 
         class Scene {
             int visibleTicks, hiddenTicks, shotsBeforeReturn;
-            boolean choseEntry, entered, returned;
+            boolean choseEntry, entered, returned, breached;
             String previousReason="";
         }
         var scene=new Scene();
@@ -259,7 +276,7 @@ public final class ActionRouteTests {
             if(visible)scene.visibleTicks++;
             String reason=controller.decision().reason();
             if(outsideTerritory) {
-                h.assertTrue(!reason.equals("enter building") && !state(h,door).getValue(DoorBlock.OPEN),"the candidate is outside DEFEND territory");
+                h.assertTrue(!reason.equals("enter building") && !state(h,door).getValue(DoorBlock.OPEN) && hunter.getX()<interiorX,"the candidate is outside DEFEND territory");
                 if(scene.visibleTicks>=80){hunter.discard();player.discard();success(h);}
                 return;
             }
@@ -270,15 +287,26 @@ public final class ActionRouteTests {
             }
             scene.choseEntry|=reason.equals("enter building");
             if(!scene.entered && reason.equals("hold inside building") && hunter.onGround() && hunter.getX()>interiorX) {
-                h.assertTrue(state(h,door).getValue(DoorBlock.OPEN) && state(h,door.above()).getValue(DoorBlock.OPEN),"native door had to open before indoor arrival");
+                if(!openArch)h.assertTrue(state(h,door).getValue(DoorBlock.OPEN) && state(h,door.above()).getValue(DoorBlock.OPEN),"native door had to open before indoor arrival");
                 scene.entered=true;
                 player.moveTo(hidden.x,hidden.y,hidden.z);
                 return;
             }
             if(!scene.entered)return;
+            if(scene.breached){
+                if(!reason.equals("enter building") && !reason.equals("hold inside building") && !reason.equals("watch building entrance")){
+                    hunter.discard();player.discard();success(h);
+                }
+                return;
+            }
             h.assertTrue(hunter.getX()>interiorX,"NPC must stay inside the room during defense, returned="+scene.returned+
                     " hiddenTicks="+scene.hiddenTicks+" at="+hunter.position()+" decision="+controller.decision()+" route="+controller.movementDiagnostics());
             if(!scene.returned && !visible && ++scene.hiddenTicks>=32) {
+                if(openArch){
+                    for(int y=2;y<=3;y++)for(int z=6;z<=8;z++)block(h,new BlockPos(7,y,z),Blocks.AIR);
+                    scene.breached=true;
+                    return;
+                }
                 scene.returned=true;
                 scene.shotsBeforeReturn=ProjectileProbe.count(hunter.getUUID());
                 player.moveTo(courtyard.x,courtyard.y,courtyard.z);
@@ -408,7 +436,8 @@ public final class ActionRouteTests {
     }
     private static void corridor(GameTestHelper h){for(int x=0;x<16;x++)for(int y=2;y<=5;y++){block(h,new BlockPos(x,y,6),Blocks.STONE);block(h,new BlockPos(x,y,8),Blocks.STONE);}for(int y=2;y<=5;y++){block(h,new BlockPos(0,y,7),Blocks.STONE);block(h,new BlockPos(15,y,7),Blocks.STONE);if(y>3)block(h,new BlockPos(7,y,7),Blocks.STONE);}}
     private static void door(GameTestHelper h,boolean open){putDoor(h,new BlockPos(7,2,7),open);}
-    private static void putDoor(GameTestHelper h,BlockPos p,boolean open){var state=Blocks.OAK_DOOR.defaultBlockState().setValue(DoorBlock.FACING,Direction.EAST).setValue(DoorBlock.OPEN,open);block(h,p,state);block(h,p.above(),state.setValue(DoorBlock.HALF,DoubleBlockHalf.UPPER));}
+    private static void putDoor(GameTestHelper h,BlockPos p,boolean open){putDoor(h,p,Direction.EAST,open);}
+    private static void putDoor(GameTestHelper h,BlockPos p,Direction facing,boolean open){var state=Blocks.OAK_DOOR.defaultBlockState().setValue(DoorBlock.FACING,facing).setValue(DoorBlock.OPEN,open);block(h,p,state);block(h,p.above(),state.setValue(DoorBlock.HALF,DoubleBlockHalf.UPPER));}
     private static TacticalNpcEntity npc(GameTestHelper h,double x,double y,double z){var n=(TacticalNpcEntity)dev.zuma.tacticalnpc.runtime.RuntimeRegistry.create(h.getLevel()).entity();var p=absolute(h,new Vec3(x,y,z));n.moveTo(p.x,p.y,p.z,0,0);n.setOrder(OrderState.Kind.ASSAULT,64);h.getLevel().addFreshEntity(n);return n;}
     private static Vector3 v(Vec3 p){return new Vector3(p.x,p.y,p.z);}
     private static void receipt(GameTestHelper h,String scene,MovementExecutor m,TacticalNpcEntity n){TacticalNpcAiMod.LOGGER.info("ACTION_RESULT scene={} tick={} position={} grounded={} {}",scene,h.getTick(),n.position(),n.onGround(),m.actionDiagnostics());}

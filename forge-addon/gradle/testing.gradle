@@ -22,6 +22,10 @@ if (project.hasProperty('profile') || project.hasProperty('clientSmoke')) {
 }
 def roots = ['src/gametest/java']
 if (project.hasProperty('legacyCompatibility')) roots += 'src/compatTest/java'
+if (project.hasProperty('sbwGameTests')) {
+    roots += 'src/sbwTest/java'
+    if (project.hasProperty('legacyCompatibility')) roots += 'src/sbwCompatTest/java'
+}
 def knownSelectors = [] as Set
 def catalog = roots.collectMany { root ->
     fileTree(root).matching { include '**/*.java' }.files.findAll {

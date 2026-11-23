@@ -141,10 +141,17 @@ public final class CombatUpgradeTests {
         var players=new java.util.ArrayList<net.minecraft.server.level.ServerPlayer>();
         for(int i=0;i<16;i++)players.add(player(h,new Vec3(30.5,2,32.5+i*.15)));
         var near=player(h,new Vec3(14.5,2,32.5));players.add(near);
-        h.runAtTickTime(20,()->{h.assertTrue(n.getHealth()/n.getMaxHealth()>.4,"retarget fixture starts outside critical-health policy");h.assertTrue(n.controller().observation()!=null && !near.getUUID().equals(n.controller().observation().subject()),"first sensor page initially contains only distant visible contacts");});
+        var blocker=new net.minecraft.world.entity.decoration.ArmorStand(h.getLevel(),at.x+21,at.y,at.z);
+        h.runAtTickTime(20,()->{
+            h.assertTrue(n.getHealth()/n.getMaxHealth()>.4,"retarget fixture starts outside critical-health policy");
+            h.assertTrue(n.controller().observation()!=null && !near.getUUID().equals(n.controller().observation().subject()),"first sensor page initially contains only distant visible contacts");
+            // Other hostiles are legal in the corridor. A protected body beyond the
+            // near target's safety depth makes only the distant firing lane unsafe.
+            h.getLevel().addFreshEntity(blocker);
+        });
         h.runAtTickTime(190,()->{
             h.assertTrue(near.getUUID().equals(n.controller().targetId()),"sustained unsafe corridor resumes bounded page cursor and selects the closer genuinely visible target: hp="+n.getHealth()+"/"+n.getMaxHealth()+" npc="+n.position()+" near="+near.position()+" nearAlive="+near.isAlive()+" ticks="+n.tickCount+" target="+n.controller().targetId()+" decision="+n.controller().decision()+" observation="+n.controller().observation()+" "+retargetDiagnostics(n.controller()));
-            players.forEach(Entity::discard);n.discard();h.succeed();
+            players.forEach(Entity::discard);blocker.discard();n.discard();h.succeed();
         });
     }
     private static String retargetDiagnostics(TacticalCombatGoal goal){

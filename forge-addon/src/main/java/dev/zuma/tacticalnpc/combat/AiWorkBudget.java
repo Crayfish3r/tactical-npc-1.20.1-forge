@@ -37,6 +37,8 @@ public final class AiWorkBudget {
     private final QueryLane contactQueries=new QueryLane(1024,16,32),optionalQueries=new QueryLane(32,1,2);
     private final QueryLane routeNodes=new QueryLane(512,64,64);
     private int queries,queryDenials,worldQueries;
+    private int grenadeSegments;
+    private final Map<UUID,Integer> grenadeSteps=new HashMap<>();
     private long maximumDeferredAge;
     private static final class RayWait {
         final long since;long last;
@@ -51,6 +53,7 @@ public final class AiWorkBudget {
             b.tick=level.getGameTime();Arrays.fill(b.used,0);b.owners.clear();b.queries=0;b.queryDenials=0;b.worldQueries=0;
             b.contactQueries.reset(b.tick);b.optionalQueries.reset(b.tick);
             b.routeNodes.reset(b.tick);
+            b.grenadeSegments=0;b.grenadeSteps.clear();
             b.reservedActive=b.prepareRays(b.activeWait,b.activeCredit,4,64);
             b.reservedOptional=b.prepareRays(b.optionalWait,b.optionalCredit,6,21);
             b.nextPaths.entrySet().removeIf(e->e.getValue()+200<b.tick);
@@ -114,6 +117,11 @@ public final class AiWorkBudget {
         if(!available)waitRay(owner,false);return available;
     }
     public boolean candidate(UUID owner) { return take(owner,1,128,6); }
+    public boolean grenadeSegment(UUID owner) {
+        int used=grenadeSteps.getOrDefault(owner,0);
+        if(grenadeSegments>=384 || used>=128)return false;
+        grenadeSegments++;grenadeSteps.put(owner,used+1);return true;
+    }
     public boolean routeNode(UUID owner){return routeNodes.take(owner,tick);}
     public int routeNodes(){return routeNodes.spent.values().stream().mapToInt(Integer::intValue).sum();}
     public boolean path(UUID owner) {

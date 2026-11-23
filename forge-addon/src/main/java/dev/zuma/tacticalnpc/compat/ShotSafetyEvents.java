@@ -4,15 +4,61 @@ import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.api.event.common.GunFireEvent;
 import dev.zuma.tacticalnpc.combat.TacticalCombatGoal;
 import dev.zuma.tacticalnpc.runtime.RuntimeRegistry;
+import java.util.ArrayDeque;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.WeakHashMap;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 
 public final class ShotSafetyEvents {
+    private record CompanionBlast(UUID owner, Vec3 position, long tick) {}
+    private final WeakHashMap<ServerLevel,ArrayDeque<CompanionBlast>> companionBlasts=new WeakHashMap<>();
+
+    @SubscribeEvent(priority=EventPriority.LOWEST)
+    public void grenadeImpact(ProjectileImpactEvent event) {
+        var grenade=event.getProjectile();
+        if(grenade.level() instanceof ServerLevel && SbwGrenades.marked(grenade) &&
+                event.getRayTraceResult() instanceof EntityHitResult hit && !SbwGrenades.mayHarm(grenade,hit.getEntity()) &&
+                event.getImpactResult()==ProjectileImpactEvent.ImpactResult.DEFAULT)
+            event.setImpactResult(ProjectileImpactEvent.ImpactResult.SKIP_ENTITY);
+    }
+
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public void detonate(net.minecraftforge.event.level.ExplosionEvent.Detonate event) {
+        if(!(event.getLevel() instanceof ServerLevel level))return;
         var source=event.getExplosion().getDirectSourceEntity();
+        if(source instanceof Projectile grenade && SbwGrenades.marked(source)) {
+            event.getAffectedEntities().removeIf(victim->!SbwGrenades.mayHarm(grenade,victim));
+            if(SbwGrenades.hasCompanionBlast(grenade)) {
+                // SBW 0.8.9 follows its custom detonation synchronously with a vanilla blast at mid-step.
+                var pending=companionBlasts.computeIfAbsent(level,ignored->new ArrayDeque<>());
+                pending.removeIf(blast->blast.tick()!=level.getGameTime());
+                if(pending.size()>=128)pending.removeFirst();
+                var owner=grenade.getOwner();
+                pending.addLast(new CompanionBlast(owner==null?null:owner.getUUID(),
+                        grenade.position().add(grenade.getDeltaMovement().scale(.5)),level.getGameTime()));
+            }
+            return;
+        }
+        if(event.getExplosion().getClass()==Explosion.class) {
+            var pending=companionBlasts.get(level);
+            if(pending!=null) {
+                var owner=source==null?null:source.getUUID();
+                Vec3 center=event.getExplosion().getPosition();
+                if(pending.removeIf(blast->blast.tick()==level.getGameTime() && Objects.equals(blast.owner(),owner) &&
+                        center.distanceToSqr(blast.position())<1e-8))
+                    event.getAffectedEntities().removeIf(victim->!SbwGrenades.mayHarm(source,null,victim));
+            }
+        }
         if(!(source instanceof com.tacz.guns.entity.EntityKineticBullet bullet) || !bullet.getTags().contains("tactical_projectile"))return;
         var owner=bullet.getOwner();
         // Filtering this native list precedes BOTH hurt() and velocity/player impulse writes.
@@ -68,7 +114,7 @@ public final class ShotSafetyEvents {
             bullet.addTag("tactical_projectile");RuntimeRegistry.active(npc).recordProjectile(event.getLevel().getGameTime());
         }
     }
-    private static boolean matchDamageAllowed(net.minecraft.world.entity.Entity attacker,net.minecraft.world.entity.Entity bullet,net.minecraft.world.entity.Entity victim){
+    static boolean matchDamageAllowed(net.minecraft.world.entity.Entity attacker,net.minecraft.world.entity.Entity bullet,net.minecraft.world.entity.Entity victim){
         var match=bullet!=null && bullet.getPersistentData().hasUUID("tacticalnpc_match")?bullet.getPersistentData().getUUID("tacticalnpc_match"):null;
         if(attacker instanceof dev.zuma.tacticalnpc.entity.TacticalNpcEntity npc && (npc.ownerMatchId()!=null || npc.invalidMatchBinding()))
             return (match==null || match.equals(npc.ownerMatchId())) && victim instanceof LivingEntity living && dev.zuma.tacticalnpc.combat.CombatTargets.eligible(npc,living);

@@ -1,5 +1,6 @@
 package dev.zuma.tacticalnpc.combat;
 
+import dev.zuma.tacticalnpc.config.ServerConfig;
 import dev.zuma.tacticalnpc.core.ActionArbiter.WeaponAction;
 import dev.zuma.tacticalnpc.core.AimCommand;
 import dev.zuma.tacticalnpc.core.CombatDecision;
@@ -20,16 +21,15 @@ import net.minecraft.world.phys.Vec3;
 import static dev.zuma.tacticalnpc.combat.ActionGeometry.*;
 import static dev.zuma.tacticalnpc.combat.VisibilitySensor.Los.*;
 
-/** Looks for a reachable indoor hold position behind a visible vanilla wooden door. */
+/** Samples local, visible building entrances and holds a defensible position inside. */
 final class BuildingDefense {
-    private static final int SEARCH_RADIUS = 6;
+    private static final int SEARCH_RADIUS = 8;
     private static final int SEARCH_BATCH = 4;
-    private static final int HOLD_AFTER_CONTACT = 120;
     private static final int HOLD_BEFORE_PEEK = 24;
     private static final int PEEK_TICKS = 24;
     private static final List<BlockPos> OFFSETS = offsets();
 
-    private record Room(BlockPos door, Vec3 cover, Vec3 peek, Vec3 entrance) {}
+    private record Room(BlockPos portal, Direction inward, Vec3 cover, Vec3 peek, Vec3 entrance) {}
     private enum Phase { ENTER, HOLD, PEEK }
 
     private final ActionGeometry geometry;
@@ -39,6 +39,7 @@ final class BuildingDefense {
     private long nextScan, nextCheck, expires, phaseSince, peekArrivedAt;
     private Room room;
     private Phase phase;
+    private Vec3 lastThreat;
 
     BuildingDefense(NpcRuntimeAdapter runtime, MovementExecutor movement) {
         geometry = new ActionGeometry(runtime);
@@ -55,7 +56,7 @@ final class BuildingDefense {
         if (order != OrderState.Kind.ASSAULT && order != OrderState.Kind.DEFEND_AREA) return false;
         var position = npc.blockPosition();
         if (!geometry.loaded(position) || roofed(position)) return false;
-        if (searchOrigin == null || searchOrigin.distSqr(position) > 4 || searchOrigin.getY() != position.getY()) {
+        if (searchOrigin == null || searchOrigin.distSqr(position) > 16 || searchOrigin.getY() != position.getY()) {
             searchOrigin = position;
             cursor = 0;
         }
@@ -63,11 +64,12 @@ final class BuildingDefense {
         var budget = AiWorkBudget.of(geometry.level);
         for (int count = 0; count < SEARCH_BATCH && cursor < OFFSETS.size(); count++) {
             if (!budget.candidate(npc.getUUID())) break;
-            var door = searchOrigin.offset(OFFSETS.get(cursor));
-            boolean deferred = inspect(door, vec(contact.position()));
+            var portal = searchOrigin.offset(OFFSETS.get(cursor));
+            boolean deferred = portal.distSqr(position)<=SEARCH_RADIUS*SEARCH_RADIUS && inspect(portal,vec(contact.position()),tick);
             if (room != null) {
                 phase = Phase.ENTER;
-                expires = tick + HOLD_AFTER_CONTACT;
+                lastThreat=vec(contact.position());
+                expires = tick + ServerConfig.BUILDING_HOLD.get();
                 nextCheck = tick + 16;
                 movement.tacticalLegChanged();
                 return true;
@@ -83,12 +85,29 @@ final class BuildingDefense {
     }
 
     /** Returns true when a ray has been deferred and this candidate should be revisited. */
-    private boolean inspect(BlockPos door, Vec3 threat) {
-        if (!geometry.loaded(door) || !RouteInteractions.VANILLA.supports(geometry.level, door)) return false;
+    private boolean inspect(BlockPos portal, Vec3 threat,long tick) {
+        if(!geometry.loaded(portal))return false;
         var npc = geometry.runtime.entity();
-        Direction inward = geometry.level.getBlockState(door).getValue(DoorBlock.FACING);
-        Vec3 towardDoor = center(door).subtract(npc.position());
-        if (towardDoor.x * inward.getStepX() + towardDoor.z * inward.getStepZ() < 0) inward = inward.getOpposite();
+        Vec3 towardDoor=center(portal).subtract(npc.position());
+        if(RouteInteractions.VANILLA.supports(geometry.level,portal)) {
+            Direction inward=geometry.level.getBlockState(portal).getValue(DoorBlock.FACING);
+            if(towardDoor.x*inward.getStepX()+towardDoor.z*inward.getStepZ()<0)inward=inward.getOpposite();
+            return inspectEntry(portal,inward,threat,tick);
+        }
+        if(!geometry.level.getBlockState(portal).isAir() || !geometry.level.getBlockState(portal.above()).isAir())return false;
+        Direction x=towardDoor.x>=0?Direction.EAST:Direction.WEST;
+        Direction z=towardDoor.z>=0?Direction.SOUTH:Direction.NORTH;
+        Direction primary=Math.abs(towardDoor.x)>=Math.abs(towardDoor.z)?x:z;
+        Direction secondary=primary==x?z:x;
+        for(var inward:List.of(primary,secondary)) {
+            if(openFrame(portal,inward) && inspectEntry(portal,inward,threat,tick))return true;
+            if(room!=null)return false;
+        }
+        return false;
+    }
+
+    private boolean inspectEntry(BlockPos door,Direction inward,Vec3 threat,long tick) {
+        var npc=geometry.runtime.entity();
         var approachBlock = door.relative(inward.getOpposite());
         var approach = geometry.standing(approachBlock);
         var inside = geometry.standing(door.relative(inward));
@@ -108,31 +127,50 @@ final class BuildingDefense {
             if (cover == null || !roofed(corner) || !geometry.permits(peek, cover)) continue;
             var protection = protection(cover, threat, door);
             if (protection == DEFERRED) return true;
-            if (protection == BLOCKED) {
-                room = new Room(door, cover, peek, entrance);
+            if (protection == BLOCKED && reserve(cover,tick)) {
+                room = new Room(door,inward,cover,peek,entrance);
                 return false;
             }
         }
         return false;
     }
 
+    private boolean openFrame(BlockPos portal,Direction inward){
+        if(!geometry.loaded(portal) || geometry.standing(portal)==null)return false;
+        BlockPos lintel=portal.above(2);
+        if(!geometry.level.getBlockState(lintel).isFaceSturdy(geometry.level,lintel,Direction.DOWN))return false;
+        var side=inward.getClockWise();
+        return jamb(portal.relative(side),side.getOpposite()) && jamb(portal.relative(side.getOpposite()),side);
+    }
+
+    private boolean jamb(BlockPos feet,Direction face){
+        return geometry.loaded(feet) && geometry.level.getBlockState(feet).isFaceSturdy(geometry.level,feet,face) &&
+                geometry.level.getBlockState(feet.above()).isFaceSturdy(geometry.level,feet.above(),face);
+    }
+
+    private boolean reserve(Vec3 point,long tick){
+        var runtime=geometry.runtime;
+        return runtime.squadId()==null || SquadRuntime.of(geometry.level).claim(runtime.squadId(),runtime.entity().getUUID(),vector(point),tick);
+    }
+
     CombatDecision plan(CombatSnapshot snapshot, CombatDecision ordered, CombatDecision combat, boolean enabled) {
         if (room == null) return ordered;
         long tick = snapshot.self().frame().tick();
         boolean visible = snapshot.targetVisible();
-        if (!enabled || ordered.intent() == TacticalIntent.RETREAT || tick > expires || movement.blocked(tick) || !roomStillUsable()) {
+        if (!enabled || ordered.intent() == TacticalIntent.RETREAT || tick > expires || movement.blocked(tick) ||
+                !roomStillUsable() || !reserve(room.cover(),tick)) {
             abandon(tick);
             return ordered;
         }
-        if (visible && tick >= nextCheck) {
-            var protection = protection(room.cover(), vec(snapshot.observation().position()), room.door());
+        if(visible){lastThreat=vec(snapshot.observation().position());expires=tick+ServerConfig.BUILDING_HOLD.get();}
+        if (tick >= nextCheck) {
+            var protection = protection(room.cover(),lastThreat,room.portal());
             if (protection == CLEAR) {
                 abandon(tick);
                 return ordered;
             }
             nextCheck = tick + (protection == DEFERRED ? 4 : 16);
         }
-        if (visible) expires = tick + HOLD_AFTER_CONTACT;
         if (phase == Phase.ENTER && arrived(room.cover())) setPhase(Phase.HOLD, tick);
         if (phase == Phase.ENTER) {
             return decision(ordered, TacticalIntent.TAKE_COVER, "enter building", room.cover(),
@@ -161,8 +199,13 @@ final class BuildingDefense {
     }
 
     private boolean roomStillUsable() {
-        return geometry.loaded(room.door()) && RouteInteractions.VANILLA.supports(geometry.level, room.door()) &&
-                usable(room.cover()) && usable(room.peek());
+        var portal=room.portal();var inward=room.inward();
+        if(!geometry.loaded(portal) || !usable(room.cover()) || !usable(room.peek()))return false;
+        boolean sameDoor=RouteInteractions.VANILLA.supports(geometry.level,portal) &&
+                geometry.level.getBlockState(portal).getValue(DoorBlock.FACING).getAxis()==inward.getAxis();
+        if(!sameDoor && !openFrame(portal,inward))return false;
+        Vec3 outside=geometry.standing(portal.relative(inward.getOpposite())),inside=geometry.standing(portal.relative(inward));
+        return outside!=null && inside!=null && geometry.permits(outside,inside);
     }
 
     private boolean usable(Vec3 point) {
@@ -217,7 +260,9 @@ final class BuildingDefense {
     }
 
     void clear() {
+        if(room!=null && geometry.runtime.squadId()!=null)SquadRuntime.of(geometry.level).releaseClaims(geometry.runtime.entity().getUUID());
         room = null;
+        lastThreat=null;
         searchOrigin = null;
         cursor = 0;
         nextScan = 0;

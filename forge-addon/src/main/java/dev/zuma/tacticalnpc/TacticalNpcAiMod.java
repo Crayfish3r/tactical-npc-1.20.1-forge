@@ -24,6 +24,7 @@ public final class TacticalNpcAiMod {
         MinecraftForge.EVENT_BUS.register(new NpcCommands());
         // Warm SavedData before ordinary ticks, including worlds without any NPCs yet.
         MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.event.server.ServerStartedEvent event)->{
+            dev.zuma.tacticalnpc.compat.SbwGrenades.initialize();
             dev.zuma.tacticalnpc.command.NpcNames.of(event.getServer());
             dev.zuma.tacticalnpc.api.MatchNpcRegistry.of(event.getServer()).startup();
         });

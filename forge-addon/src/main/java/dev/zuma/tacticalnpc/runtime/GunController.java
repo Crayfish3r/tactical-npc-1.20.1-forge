@@ -2,6 +2,7 @@ package dev.zuma.tacticalnpc.runtime;
 import dev.zuma.tacticalnpc.core.ActionArbiter.WeaponAction;
 import dev.zuma.tacticalnpc.core.WeaponState;
 public interface GunController {
+    boolean handsBusy();
     void maintain(long tick);
     WeaponState snapshot();
     void apply(WeaponAction action, long tick);

@@ -154,27 +154,39 @@ public final class PerceptionTests {
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="perception-01",timeoutTicks=260)
     public static void hiddenPositionFrozenAndExpires(GameTestHelper h) {
         ScenarioIsolation.begin(h);var n=NpcEntities.NPC.get().create(h.getLevel());
+        dev.zuma.tacticalnpc.config.ServerConfig.SUPPRESSION.set(false);
+        for(int x=0;x<16;x++)for(int z=0;z<16;z++) {
+            h.setBlock(new BlockPos(x,1,z),Blocks.STONE);
+            for(int y=2;y<=6;y++)h.setBlock(new BlockPos(x,y,z),Blocks.AIR);
+        }
         traced=n.getUUID();death="none";
         Vec3 origin=h.absoluteVec(new Vec3(3.5,2,7.5));n.moveTo(origin.x,origin.y,origin.z,-90,0);n.setYHeadRot(-90);
         n.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
         n.setItemSlot(EquipmentSlot.MAINHAND,GunSupport.create(new ResourceLocation("tacz:ak47")));n.addTag(RuntimeRegistry.TAG);h.getLevel().addFreshEntity(n);
         var p=net.minecraftforge.common.util.FakePlayerFactory.get(h.getLevel(),new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"memory-test"));
         p.setGameMode(GameType.SURVIVAL);p.setInvulnerable(true);Vec3 at=h.absoluteVec(new Vec3(11.5,2,7.5));p.moveTo(at.x,at.y,at.z);h.getLevel().addNewPlayer(p);
-        dev.zuma.tacticalnpc.core.Vector3[] known={null};long[] seen={0};
+        Vec3[] fixed={at};
+        h.onEachTick(()->{p.setPos(fixed[0]);p.setDeltaMovement(Vec3.ZERO);});
+        dev.zuma.tacticalnpc.core.Vector3[] known={null};long[] seen={0},expires={0};
         h.runAtTickTime(35,()->{
             h.assertTrue(n.controller()!=null,"memory fixture controller missing at35: removed="+n.isRemoved()+" reason="+n.getRemovalReason()+" health="+n.getHealth()+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition()));
-            var observation=n.controller().observation();h.assertTrue(observation!=null && observation.visible(),"perception registers visual track");known[0]=observation.position();seen[0]=observation.tick();
+            var observation=n.controller().observation();h.assertTrue(observation!=null && observation.visible(),"perception registers visual track");known[0]=observation.position();seen[0]=observation.tick();expires[0]=observation.expires();
             for(int y=2;y<7;y++)for(int z=0;z<16;z++)h.setBlock(new BlockPos(7,y,z),Blocks.STONE);
-            p.setPos(at.x+2,at.y,at.z+3);
+            fixed[0]=at.add(2,0,3);
         });
         h.runAtTickTime(55,()->{
             h.assertTrue(n.controller()!=null,"memory fixture controller missing at55: removed="+n.isRemoved()+" reason="+n.getRemovalReason()+" health="+n.getHealth()+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition()));
             Observation memory=n.controller().observation();
             h.assertTrue(memory!=null && !memory.visible() && memory.position().equals(known[0]) && memory.tick()==seen[0],"moving occluded player never refreshes known coordinates");
             h.assertTrue(memory.uncertainty()>0 && memory.velocity().lengthSquared()==0,"stale track is uncertain and not predicted");
-            p.setPos(at.x+3,at.y,at.z-3);
+            fixed[0]=at.add(3,0,-3);
         });
-        h.runAtTickTime(235,()->{h.assertTrue(n.controller()!=null,"memory fixture controller missing at235: removed="+n.isRemoved()+" reason="+n.getRemovalReason()+" health="+n.getHealth()+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition())+" death="+death);h.assertTrue(n.controller().observation()==null,"visual memory expires");p.discard();n.discard();h.succeed();});
+        h.runAtTickTime(235,()->{
+            h.assertTrue(n.controller()!=null,"memory fixture controller missing at235: removed="+n.isRemoved()+" reason="+n.getRemovalReason()+" health="+n.getHealth()+" ticking="+h.getLevel().isPositionEntityTicking(n.blockPosition())+" death="+death);
+            var remaining=n.controller().observation();long tick=h.getLevel().getGameTime();
+            h.assertTrue(tick>expires[0] && remaining==null,"visual memory expires: tick="+tick+" initial deadline="+expires[0]+" observation="+remaining);
+            p.discard();n.discard();h.succeed();
+        });
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID, template="arena",batch="perception-02",timeoutTicks=100)
     public static void hearingIsRegionAndFovIsSeparate(GameTestHelper h) {

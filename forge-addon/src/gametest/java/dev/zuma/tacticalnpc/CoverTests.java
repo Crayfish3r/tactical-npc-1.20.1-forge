@@ -47,10 +47,15 @@ public final class CoverTests {
             if(n.controller().decision().intent()==dev.zuma.tacticalnpc.core.TacticalIntent.PEEK) {
                 peek[0]=true;if(ProjectileProbe.count(n.getUUID())>lastBullets[0])peekFire[0]=true;
             }
-            if(peekFire[0] && emergencyAt[0]<0) {n.setHealth(4);emergencyAt[0]=h.getLevel().getGameTime();}
+            if(peekFire[0] && emergencyAt[0]<0) {
+                // The emergency invalidates the peek. Close sight as a separate condition
+                // for canceling native rounds, since visible critical return fire is legal.
+                for(int y=2;y<=6;y++)for(int z=0;z<=31;z++)h.setBlock(new BlockPos(16,y,z),Blocks.STONE);
+                n.setHealth(4);emergencyAt[0]=h.getLevel().getGameTime();
+            }
             if(emergencyAt[0]>=0 && h.getLevel().getGameTime()>emergencyAt[0]+1) {
                 h.assertTrue(n.controller().decision().intent()==dev.zuma.tacticalnpc.core.TacticalIntent.RETREAT,"critical HP interrupts real PEEK on next controller tick: decision="+n.controller().decision()+" observation="+n.controller().observation()+" emergencyAt="+emergencyAt[0]+" now="+h.getLevel().getGameTime()+" entityTicks="+n.tickCount);
-                h.assertTrue(ProjectileProbe.count(n.getUUID())==lastBullets[0],"emergency cancels subsequent native rounds");emergency[0]=true;
+                h.assertTrue(hidden && ProjectileProbe.count(n.getUUID())==lastBullets[0],"lost sight cancels subsequent native rounds during emergency retreat");emergency[0]=true;
             }
             lastBullets[0]=ProjectileProbe.count(n.getUUID());
             if(busy) { if(maxShotsDuringReload[0]==0) maxShotsDuringReload[0]=n.controller().shots()+1;else h.assertTrue(n.controller().shots()+1==maxShotsDuringReload[0],"no accepted shots while native reload busy"); }

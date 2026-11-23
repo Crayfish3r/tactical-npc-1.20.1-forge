@@ -3,6 +3,32 @@ package dev.zuma.tacticalnpc.core;
 public final class CoreSmokeTest {
     private static int passed;
 
+    private static void grenadeContact(Frame current,Observation visual) {
+        var contact=new GrenadeContact();
+        long tick=current.tick();
+        var target=visual.subject();
+        check(contact.permit(target,true,current,36,0)==null,"occlusion needs a previous personal visual sample");
+        contact.seen(target,visual.position(),tick-1,tick+100);
+        check(contact.permit(target,false,current,36,0)==null,"visible or deferred sight never permits RGO");
+        check(contact.permit(current.owner(),true,current,36,0)==null,"another identity does not inherit the visual point");
+        var permit=contact.permit(target,true,current,36,0);
+        check(permit!=null && permit.feet().equals(visual.position()),"confirmed occlusion freezes the visual point");
+        var newGeneration=new Frame(current.owner(),current.dimension(),tick+1,current.generation()+1);
+        check(contact.permit(target,true,newGeneration,36,56)==null,"a new controller generation cannot refresh an issued throw");
+        var afterStartWindow=new Frame(current.owner(),current.dimension(),tick+36,current.generation());
+        check(contact.permit(target,true,afterStartWindow,36,0)==null,"throw expires before long-term visual memory");
+        contact.spend();
+        check(contact.permit(target,true,current,36,0)==null,"one confirmed release consumes the episode");
+        contact.seen(target,visual.position(),tick,tick+1);
+        check(contact.permit(target,true,newGeneration,36,0)!=null,"new visual contact allows another episode");
+        contact.seen(target,visual.position(),tick-1,tick+50);
+        check(contact.permit(target,true,afterStartWindow,36,56)==null,"reposition cannot start from stale sight");
+        check(contact.permit(target,true,current,36,56)!=null,"early occlusion may authorize a bounded relocation");
+        check(contact.permit(target,true,afterStartWindow,36,0)!=null,"accepted relocation may finish outside the sight window");
+        var afterMemory=new Frame(current.owner(),current.dimension(),tick+51,current.generation());
+        check(contact.permit(target,true,afterMemory,36,56)==null,"relocation cannot extend visual memory or renew its deadline");
+    }
+
     public static void main(String[] args) {
         CombatBrain brain = new CombatBrain(100, 45);
         CombatSnapshot normal = snapshot(true, true, 10, 20, 1, 25, true,
@@ -56,6 +82,7 @@ public final class CoreSmokeTest {
         check(hidden.position().equals(seen.position()) && hidden.velocity().lengthSquared()==0,"hidden memory freezes position and velocity");
         check(!hidden.visible() && hidden.confidence()<1 && hidden.uncertainty()>0,"hidden uncertainty grows and confidence decays");
         check(memory.sample(201,false,new Vector3(0,0,0),64)==null,"expired observation forgotten");
+        grenadeContact(current,seen);
         memory.record(seen);check(memory.sample(110,false,new Vector3(100,0,0),32)==null,"memory distance independent from detection");
         var option=new CoverOption(new Vector3(3,0,0),new Vector3(3,0,2),1200);
         var empty=snapshot(true,true,0,20,1,0,true,false,true,false,false,true,false,false,true);

@@ -80,7 +80,7 @@ minecraft {
         }
     }
 }
-repositories { flatDir { dirs 'libs' } }
+repositories { flatDir { dirs 'libs', 'build/sbw-audit' } }
 def taczLua = tasks.register('extractTaczLua', Copy) {
     from(zipTree(file('libs/tacz-1.20.1-1.1.8-hotfix2.jar'))) {
         include 'META-INF/jarjar/*luaj*.jar'
@@ -93,6 +93,19 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.4.20'
     compatCompileOnly fg.deobf('local:tacznpcs:2.1.0-1.20.1')
     if(project.hasProperty('legacyCompatibility')) runtimeOnly fg.deobf('local:tacznpcs:2.1.0-1.20.1')
+    if(project.hasProperty('sbwGameTests')) {
+        def sbwVersion = providers.gradleProperty('sbwTestVersion').getOrElse('0.8.9.1-hotfix')
+        if(sbwVersion == '0.8.9-final') {
+            runtimeOnly fg.deobf('local:superbwarfare:0.8.9-final-mc1.20.1-6effe4385-all')
+            runtimeOnly fg.deobf('local:curios-forge:5.14.1+1.20.1')
+            runtimeOnly fg.deobf('local:geckolib-forge-1.20.1:4.4.6')
+        } else if(sbwVersion == '0.8.9.1-hotfix') {
+            runtimeOnly fg.deobf('local:superbwarfare:0.8.9.1-hotfix-mc1.20.1-993063bed-all')
+        } else {
+            throw new GradleException("Unknown sbwTestVersion: ${sbwVersion}")
+        }
+        runtimeOnly fg.deobf('local:kotlinforforge:4.11.0-all')
+    }
     implementation fg.deobf('local:tacz:1.20.1-1.1.8-hotfix2')
     compileOnly files(fileTree(layout.buildDirectory.dir('tacz-compile-libs')) { include '*.jar' }).builtBy(taczLua)
 }
@@ -100,6 +113,10 @@ sourceSets.main.java.srcDir '../ai-core/src/main/java'
 if (project.hasProperty('combatTests')) {
     sourceSets.main.java.srcDir 'src/gametest/java'
     sourceSets.main.resources.srcDir 'src/gametest/resources'
+    if(project.hasProperty('sbwGameTests')) {
+        sourceSets.main.java.srcDir 'src/sbwTest/java'
+        if(project.hasProperty('legacyCompatibility')) sourceSets.compatTest.java.srcDir 'src/sbwCompatTest/java'
+    }
 }
 if(project.hasProperty('clientSmoke')) sourceSets.main.java.srcDir 'src/clientSmoke/java'
 if(project.hasProperty('profile')) sourceSets.main.java.srcDir 'src/profile/java'

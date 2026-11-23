@@ -63,7 +63,8 @@ public final class MatchNpcApiTests {
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="match-03-weapons",timeoutTicks=45)
     public static void invalidAndUnsupportedWeaponsLeaveNoGroup(GameTestHelper h){
         var s=scene(h);h.runAtTickTime(5,()->{int teams=h.getLevel().getScoreboard().getPlayerTeams().size();
-            for(String gun:List.of("not_a_gun","rpg7")){var r=s.api().spawn(request(h,s,"ak47",gun));h.assertTrue(r.status()==SpawnResult.Status.INVALID_WEAPON && r.entityIds().isEmpty(),"invalid/unsupported weapon: "+gun+" "+r);}
+            h.assertTrue(com.tacz.guns.api.TimelessAPI.getCommonGunIndex(new ResourceLocation("tacz:minigun")).isPresent(),"heat-dependent gun must exist in the pinned pack");
+            for(String gun:List.of("not_a_gun","minigun")){var r=s.api().spawn(request(h,s,"ak47",gun));h.assertTrue(r.status()==SpawnResult.Status.INVALID_WEAPON && r.entityIds().isEmpty(),"invalid/unsupported weapon: "+gun+" "+r);}
             h.assertTrue(s.api().activeNpcCount(s.match())==0 && teams==h.getLevel().getScoreboard().getPlayerTeams().size(),"preflight has no live entity/team side effects");finish(h,s);
         });
     }

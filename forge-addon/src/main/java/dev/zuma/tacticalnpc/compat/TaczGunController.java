@@ -114,10 +114,13 @@ public final class TaczGunController implements GunController {
         int rounds = Math.max(0, gun.getCurrentAmmoCount(stack)) + (chamber ? 1 : 0);
         // hasInventoryAmmo is inventory-fed only in 1.1.8-hotfix2; it returns false for magazines.
         boolean reserve = !operator.needCheckAmmo() || gun instanceof com.tacz.guns.api.item.gun.AbstractGunItem logic && logic.canReload(npc,stack);
-        boolean busy = operator.getDataHolder().reloadStateType.isReloading() || operator.getDataHolder().isBolting ||
-                operator.getSynDrawCoolDown() != 0 || operator.getSynMeleeCoolDown() != 0;
         return new GunSnapshot(true, rounds, reserve, bolt == Bolt.MANUAL_ACTION && !chamber && rounds > 0,
-                busy, operator.getSynShootCoolDown() == 0 && operator.getSynSprintTime()==0 && !npc.isSprinting() && npc.level().getGameTime()>=nextVolley);
+                handsBusy(), operator.getSynShootCoolDown() == 0 && operator.getSynSprintTime()==0 && !npc.isSprinting() && npc.level().getGameTime()>=nextVolley);
+    }
+
+    @Override public boolean handsBusy() {
+        return operator.getDataHolder().reloadStateType.isReloading() || operator.getDataHolder().isBolting ||
+                operator.getSynDrawCoolDown()!=0 || operator.getSynMeleeCoolDown()!=0;
     }
 
     private boolean suppressing(){

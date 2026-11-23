@@ -7,6 +7,8 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.EnumValue<Difficulty> DIFFICULTY;
     public static final ForgeConfigSpec.IntValue SUPPRESSION_DURATION,SUPPRESSION_ROUNDS,SUPPRESSION_BURST,SUPPRESSION_PAUSE,HINT_INTERVAL;
     public static final ForgeConfigSpec.DoubleValue DEFAULT_ERROR_MULTIPLIER;
+    public static final ForgeConfigSpec.IntValue GRENADE_STOCK,GRENADE_WINDOW,GRENADE_PREPARE,GRENADE_COOLDOWN,GRENADE_RANGE;
+    public static final ForgeConfigSpec.IntValue BUILDING_HOLD;
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.BooleanValue ENABLED, DEBUG, SUPPRESSION, TELEMETRY;
     public static final ForgeConfigSpec.DoubleValue RANGE, TURN, ERROR, STRAFE, FOV, MEMORY_RANGE, HEARING_RANGE, ACTIVATION_RANGE;
@@ -22,6 +24,12 @@ public final class ServerConfig {
         ENABLED = b.comment("Only NPCs with entity tag tactical_ai are affected.").define("enabled", true);
         DEBUG = b.comment("Log target, state, successful shots and reload requests.").define("debug", false);
         TELEMETRY=b.comment("Aggregate in-memory AI samples; log every 200 ticks, not every NPC tick.").define("telemetry",false);
+        GRENADE_STOCK=b.comment("Initial RGO supply for each newly eligible NPC with supported Superb Warfare.").defineInRange("sbwGrenadeStock",2,0,16);
+        GRENADE_WINDOW=b.defineInRange("sbwGrenadeLossWindowTicks",36,8,80);
+        GRENADE_PREPARE=b.defineInRange("sbwGrenadePrepareTicks",6,4,20);
+        GRENADE_COOLDOWN=b.defineInRange("sbwGrenadeCooldownTicks",100,20,1200);
+        GRENADE_RANGE=b.defineInRange("sbwGrenadeMaxRangeBlocks",48,16,60);
+        BUILDING_HOLD=b.comment("How long NPCs keep guarding a valid room after losing hostile contact.").defineInRange("buildingHoldAfterContactTicks",200,40,1200);
         SUPPRESSION=b.comment("Sustained bounded native bursts at checked sectors around known contact. No deliberate wall penetration.").define("suppression",true);
         RANGE = b.defineInRange("detectionRange", 128.0, 4.0, 128.0);
         ACTIVATION_RANGE=b.comment("Dormant AI updates every ten ticks outside this radius; never smaller than sight/hearing. Does not grant a target observation.").defineInRange("activationRange",128.0,16.0,192.0);

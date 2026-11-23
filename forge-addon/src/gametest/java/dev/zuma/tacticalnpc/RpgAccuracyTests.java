@@ -9,8 +9,12 @@ import net.minecraft.gametest.framework.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.level.ExplosionEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import java.util.*;
+import java.util.function.Consumer;
 
 @PrefixGameTestTemplate(false)
 public final class RpgAccuracyTests {
@@ -24,13 +28,12 @@ public final class RpgAccuracyTests {
         Vec3[] fixed={p.position()};h.onEachTick(()->{p.setPos(fixed[0]);p.setDeltaMovement(Vec3.ZERO);});
         var launched=new HashSet<UUID>();var rounds=new ArrayList<com.tacz.guns.entity.EntityKineticBullet>();boolean[] safe={true};
         var match=UUID.randomUUID();var registry=dev.zuma.tacticalnpc.api.MatchNpcRegistry.of(h.getLevel().getServer());
-        var listener=new Object(){@net.minecraftforge.eventbus.api.SubscribeEvent(priority=net.minecraftforge.eventbus.api.EventPriority.LOWEST)
-            public void blast(net.minecraftforge.event.level.ExplosionEvent.Detonate e){
-                if(changed[0] && e.getExplosion().getDirectSourceEntity() instanceof com.tacz.guns.entity.EntityKineticBullet b && launched.contains(b.getUUID())){
-                    blasts[0]++;safe[0]&=e.getAffectedEntities().isEmpty();
-                }
-            }};
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(listener);
+        Consumer<ExplosionEvent.Detonate> listener=e->{
+            if(changed[0] && e.getExplosion().getDirectSourceEntity() instanceof com.tacz.guns.entity.EntityKineticBullet b && launched.contains(b.getUUID())){
+                blasts[0]++;safe[0]&=e.getAffectedEntities().isEmpty();
+            }
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST,false,ExplosionEvent.Detonate.class,listener);
         h.onEachTick(()->{if(!changed[0] && ProjectileProbe.count(n.getUUID())>0){
             changed[0]=true;
             // Avoid an entity-hit Pre cancellation: force the real rocket's next impact to be native block-hit splash.
@@ -41,7 +44,7 @@ public final class RpgAccuracyTests {
                 h.getLevel().getAllEntities().forEach(e->{if(e instanceof com.tacz.guns.entity.EntityKineticBullet b && b.getOwner()==n)b.getPersistentData().putUUID("tacticalnpc_match",match);});
             }else n.remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
         }});
-        h.runAtTickTime(130,()->{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(listener);h.assertTrue(changed[0] && blasts[0]>0 && safe[0],"real rocket outlives authorization; launched="+launched.size()+" blasts="+blasts[0]+" safe="+safe[0]+" projectiles="+rounds.stream().map(b->"pos="+b.position()+" local="+b.position().subtract(h.absoluteVec(Vec3.ZERO))+" ticks="+b.tickCount+" removed="+b.getRemovalReason()+" velocity="+b.getDeltaMovement()).toList()+" decision="+(n.controller()==null?null:n.controller().fireDiagnostics()));n.discard();p.discard();h.succeed();});
+        h.runAtTickTime(130,()->{MinecraftForge.EVENT_BUS.unregister(listener);h.assertTrue(changed[0] && blasts[0]>0 && safe[0],"real rocket outlives authorization; launched="+launched.size()+" blasts="+blasts[0]+" safe="+safe[0]+" projectiles="+rounds.stream().map(b->"pos="+b.position()+" local="+b.position().subtract(h.absoluteVec(Vec3.ZERO))+" ticks="+b.tickCount+" removed="+b.getRemovalReason()+" velocity="+b.getDeltaMovement()).toList()+" decision="+(n.controller()==null?null:n.controller().fireDiagnostics()));n.discard();p.discard();h.succeed();});
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="accuracy-03-api",timeoutTicks=50)
     public static void mixedPublicSpawnApi(GameTestHelper h) {
@@ -76,14 +79,19 @@ public final class RpgAccuracyTests {
     }
     @GameTest(templateNamespace=TacticalNpcAiMod.ID,template="wide_arena",batch="rpg-01-close",timeoutTicks=250)
     public static void closeStandWaitThenNativeRocketAndReload(GameTestHelper h) {
-        ScenarioIsolation.begin(h);var n=npc(h,"rpg7",0);var p=player(h,n.position().add(4,0,0));var start=n.position();
+        ScenarioIsolation.begin(h);
+        for(int x=12;x<=52;x++)for(int z=29;z<=36;z++){
+            h.setBlock(new net.minecraft.core.BlockPos(x,1,z),net.minecraft.world.level.block.Blocks.BEDROCK);
+            for(int y=2;y<=6;y++)h.setBlock(new net.minecraft.core.BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR);
+        }
+        var n=npc(h,"rpg7",0);var p=player(h,n.position().add(4,0,0));var start=n.position();
         Vec3[] fixed={p.position()};h.onEachTick(()->{p.setPos(fixed[0]);p.setDeltaMovement(Vec3.ZERO);});
         h.runAtTickTime(85,()->{
             h.assertTrue(ProjectileProbe.count(n.getUUID())==0 && n.standPhase()==TacticalNpcEntity.StandPhase.WAIT && n.position().distanceTo(start)<.1,"close RPG waits without fake STAND shot or movement");
             h.assertTrue(n.controller().reloads()==1,"ordinary native initial reload");fixed[0]=start.add(24,0,0);p.moveTo(fixed[0].x,fixed[0].y,fixed[0].z);
         });
         h.runAtTickTime(230,()->{
-            h.assertTrue(ProjectileProbe.count(n.getUUID())>=2 && n.controller().reloads()>=2,"actual native rockets and subsequent reload: rounds="+ProjectileProbe.count(n.getUUID())+" reloads="+n.controller().reloads()+" npc="+n.position()+" target="+p.position()+" "+n.controller().fireDiagnostics());
+            h.assertTrue(ProjectileProbe.count(n.getUUID())>=2 && n.controller().reloads()>=2,"actual native rockets and subsequent reload: rounds="+ProjectileProbe.count(n.getUUID())+" reloads="+n.controller().reloads()+" npc="+n.position()+" target="+p.position()+" observation="+n.controller().observation()+" "+n.controller().fireDiagnostics());
             var gun=IGun.getIGunOrNull(n.getMainHandItem());h.assertTrue(gun.getDummyAmmoAmount(n.getMainHandItem())<3,"native reload consumes rocket reserve");
             h.assertTrue(new TaczGunController(n.runtime()).snapshot().profile().kind()==WeaponProfile.Kind.RPG,"dedicated RPG profile");n.discard();p.discard();h.succeed();
         });
@@ -96,19 +104,20 @@ public final class RpgAccuracyTests {
         var ally=NpcEntities.NPC.get().create(h.getLevel());ally.setNoAi(true);ally.moveTo(p.getX(),p.getY(),p.getZ()+2);h.getLevel().addFreshEntity(ally);
         var team=h.getLevel().getScoreboard().addPlayerTeam("rocket-allies");
         h.getLevel().getScoreboard().addPlayerToTeam(n.getScoreboardName(),team);h.getLevel().getScoreboard().addPlayerToTeam(ally.getScoreboardName(),team);n.syncTeam();
-        boolean[] moved={false};int[] blasts={0};
-        var listener=new Object(){@net.minecraftforge.eventbus.api.SubscribeEvent(priority=net.minecraftforge.eventbus.api.EventPriority.LOWEST)
-            public void blast(net.minecraftforge.event.level.ExplosionEvent.Detonate e){
-                if(e.getExplosion().getDirectSourceEntity() instanceof com.tacz.guns.entity.EntityKineticBullet b && b.getOwner()==n){blasts[0]++;h.assertFalse(e.getAffectedEntities().contains(ally),"native explosion excludes ally before damage AND knockback");}
-            }};
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(listener);
+        boolean[] moved={false}, safe={true};int[] blasts={0};
+        Consumer<ExplosionEvent.Detonate> listener=e->{
+            if(e.getExplosion().getDirectSourceEntity() instanceof com.tacz.guns.entity.EntityKineticBullet b && b.getOwner()==n){
+                blasts[0]++;safe[0]&=!e.getAffectedEntities().contains(ally);
+            }
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST,false,ExplosionEvent.Detonate.class,listener);
         h.runAtTickTime(55,()->{h.assertTrue(ProjectileProbe.count(n.getUUID())==0,"ally near impact prevents real launch");ally.moveTo(n.getX(),n.getY(),n.getZ()+16);});
         h.onEachTick(()->{
             if(!moved[0] && ProjectileProbe.count(n.getUUID())>0){moved[0]=true;ally.moveTo(p.getX()+3,p.getY(),p.getZ()+2);ally.setDeltaMovement(Vec3.ZERO);fixed[0]=p.position().add(3,0,-2);}
         });
         h.runAtTickTime(175,()->{
-            net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(listener);
-            h.assertTrue(blasts[0]>0 && ally.getHealth()==ally.getMaxHealth() && Math.abs(ally.getZ()-(p.getZ()+4))<.1,"real native explosion protects ally health and displacement; blasts="+blasts[0]);
+            MinecraftForge.EVENT_BUS.unregister(listener);
+            h.assertTrue(blasts[0]>0 && safe[0] && ally.getHealth()==ally.getMaxHealth() && Math.abs(ally.getZ()-(p.getZ()+4))<.1,"real native explosion protects ally health and displacement; blasts="+blasts[0]);
             n.discard();p.discard();ally.discard();h.succeed();
         });
     }

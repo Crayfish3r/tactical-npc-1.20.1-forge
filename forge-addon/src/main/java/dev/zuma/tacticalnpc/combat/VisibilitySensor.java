@@ -36,8 +36,10 @@ public final class VisibilitySensor {
     public Sector lastSector(){return lastSector;}
     private boolean sector(PathfinderMob npc,Sector result){lastSector=result;AiTelemetry.sector((ServerLevel)npc.level(),result);return result!=Sector.CLEAR;}
     public boolean inFov(PathfinderMob npc,LivingEntity target) {
-        if(target==null) return false;
-        Vec3 d=target.position().subtract(npc.position());
+        return target!=null && inFov(npc,target.position());
+    }
+    boolean inFov(PathfinderMob npc,Vec3 point) {
+        Vec3 d=point.subtract(npc.position());
         double yaw=Math.toDegrees(Math.atan2(d.z,d.x))-90;
         return Math.abs(net.minecraft.util.Mth.wrapDegrees(yaw-npc.getYHeadRot()))<=dev.zuma.tacticalnpc.config.ServerConfig.FOV.get()/2;
     }
@@ -53,6 +55,7 @@ public final class VisibilitySensor {
         return los(npc,point,false)==Los.CLEAR;
     }
     private NpcSightRay.Result lastLos;
+    boolean physicalOcclusion(){return lastLos!=null && (lastLos.reason()==NpcSightRay.Reason.BLOCK || lastLos.reason()==NpcSightRay.Reason.LEAF_LIMIT);}
     public String losDiagnostics(){return lastLos==null?"NOT_CHECKED":lastLos.toString();}
     public Los los(PathfinderMob npc,Vec3 point,boolean active) {
         lastLos=NpcSightRay.trace(npc,npc.getEyePosition(),point,active);
